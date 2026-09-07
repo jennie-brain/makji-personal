@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKJI 빵마켓 - 금융현황과 빵 배당</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f5f1eb;
+            --color-green: #2d5a4f;
+            --color-black: #1a1a1a;
+            --color-lime: #c4d962;
+            --color-up: #4ade80;
+            --color-down: #f97979;
+            --color-gray: #9ca3af;
+            --color-light-gray: #e5e7eb;
+            --font-size-xl: 28px;
+            --font-size-lg: 20px;
+            --font-size-md: 16px;
+            --font-size-sm: 14px;
+            --font-size-xs: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--color-black);
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        .phone-frame {
+            width: 402px;
+            height: 874px;
+            background: var(--bg-primary);
+            border-radius: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            font-size: var(--font-size-xs);
+            color: var(--color-black);
+            background: var(--bg-primary);
+            font-weight: 600;
+        }
+
+        .screen-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 60px;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            min-height: 100%;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--color-light-gray);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            padding: 8px;
+            font-size: var(--font-size-xs);
+            color: var(--color-gray);
+            transition: all 0.2s;
+        }
+
+        .tab-item.active {
+            color: var(--color-green);
+            font-weight: 600;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Dev Controls */
+        .dev-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .dev-btn {
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .dev-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .flow-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 200;
+            overflow: auto;
+            padding: 40px;
+        }
+
+        .flow-view.active {
+            display: block;
+        }
+
+        .flow-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--color-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 201;
+        }
+
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .flow-screen {
+            aspect-ratio: 9 / 16;
+            border: 2px solid var(--color-light-gray);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .flow-screen:hover {
+            border-color: var(--color-green);
+            box-shadow: 0 8px 24px rgba(45, 90, 79, 0.15);
+        }
+
+        .flow-screen iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        .flow-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Sections */
+        .section-title {
+            font-size: var(--font-size-md);
+            font-weight: 600;
+            color: var(--color-black);
+            margin: 20px 0 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--color-light-gray);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: var(--font-size-md);
+            font-weight: 600;
+        }
+
+        .ticker {
+            font-size: var(--font-size-xs);
+            color: var(--color-gray);
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: var(--font-size-sm);
+        }
+
+        .metric-label {
+            color: var(--color-gray);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--color-black);
+        }
+
+        .change-up {
+            color: var(--color-up);
+        }
+
+        .change-down {
+            color: var(--color-down);
+        }
+
+        /* MAKJI Index */
+        .makji-index {
+            background: linear-gradient(135deg, var(--color-green) 0%, #3d6b5f 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .makji-index-value {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 12px 0;
+        }
+
+        .makji-index-status {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            opacity: 0.95;
+            margin: 8px 0;
+        }
+
+        .makji-index-description {
+            font-size: var(--font-size-sm);
+            opacity: 0.85;
+            margin-top: 12px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--color-green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: var(--font-size-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #1f4239;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--color-green);
+            border: 2px solid var(--color-green);
+        }
+
+        .btn-secondary:hover {
+            background: #f5f1eb;
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            font-size: var(--font-size-sm);
+            width: auto;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 150;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 40px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--color-black);
+        }
+
+        /* Input */
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-black);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 1px solid var(--color-light-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--color-green);
+            background: #fafaf8;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--color-green);
+        }
+
+        .checkbox-item input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: var(--color-green);
+        }
+
+        /* Charts */
+        .mini-chart {
+            width: 100%;
+            height: 40px;
+            margin: 12px 0;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding: 20px 0;
+            border-top: 1px solid var(--color-light-gray);
+            border-bottom: 1px solid var(--color-light-gray);
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--color-green);
+            border-radius: 4px 4px 0 0;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .chart-bar:hover {
+            opacity: 1;
+        }
+
+        .pie-chart {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-sm);
+        }
+
+        th {
+            background: #f0f0f0;
+            padding: 8px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-gray);
+            border: none;
+        }
+
+        td {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--color-light-gray);
+        }
+
+        /* Utility */
+        .flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-sm {
+            font-size: var(--font-size-sm);
+            color: var(--color-gray);
+        }
+
+        .text-highlight {
+            font-weight: 600;
+            color: var(--color-green);
+        }
+
+        .badge {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            color: var(--color-gray);
+        }
+
+        .badge-primary {
+            background: var(--color-lime);
+            color: var(--color-green);
+        }
+
+        .countdown {
+            background: white;
+            border: 2px dashed var(--color-green);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .countdown-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--color-green);
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: var(--font-size-xs);
+            color: var(--color-gray);
+            margin-top: 4px;
+        }
+
+        .health-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .stat-item {
+            background: #f9f8f6;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-xs);
+            color: var(--color-gray);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            color: var(--color-black);
+        }
+
+        .disclaimer {
+            font-size: var(--font-size-xs);
+            color: var(--color-gray);
+            text-align: center;
+            padding: 16px;
+            margin-top: 20px;
+            border-top: 1px solid var(--color-light-gray);
+            line-height: 1.6;
+        }
+
+        .streek {
+            background: var(--color-lime);
+            color: var(--color-green);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin: 12px 0;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container {
+                background: #e5e5e5;
+            }
+
+            .phone-frame {
+                box-shadow: 0 40px 120px rgba(0, 0, 0, 0.2);
+            }
+
+            .dev-controls {
+                bottom: 40px;
+                right: 40px;
+            }
+        }
+
+        /* Scrollbar */
+        .screen-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .screen-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .screen-content::-webkit-scrollbar-thumb {
+            background: var(--color-gray);
+            border-radius: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="phone-frame">
+            <div class="status-bar">
+                <span id="statusTime">9:41</span>
+                <span>●●●●●</span>
+            </div>
+
+            <div class="screen-content" id="screenContent">
+                <!-- Screen 1: Onboarding -->
+                <div class="screen active" id="screen-onboarding">
+                    <div style="text-align: center; margin: 40px 0 30px;">
+                        <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">MAKJI</h1>
+                        <p style="color: var(--color-gray); font-size: var(--font-size-md);">빵마켓</p>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <div class="input-group">
+                            <div class="input-label">📊 관심 금융시장을 선택해주세요</div>
+                            <p style="font-size: var(--font-size-xs); color: var(--color-gray); margin-bottom: 12px;">실제 계좌는 연결하지 않아요. 관심 있는 시장만 골라주세요.</p>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="market" value="kospi"> 국내주식 (KOSPI)
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="market" value="kosdaq"> 국내주식 (KOSDAQ)
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="market" value="us"> 미국주식 (NASDAQ)
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="market" value="forex"> 환율 (USD/KRW)
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="market" value="btc"> 비트코인
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="market" value="gold"> 금
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <div class="input-group">
+                            <div class="input-label">🍞 빵 목표를 선택해주세요</div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="breadGoal" value="low-sugar"> 저당
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="breadGoal" value="high-protein"> 고단백
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="breadGoal" value="gluten-free"> 글루텐프리
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="breadGoal" value="taste"> 맛
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="breadGoal" value="value"> 가성비
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <div class="input-group">
+                            <div class="input-label">💰 투자 캐릭터를 선택해주세요</div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="radio" name="investType" value="safe"> 안정형 - 위험을 최소화
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="radio" name="investType" value="growth"> 성장형 - 수익성 추구
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="radio" name="investType" value="theme"> 테마형 - 특정 시장에 집중
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 30px;">
+                        <div class="input-group">
+                            <div class="input-label">🚫 제외 식재료 (선택사항)</div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exclude" value="wheat"> 밀
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exclude" value="egg"> 계란
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exclude" value="dairy"> 유제품
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exclude" value="nuts"> 견과류
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="completeOnboarding()">시작하기</button>
+                </div>
+
+                <!-- Screen 2: Home Today -->
+                <div class="screen" id="screen-home">
+                    <div class="flex" style="margin-bottom: 20px;">
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--color-gray);">오늘</div>
+                            <div id="todayDate" style="font-size: var(--font-size-lg); font-weight: 700;">2026년 9월 7일</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: var(--font-size-xs); color: var(--color-gray);">연속 방문</div>
+                            <div style="font-size: var(--font-size-lg); font-weight: 700;">7일 🔥</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <div class="section-title">관심시장 미니 틱커</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div id="miniTicker" style="grid-column: 1 / -1;"></div>
+                        </div>
+                    </div>
+
+                    <div class="makji-index">
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9;">막지수</div>
+                        <div class="makji-index-value">38</div>
+                        <div class="makji-index-status">방어장</div>
+                        <div class="makji-index-description">
+                            "나스닥은 쉬어가고, 금은 몸을 풀었습니다."
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">오늘 시장 분석</div>
+                        <p style="font-size: var(--font-size-sm); color: var(--color-gray); line-height: 1.6; margin-bottom: 12px;">
+                            KOSPI 하락과 금 가격 상승으로 오늘은 방어주가 유리해요.
+                        </p>
+                        <div style="font-size: var(--font-size-xs); color: var(--color-gray); font-weight: 600; margin-bottom: 8px;">주요 변동 요인</div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f9f8f6; border-radius: 6px;">
+                                <span>KOSPI</span>
+                                <span class="change-down">-0.82%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f9f8f6; border-radius: 6px;">
+                                <span>금</span>
+                                <span class="change-up">+0.51%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f9f8f6; border-radius: 6px;">
+                                <span>원/달러</span>
+                                <span class="change-up">+0.34%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin: 16px 0;">
+                        <button class="btn btn-secondary btn-small" onclick="showModal('makji-detail')" style="width: 100%;">막지수 상세 보기</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">김막지님의 오늘의 건강주</div>
+                        <p style="font-size: var(--font-size-xs); color: var(--color-gray); margin-bottom: 12px;">
+                            안정형 성향과 저당 목표를 반영했어요. 오늘 방어장과 가장 잘 맞는 건강주예요.
+                        </p>
+                        <div style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f6 100%); border-radius: 12px; padding: 16px; border: 2px solid var(--color-up);">
+                            <div class="flex" style="margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-weight: 700; font-size: var(--font-size-lg);">ZERO 카스테라</div>
+                                    <div class="text-sm">경기방어주</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="change-up" style="font-size: var(--font-size-lg); font-weight: 700;">+8.4%</div>
+                                    <div class="badge">추천 1위</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="countdown">
+                        <div class="countdown-value" id="marketCountdown">03:12:44</div>
+                        <div class="countdown-label">장 마감까지</div>
+                    </div>
+
+                    <button class="btn" onclick="navigateTo('health-stocks')">10,000 빵가루 투자하기</button>
+
+                    <div class="disclaimer">
+                        본 서비스는 금융상품 투자 권유 또는 중개 서비스가 아닙니다. 시장 데이터와 수익률은 게임형 콘텐츠를 위한 예시이며, 실제 금융계좌와 연결되지 않습니다.
+                    </div>
+                </div>
+
+                <!-- Screen 3: MAKJI Index Detail -->
+                <div class="screen" id="screen-makji-detail">
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">←</button>
+                        <h2 style="font-size: var(--font-size-lg); font-weight: 700; margin-top: 8px;">막지수 상세</h2>
+                    </div>
+
+                    <div class="makji-index">
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9;">현재 막지수</div>
+                        <div class="makji-index-value">38</div>
+                        <div class="makji-index-status">방어장</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">일중 추이</div>
+                        <svg class="mini-chart" viewBox="0 0 300 60" xmlns="http://www.w3.org/2000/svg">
+                            <polyline points="0,45 30,42 60,48 90,40 120,35 150,38 180,36 210,42 240,38 270,40 300,38" fill="none" stroke="var(--color-green)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                            <circle cx="300" cy="38" r="4" fill="var(--color-green)"/>
+                        </svg>
+                    </div>
+
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>지표</th>
+                                    <th>현재</th>
+                                    <th>변동</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>KOSPI</td>
+                                    <td>2,732.18</td>
+                                    <td class="change-down">-0.82%</td>
+                                </tr>
+                                <tr>
+                                    <td>KOSDAQ</td>
+                                    <td>862.41</td>
+                                    <td class="change-down">-1.14%</td>
+                                </tr>
+                                <tr>
+                                    <td>NASDAQ</td>
+                                    <td>17,127.66</td>
+                                    <td class="change-down">-1.20%</td>
+                                </tr>
+                                <tr>
+                                    <td>원/달러</td>
+                                    <td>1,376.40</td>
+                                    <td class="change-up">+0.34%</td>
+                                </tr>
+                                <tr>
+                                    <td>비트코인</td>
+                                    <td>-</td>
+                                    <td class="change-up">+0.80%</td>
+                                </tr>
+                                <tr>
+                                    <td>금</td>
+                                    <td>-</td>
+                                    <td class="change-up">+0.51%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">가중치</div>
+                        <svg class="pie-chart" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--color-green)" stroke-width="12" stroke-dasharray="39.27 314" stroke-dashoffset="0"/>
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#7ec582" stroke-width="12" stroke-dasharray="23.56 314" stroke-dashoffset="-39.27"/>
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#b3d977" stroke-width="12" stroke-dasharray="31.4 314" stroke-dashoffset="-62.83"/>
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#c4d962" stroke-width="12" stroke-dasharray="23.56 314" stroke-dashoffset="-94.23"/>
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#d9e374" stroke-width="12" stroke-dasharray="23.56 314" stroke-dashoffset="-117.79"/>
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#e8ecac" stroke-width="12" stroke-dasharray="15.7 314" stroke-dashoffset="-141.35"/>
+                        </svg>
+                        <div style="font-size: var(--font-size-xs); color: var(--color-gray); text-align: center; margin-top: 12px;">
+                            <div>KOSPI 25% | KOSDAQ 15% | 원/달러 20%</div>
+                            <div>NASDAQ 15% | 비트코인 15% | 금 10%</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">산정 방식</div>
+                        <p style="font-size: var(--font-size-sm); color: var(--color-gray); line-height: 1.6;">
+                            막지수는 6개 금융시장의 변동을 가중평균으로 계산한 지수입니다. 0부터 100까지의 범위로 시장의 공격성과 방어성을 표현합니다.
+                        </p>
+                        <div style="margin-top: 12px; padding: 12px; background: #f9f8f6; border-left: 3px solid var(--color-lime); border-radius: 4px;">
+                            <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--color-green); margin-bottom: 4px;">0~30: 강한 방어장</div>
+                            <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--color-green); margin-bottom: 4px;">31~45: 방어장</div>
+                            <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--color-green); margin-bottom: 4px;">46~55: 눈치보기장</div>
+                            <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--color-green); margin-bottom: 4px;">56~70: 성장장</div>
+                            <div style="font-size: var(--font-size-xs); font-weight: 600; color: var(--color-green);">71~100: 강한 성장장</div>
+                        </div>
+                    </div>
+
+                    <div class="text-sm" style="text-align: center; margin-top: 16px;">
+                        기준시각: 오늘 09:41 KST
+                    </div>
+                </div>
+
+                <!-- Screen 4: Health Stocks List -->
+                <div class="screen" id="screen-health-stocks">
+                    <div style="margin-bottom: 20px;">
+                        <h2 style="font-size: var(--font-size-lg); font-weight: 700;">오늘의 건강주</h2>
+                        <p class="text-sm" style="margin-top: 4px;">당신의 성향에 맞는 추천 종목</p>
+                    </div>
+
+                    <div id="healthStocksList"></div>
+
+                    <div class="disclaimer">
+                        본 서비스는 금융상품 투자 권유 또는 중개 서비스가 아닙니다.
+                    </div>
+                </div>
+
+                <!-- Screen 5: Health Stock Detail -->
+                <div class="screen" id="screen-stock-detail">
+                    <div style="margin-bottom: 20px;">
+                        <button onclick="navigateTo('health-stocks')" style="background: none; border: none; font-size: 24px; cursor: pointer;">←</button>
+                    </div>
+
+                    <div id="stockDetailContent"></div>
+
+                    <div class="disclaimer">
+                        본 서비스는 금융상품 투자 권유 또는 중개 서비스가 아닙니다.
+                    </div>
+                </div>
+
+                <!-- Screen 6: Purchase Complete -->
+                <div class="screen" id="screen-purchase-complete">
+                    <div style="text-align: center; margin: 60px 0;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">✓</div>
+                        <h2 style="font-size: var(--font-size-lg); font-weight: 700; margin-bottom: 8px;" id="completeTitle">ZERO 매수 완료</h2>
+                        <p style="color: var(--color-gray); margin-bottom: 20px;">장바구니가 아니라 빵 계좌에 담았어요.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="metric">
+                            <span class="metric-label">매수 종목</span>
+                            <span class="metric-value" id="completeStock">ZERO 카스테라</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">투자 금액</span>
+                            <span class="metric-value">10,000 빵가루</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">시간</span>
+                            <span class="metric-value">09:41</span>
+                        </div>
+                    </div>
+
+                    <div class="countdown" style="border-style: solid; border-color: var(--color-green);">
+                        <div class="countdown-value" id="completionCountdown">03:12:44</div>
+                        <div class="countdown-label">장 마감까지 기다리는 중</div>
+                    </div>
+
+                    <p style="font-size: var(--font-size-sm); color: var(--color-gray); text-align: center; line-height: 1.6; margin: 20px 0;">
+                        장 마감 후 수익률과 빵 배당을 확인하세요.
+                    </p>
+
+                    <button class="btn" onclick="navigateTo('home')">홈으로 돌아가기</button>
+                </div>
+
+                <!-- Screen 7: Market Close Result -->
+                <div class="screen" id="screen-market-close">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h2 style="font-size: var(--font-size-lg); font-weight: 700; margin-bottom: 8px;">장 마감</h2>
+                        <p class="text-sm">오늘의 결과를 확인하세요</p>
+                    </div>
+
+                    <div class="makji-index">
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9;">마감 막지수</div>
+                        <div class="makji-index-value">31</div>
+                        <div class="makji-index-status">방어장</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">당신의 수익 결과</div>
+                        <div style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f6 100%); border-radius: 12px; padding: 16px; border: 2px solid var(--color-up);">
+                            <div class="flex" style="margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-weight: 700; font-size: var(--font-size-lg);">ZERO 카스테라</div>
+                                    <div class="text-sm">당신의 선택</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="change-up" style="font-size: var(--font-size-lg); font-weight: 700;">+8.2%</div>
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 12px; margin-top: 12px;">
+                                <div class="metric" style="padding: 0;">
+                                    <span class="metric-label">획득 빵가루</span>
+                                    <span class="metric-value change-up">+820</span>
+                                </div>
+                                <div class="metric" style="padding: 0;">
+                                    <span class="metric-label">현재 총 빵가루</span>
+                                    <span class="metric-value">10,820</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">빵 배당 🍞</div>
+                        <div style="background: #fff9e6; border-radius: 12px; padding: 16px; border: 2px solid var(--color-lime); text-align: center;">
+                            <div style="font-size: var(--font-size-lg); font-weight: 700; margin-bottom: 4px;">ZERO 카스테라</div>
+                            <div style="color: var(--color-green); font-weight: 600;">7% 할인 쿠폰</div>
+                        </div>
+                    </div>
+
+                    <div class="streek">
+                        🔥 연속 참여 7일 달성!
+                    </div>
+
+                    <div style="margin: 20px 0;">
+                        <div class="input-label" style="margin-bottom: 8px;">SNS에 공유하기</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <button class="btn btn-secondary" style="padding: 10px;">📱 카톡</button>
+                            <button class="btn btn-secondary" style="padding: 10px;">X</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 16px; padding: 12px; background: #f9f8f6; border-radius: 8px; border-left: 3px solid var(--color-lime);">
+                        <div style="font-size: var(--font-size-xs); color: var(--color-gray); margin-bottom: 4px;">공유 문구</div>
+                        <div style="font-size: var(--font-size-sm); font-weight: 600; color: var(--color-black);">주식은 물려도 빵은 벌었다. 💰</div>
+                        <div style="font-size: var(--font-size-xs); color: var(--color-gray); margin-top: 4px;">오늘 내 빵 계좌 +8.2% 🥖</div>
+                    </div>
+
+                    <button class="btn" onclick="navigateTo('store')">MAKJI 제품 구매하기</button>
+                    <button class="btn btn-secondary" style="margin-top: 12px;" onclick="navigateTo('home')">내일 또 만나요!</button>
+                </div>
+
+                <!-- Screen 8: Bread Account -->
+                <div class="screen" id="screen-bread-account">
+                    <div style="margin-bottom: 20px;">
+                        <h2 style="font-size: var(--font-size-lg); font-weight: 700;">내 빵 계좌</h2>
+                        <p class="text-sm">가상 콘텐츠입니다</p>
+                    </div>
+
+                    <div class="makji-index">
+                        <div style="font-size: var(--font-size-sm); opacity: 0.9;">보유 빵가루</div>
+                        <div class="makji-index-value">10,820</div>
+                        <div class="makji-index-description">
+                            이번 주 가상 수익률 +8.2%
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">참여 기록</div>
+                        <div class="metric">
+                            <span class="metric-label">연속 참여일</span>
+                            <span class="metric-value">7일 🔥</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">총 수익률</span>
+                            <span class="metric-value change-up">+8.2%</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">획득 배당</span>
+                            <span class="metric-value">3개</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">보유 건강주</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f9f8f6; border-radius: 6px;">
+                                <div>
+                                    <div style="font-weight: 600;">ZERO 카스테라</div>
+                                    <div class="text-sm">1주</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="change-up" style="font-weight: 600;">+8.2%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">받은 배당</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="padding: 12px; background: #fff9e6; border-radius: 8px; border-left: 3px solid var(--color-lime);">
+                                <div style="font-weight: 600; margin-bottom: 4px;">ZERO 카스테라</div>
+                                <div style="font-size: var(--font-size-sm); color: var(--color-green);">7% 할인 쿠폰</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="navigateTo('settings')" style="margin-top: 20px;">개인화 설정 변경</button>
+
+                    <div class="disclaimer">
+                        본 서비스는 금융상품 투자 권유 또는 중개 서비스가 아닙니다. 시장 데이터와 수익률은 게임형 콘텐츠를 위한 예시입니다.
+                    </div>
+                </div>
+
+                <!-- Screen 9: Settings -->
+                <div class="screen" id="screen-settings">
+                    <div style="margin-bottom: 20px;">
+                        <h2 style="font-size: var(--font-size-lg); font-weight: 700;">설정</h2>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">내 프로필</div>
+                        <div class="metric">
+                            <span class="metric-label">이름</span>
+                            <span class="metric-value">김막지</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">투자 캐릭터</span>
+                            <span class="metric-value" id="settingsInvestType">안정형</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">관심 시장</div>
+                        <div id="settingsMarkets"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title" style="margin: 0 0 12px 0;">빵 목표</div>
+                        <div id="settingsBreadGoals"></div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="resetOnboarding()" style="margin-top: 20px;">설정 초기화</button>
+                </div>
+            </div>
+
+            <div class="tab-bar">
+                <div class="tab-item active" onclick="navigateTo('home')">
+                    <div class="tab-icon">📊</div>
+                    <div>오늘</div>
+                </div>
+                <div class="tab-item" onclick="navigateTo('health-stocks')">
+                    <div class="tab-icon">🥖</div>
+                    <div>건강주</div>
+                </div>
+                <div class="tab-item" onclick="navigateTo('bread-account')">
+                    <div class="tab-icon">💰</div>
+                    <div>빵 계좌</div>
+                </div>
+                <div class="tab-item" onclick="navigateTo('settings')">
+                    <div class="tab-icon">⚙️</div>
+                    <div>설정</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="makji-detail-modal">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="makji-detail"></div>
+        </div>
+    </div>
+
+    <!-- Dev Controls -->
+    <div class="dev-controls">
+        <button class="dev-btn" onclick="changeMarketState('morning')">오전</button>
+        <button class="dev-btn" onclick="changeMarketState('trading')">장중</button>
+        <button class="dev-btn" onclick="changeMarketState('close')">마감</button>
+        <button class="dev-btn" onclick="toggleFlowView()">플로우</button>
+    </div>
+
+    <!-- Flow View -->
+    <div class="flow-view" id="flowView">
+        <button class="flow-close" onclick="toggleFlowView()">×</button>
+        <h1 style="text-align: center; margin-bottom: 40px; font-size: 28px;">사용자 흐름 (클릭하여 상세 보기)</h1>
+        <div class="flow-grid">
+            <div class="flow-screen" onclick="navigateTo('onboarding'); toggleFlowView();">
+                <div class="flow-label">온보딩</div>
+            </div>
+            <div class="flow-screen" onclick="navigateTo('home'); toggleFlowView();">
+                <div class="flow-label">오늘의 막지수</div>
+            </div>
+            <div class="flow-screen" onclick="navigateTo('health-stocks'); toggleFlowView();">
+                <div class="flow-label">건강주 추천</div>
+            </div>
+            <div class="flow-screen" onclick="navigateTo('stock-detail'); toggleFlowView();">
+                <div class="flow-label">종목 상세</div>
+            </div>
+            <div class="flow-screen" onclick="navigateTo('purchase-complete'); toggleFlowView();">
+                <div class="flow-label">투자 완료</div>
+            </div>
+            <div class="flow-screen" onclick="navigateTo('market-close'); toggleFlowView();">
+                <div class="flow-label">장 마감</div>
+            </div>
+            <div class="flow-screen" onclick="navigateTo('bread-account'); toggleFlowView();">
+                <div class="flow-label">빵 배당</div>
+            </div>
+            <div class="flow-screen" onclick="navigateTo('store'); toggleFlowView();">
+                <div class="flow-label">제품 구매</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        const appState = {
+            onboarded: false,
+            marketState: 'morning', // morning, trading, close
+            selectedMarkets: [],
+            breadGoals: [],
+            investType: 'safe',
+            excludedIngredients: [],
+            breadCrumbs: 10000,
+            investmentHistory: [],
+            name: '김막지',
+            consecutiveDays: 7
+        };
+
+        const healthStocks = [
+            {
+                id: 'zero',
+                name: 'ZERO 카스테라',
+                ticker: 'ZERO',
+                type: '경기방어주',
+                change: 8.4,
+                features: ['저당', '밀가루 0%'],
+                description: '안정형 성향과 저당 목표를 반영했어요. 오늘 방어장과 가장 잘 맞는 건강주예요.',
+                signals: ['시장 하락', '금 가격 상승'],
+                nutritionLabel: {
+                    sugar: '0g',
+                    protein: '5g',
+                    calories: '180kcal',
+                    glutenFree: true,
+                    wheat: false
+                },
+                dividend: 'ZERO 카스테라 7% 쿠폰',
+                expectedReturn: 8.2
+            },
+            {
+                id: 'pro',
+                name: '프로틴 머핀',
+                ticker: 'PRO',
+                type: '성장주',
+                change: 3.7,
+                features: ['고단백'],
+                description: '성장 시장에 강한 추천 종목입니다.',
+                signals: ['KOSDAQ', 'NASDAQ'],
+                nutritionLabel: {
+                    sugar: '8g',
+                    protein: '15g',
+                    calories: '280kcal',
+                    glutenFree: false,
+                    wheat: true
+                },
+                dividend: '프로틴 머핀 5% 쿠폰',
+                expectedReturn: 3.7
+            },
+            {
+                id: 'jpy',
+                name: '말차 마들렌',
+                ticker: 'JPY',
+                type: '환율 테마주',
+                change: -1.2,
+                features: ['디저트'],
+                description: '엔화 환율 변동과 연계된 테마주입니다.',
+                signals: ['엔화 환율'],
+                nutritionLabel: {
+                    sugar: '12g',
+                    protein: '3g',
+                    calories: '240kcal',
+                    glutenFree: false,
+                    wheat: true
+                },
+                dividend: '말차 마들렌 3% 쿠폰',
+                expectedReturn: -1.2
+            },
+            {
+                id: 'div',
+                name: '저당 모닝롤',
+                ticker: 'DIV',
+                type: '배당주',
+                change: 2.1,
+                features: ['저당', '가성비'],
+                description: '안정적인 수익을 기대할 수 있는 배당주입니다.',
+                signals: ['금리', '시장 횡보'],
+                nutritionLabel: {
+                    sugar: '2g',
+                    protein: '6g',
+                    calories: '150kcal',
+                    glutenFree: false,
+                    wheat: false
+                },
+                dividend: '저당 모닝롤 6% 쿠폰',
+                expectedReturn: 2.1
+            },
+            {
+                id: 'safe',
+                name: '글루텐프리 스콘',
+                ticker: 'SAFE',
+                type: '안정주',
+                change: 1.5,
+                features: ['글루텐프리'],
+                description: '변동성이 낮은 안정적인 선택입니다.',
+                signals: ['시장 변동성'],
+                nutritionLabel: {
+                    sugar: '5g',
+                    protein: '4g',
+                    calories: '200kcal',
+                    glutenFree: true,
+                    wheat: false
+                },
+                dividend: '글루텐프리 스콘 4% 쿠폰',
+                expectedReturn: 1.5
+            }
+        ];
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadState();
+            updateClock();
+            updateCountdown();
+            if (appState.onboarded) {
+                navigateTo('home');
+            } else {
+                navigateTo('onboarding');
+            }
+        });
+
+        setInterval(updateClock, 1000);
+        setInterval(updateCountdown, 1000);
+
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours().toString().padStart(2, '0');
+            let minutes = now.getMinutes().toString().padStart(2, '0');
+            document.querySelector('.status-bar span:first-child').textContent = `${hours}:${minutes}`;
+
+            const dateFormatter = new Intl.DateTimeFormat('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const todayDate = document.getElementById('todayDate');
+            if (todayDate) {
+                todayDate.textContent = dateFormatter.format(now);
+            }
+        }
+
+        // Countdown
+        function updateCountdown() {
+            const countdownElements = document.querySelectorAll('[id*="Countdown"]');
+            countdownElements.forEach(el => {
+                if (appState.marketState === 'morning' || appState.marketState === 'trading') {
+                    const closeTime = new Date();
+                    closeTime.setHours(15, 30, 0);
+                    const now = new Date();
+                    const diff = closeTime - now;
+                    
+                    if (diff > 0) {
+                        const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                        const minutes = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                        const seconds = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                        el.textContent = `${hours}:${minutes}:${seconds}`;
+                    } else {
+                        el.textContent = '00:00:00';
+                    }
+                } else {
+                    el.textContent = '마감됨';
+                }
+            });
+        }
+
+        // Navigation
+        function navigateTo(screenId) {
+            const screenMap = {
+                'onboarding': 'screen-onboarding',
+                'home': 'screen-home',
+                'makji-detail': 'screen-makji-detail',
+                'health-stocks': 'screen-health-stocks',
+                'stock-detail': 'screen-stock-detail',
+                'purchase-complete': 'screen-purchase-complete',
+                'market-close': 'screen-market-close',
+                'bread-account': 'screen-bread-account',
+                'settings': 'screen-settings',
+                'store': 'screen-market-close' // Placeholder
+            };
+
+            const screenId_mapped = screenMap[screenId];
+            if (!screenId_mapped) return;
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId_mapped).classList.add('active');
+
+            // Update tab bar
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            const tabIndex = {
+                'home': 0,
+                'health-stocks': 1,
+                'bread-account': 2,
+                'settings': 3
+            };
+            if (tabIndex[screenId] !== undefined) {
+                document.querySelectorAll('.tab-item')[tabIndex[screenId]].classList.add('active');
+            }
+
+            // Update content when needed
+            if (screenId === 'home') {
+                updateHomeScreen();
+            } else if (screenId === 'health-stocks') {
+                updateHealthStocksList();
+            } else if (screenId === 'stock-detail') {
+                updateStockDetail();
+            } else if (screenId === 'settings') {
+                updateSettings();
+            } else if (screenId === 'bread-account') {
+                updateBreadAccount();
+            }
+
+            document.getElementById('screenContent').scrollTop = 0;
+        }
+
+        // Onboarding
+        function completeOnboarding() {
+            const markets = Array.from(document.querySelectorAll('input[name="market"]:checked')).map(el => el.value);
+            const breadGoals = Array.from(document.querySelectorAll('input[name="breadGoal"]:checked')).map(el => el.value);
+            const investType = document.querySelector('input[name="investType"]:checked');
+            const excludedIngredients = Array.from(document.querySelectorAll('input[name="exclude"]:checked')).map(el => el.value);
+
+            if (markets.length === 0 || breadGoals.length === 0 || !investType) {
+                alert('모든 필수 항목을 선택해주세요.');
+                return;
+            }
+
+            appState.selectedMarkets = markets;
+            appState.breadGoals = breadGoals;
+            appState.investType = investType.value;
+            appState.excludedIngredients = excludedIngredients;
+            appState.onboarded = true;
+
+            saveState();
+            navigateTo('home');
+        }
+
+        // Home Screen
+        function updateHomeScreen() {
+            const miniTicker = document.getElementById('miniTicker');
+            const marketData = {
+                kospi: { name: 'KOSPI', price: '2,732.18', change: -0.82 },
+                kosdaq: { name: 'KOSDAQ', price: '862.41', change: -1.14 },
+                us: { name: 'NASDAQ', price: '17,127.66', change: -1.20 },
+                forex: { name: 'USD/KRW', price: '1,376.40', change: 0.34 },
+                btc: { name: 'Bitcoin', price: '-', change: 0.80 },
+                gold: { name: 'Gold', price: '-', change: 0.51 }
+            };
+
+            let html = '';
+            appState.selectedMarkets.forEach(market => {
+                const data = marketData[market];
+                const changeClass = data.change >= 0 ? 'change-up' : 'change-down';
+                const changeSymbol = data.change >= 0 ? '+' : '';
+                html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 6px; border: 1px solid var(--color-light-gray);">
+                    <span style="font-weight: 600;">${data.name}</span>
+                    <span class="${changeClass}">${changeSymbol}${data.change}%</span>
+                </div>`;
+            });
+            miniTicker.innerHTML = html;
+        }
+
+        // Health Stocks List
+        function updateHealthStocksList() {
+            const container = document.getElementById('healthStocksList');
+            const filtered = healthStocks.filter(stock => {
+                // Filter by bread goals
+                if (stock.id === 'zero' && appState.breadGoals.includes('low-sugar')) return true;
+                if (stock.id === 'pro' && appState.breadGoals.includes('high-protein')) return true;
+                if (stock.id === 'safe' && (appState.investType === 'safe' || appState.breadGoals.includes('low-sugar'))) return true;
+                if (stock.id === 'div' && appState.breadGoals.includes('value')) return true;
+                if (stock.id === 'jpy' && appState.selectedMarkets.includes('forex')) return true;
+                return false;
+            });
+
+            // Ensure ZERO is first
+            const stocks = [healthStocks[0], ...filtered.filter(s => s.id !== 'zero')].slice(0, 3);
+
+            let html = '';
+            stocks.forEach((stock, idx) => {
+                const changeClass = stock.change >= 0 ? 'change-up' : 'change-down';
+                const changeSymbol = stock.change >= 0 ? '+' : '';
+                html += `
+                    <div class="card" onclick="selectStock('${stock.id}')">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${stock.name}</div>
+                                <div class="text-sm">${stock.type}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="${changeClass}" style="font-size: var(--font-size-lg); font-weight: 700;">${changeSymbol}${stock.change}%</span>
+                                ${idx === 0 ? '<div class="badge badge-primary">추천 1위</div>' : ''}
+                            </div>
+                        </div>
+                        <div class="ticker" style="display: inline-block;">${stock.ticker}</div>
+                        <p style="font-size: var(--font-size-sm); color: var(--color-gray); margin: 8px 0;">${stock.description}</p>
+                        <div style="display: flex; gap: 4px; margin-top: 8px;">
+                            ${stock.features.map(f => `<div class="badge">${f}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // Stock Detail
+        function selectStock(stockId) {
+            const stock = healthStocks.find(s => s.id === stockId);
+            appState.selectedStock = stock;
+            navigateTo('stock-detail');
+        }
+
+        function updateStockDetail() {
+            const stock = appState.selectedStock;
+            if (!stock) return;
+
+            const container = document.getElementById('stockDetailContent');
+            const changeClass = stock.change >= 0 ? 'change-up' : 'change-down';
+            const changeSymbol = stock.change >= 0 ? '+' : '';
+
+            html = `
+                <div style="margin-bottom: 20px;">
+                    <h2 style="font-size: var(--font-size-lg); font-weight: 700;">${stock.name}</h2>
+                    <div class="text-sm" style="margin-top: 4px;">${stock.type}</div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, var(--color-green) 0%, #3d6b5f 100%); color: white; border-radius: 16px; padding: 24px; margin-bottom: 16px; text-align: center;">
+                    <div style="font-size: var(--font-size-sm); opacity: 0.9;">현재 가상 가격</div>
+                    <div style="font-size: 48px; font-weight: 700; line-height: 1; margin: 12px 0;">10,000₩</div>
+                    <div class="${changeClass}" style="font-size: var(--font-size-lg); font-weight: 700;">${changeSymbol}${stock.change}%</div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title" style="margin: 0 0 12px 0;">일중 추이</div>
+                    <svg class="mini-chart" viewBox="0 0 300 60" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="0,45 30,42 60,48 90,40 120,35 150,38 180,36 210,42 240,38 270,40 300,${stock.change >= 0 ? 30 : 45}" fill="none" stroke="var(--color-green)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                        <circle cx="300" cy="${stock.change >= 0 ? 30 : 45}" r="4" fill="var(--color-green)"/>
+                    </svg>
+                </div>
+
+                <div class="card">
+                    <div class="section-title" style="margin: 0 0 12px 0;">영양 공시</div>
+                    <div class="health-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">당류</div>
+                            <div class="stat-value">${stock.nutritionLabel.sugar}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">단백질</div>
+                            <div class="stat-value">${stock.nutritionLabel.protein}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">열량</div>
+                            <div class="stat-value">${stock.nutritionLabel.calories}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">글루텐</div>
+                            <div class="stat-value">${stock.nutritionLabel.glutenFree ? '무' : '함'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title" style="margin: 0 0 12px 0;">제품 표시사항</div>
+                    <div class="metric">
+                        <span class="metric-label">제조일</span>
+                        <span class="metric-value">본일</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">유통기한</span>
+                        <span class="metric-value">7일</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">원산지</span>
+                        <span class="metric-value">대한민국</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title" style="margin: 0 0 12px 0;">선정 이유</div>
+                    <p style="font-size: var(--font-size-sm); color: var(--color-gray); line-height: 1.6;">
+                        ${stock.description}
+                    </p>
+                    <div style="margin-top: 12px;">
+                        ${stock.signals.map(s => `<div class="badge" style="display: inline-block; margin: 4px 4px 4px 0;">${s}</div>`).join('')}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title" style="margin: 0 0 12px 0;">예상 배당</div>
+                    <div style="background: #fff9e6; border-radius: 12px; padding: 16px; border: 2px solid var(--color-lime); text-align: center;">
+                        <div style="color: var(--color-green); font-weight: 600;">${stock.dividend}</div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="investStock('${stock.id}')">10,000 빵가루로 매수</button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Investment
+        function investStock(stockId) {
+            appState.investmentHistory.push({
+                stockId: stockId,
+                breadCrumbs: 10000,
+                timestamp: new Date(),
+                status: 'pending'
+            });
+            
+            const stock = healthStocks.find(s => s.id === stockId);
+            document.getElementById('completeTitle').textContent = `${stock.name} 매수 완료`;
+            document.getElementById('completeStock').textContent = stock.name;
+            
+            navigateTo('purchase-complete');
+        }
+
+        // Market State
+        function changeMarketState(state) {
+            appState.marketState = state;
+            if (state === 'close') {
+                navigateTo('market-close');
+            } else {
+                navigateTo('home');
+            }
+        }
+
+        // Bread Account
+        function updateBreadAccount() {
+            const container = document.getElementById('screen-bread-account');
+            // Already static for now
+        }
+
+        // Settings
+        function updateSettings() {
+            const investTypeMap = { safe: '안정형', growth: '성장형', theme: '테마형' };
+            const marketMap = {
+                kospi: '국내주식 (KOSPI)',
+                kosdaq: '국내주식 (KOSDAQ)',
+                us: '미국주식 (NASDAQ)',
+                forex: '환율 (USD/KRW)',
+                btc: '비트코인',
+                gold: '금'
+            };
+            const breadGoalMap = {
+                'low-sugar': '저당',
+                'high-protein': '고단백',
+                'gluten-free': '글루텐프리',
+                'taste': '맛',
+                'value': '가성비'
+            };
+
+            document.getElementById('settingsInvestType').textContent = investTypeMap[appState.investType];
+            
+            let marketsHtml = '';
+            appState.selectedMarkets.forEach(market => {
+                marketsHtml += `<div class="metric"><span class="metric-label">-</span><span class="metric-value">${marketMap[market]}</span></div>`;
+            });
+            document.getElementById('settingsMarkets').innerHTML = marketsHtml;
+
+            let breadGoalsHtml = '';
+            appState.breadGoals.forEach(goal => {
+                breadGoalsHtml += `<div class="metric"><span class="metric-label">-</span><span class="metric-value">${breadGoalMap[goal]}</span></div>`;
+            });
+            document.getElementById('settingsBreadGoals').innerHTML = breadGoalsHtml;
+        }
+
+        // Modal
+        function showModal(modalId) {
+            const modal = document.getElementById(`${modalId}-modal`);
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        }
+
+        // Flow View
+        function toggleFlowView() {
+            document.getElementById('flowView').classList.toggle('active');
+        }
+
+        // Reset
+        function resetOnboarding() {
+            if (confirm('설정을 초기화하시겠습니까?')) {
+                appState.onboarded = false;
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Storage
+        function saveState() {
+            localStorage.setItem('appState', JSON.stringify(appState));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('appState');
+            if (saved) {
+                Object.assign(appState, JSON.parse(saved));
+            }
+        }
+
+        // Close modal on outside click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

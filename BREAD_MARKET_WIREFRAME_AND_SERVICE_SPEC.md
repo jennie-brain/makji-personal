@@ -89,6 +89,28 @@ flowchart TD
 
 ---
 
+### 🎨 캠페인 시각화 (Visual Mockups)
+
+#### [1] 메타(인스타그램) 피드 광고 소재 디자인
+<p align="center">
+  <img src="docs/images/meta_ad_creative.jpg" width="450" alt="메타 피드 광고 소재 디자인">
+</p>
+
+* **광고 후킹 전략:** 금융 시장의 차가운 파란색 하락 차트와 따뜻하고 달콤한 초코케이크의 강렬한 비주얼 대비를 통해 인스타그램 스크롤 정지율(Thumb-stopping)을 극대화.
+
+#### [2] 모바일 이벤트 랜딩 페이지 UI 디자인
+<p align="center">
+  <img src="docs/images/bread_prescription_ui.jpg" width="380" alt="모바일 이벤트 랜딩 페이지 UI">
+</p>
+
+* **UI/UX 설계 포인트:**
+  * 상단 실시간 KOSPI & 환율 티커 바
+  * '우울해서 빵 샀어' 인터랙티브 감정 진단 카드
+  * 의사 처방전 스타일의 티켓형 7% 헷지 쿠폰 및 영양 성분(당류 0g, 순탄수 4g) 강조
+  * 자사몰 직행 원클릭 CTA 버튼
+
+---
+
 ## 4. 화면별 마크다운 와이어프레임 (Wireframe)
 
 ---
