@@ -143,12 +143,14 @@ MAKJI 자사몰은 정적인 가격 구조로 인해 고객이 매일 방문할 
 ├── BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md
 ├── index.html
 └── research/
+    ├── MAKJI_STRATEGIC_ANALYSIS_2026.md
     ├── wellness_bakery_market_research.md
     ├── WELLNESS_BAKERY_DEEP_RESEARCH.md
     └── report-source.md
 ```
 
 - [서비스 기획안 및 와이어프레임](BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md): 사용자 여정, 핵심 기능, 화면별 와이어프레임, 데이터 연동 구조
+- [MAKJI 전략 분석 2026](research/MAKJI_STRATEGIC_ANALYSIS_2026.md): 브랜드 가치제안·포지셔닝·SWOT, 국내 웰니스 베이커리 시장규모와 성장성, 국내외 경쟁사, 금융데이터 프로모션 전략
 - [웰니스 베이커리 시장 리서치](research/wellness_bakery_market_research.md): 시장 동향, 고객 페르소나, 경쟁사 및 유통 채널 분석
 - [글로벌 레퍼런스 비교](research/WELLNESS_BAKERY_DEEP_RESEARCH.md): MAKJI 시장 분석과 국내외 사례 비교
 
