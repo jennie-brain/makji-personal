@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#171a13" />
+  <title>BAKEOUT — 오늘의 건강주</title>
+  <meta name="description" content="진짜 시장 데이터로 움직이는 하루짜리 빵 거래소, 오늘의 건강주 프로토타입" />
+  <style>
+    :root {
+      --ink:#171a13; --paper:#f4f0e6; --cream:#fffaf0; --lime:#d7ff45;
+      --green:#125b43; --red:#ee5c42; --muted:#6f7169; --line:#d8d2c4;
+      --shadow:0 12px 36px rgba(23,26,19,.10); --radius:22px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);background:var(--paper);font-family:Pretendard,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;letter-spacing:-.02em}
+    button{font:inherit;color:inherit} button:focus-visible{outline:3px solid #3880ff;outline-offset:2px}
+    .ticker{height:34px;overflow:hidden;background:var(--ink);color:#fff;font-size:12px;font-weight:750;letter-spacing:.02em;white-space:nowrap}
+    .ticker-track{display:inline-flex;align-items:center;gap:28px;min-width:200%;height:100%;animation:ticker 28s linear infinite}
+    .ticker b{color:var(--lime)} @keyframes ticker{to{transform:translateX(-50%)}}
+    header{height:74px;display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:auto;padding:0 24px;border-bottom:1px solid var(--line)}
+    .brand{font-weight:1000;font-size:23px;letter-spacing:-.07em}.brand i{font-style:normal;color:var(--green)}
+    .status{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:700}.dot{width:8px;height:8px;border-radius:50%;background:#27b56d;box-shadow:0 0 0 6px rgba(39,181,109,.12)}
+    main{max-width:1180px;margin:0 auto;padding:38px 24px 80px}
+    .hero{display:grid;grid-template-columns:1.08fr .92fr;gap:22px;align-items:stretch}
+    .hero-copy{min-height:410px;padding:42px;border-radius:30px;background:var(--green);color:white;position:relative;overflow:hidden}
+    .hero-copy:after{content:"↗";position:absolute;right:-22px;bottom:-75px;color:rgba(255,255,255,.08);font-size:280px;font-weight:900;transform:rotate(-8deg)}
+    .eyebrow{display:inline-flex;gap:8px;align-items:center;padding:7px 12px;border:1px solid rgba(255,255,255,.3);border-radius:999px;font-size:12px;font-weight:800}
+    h1{font-size:clamp(42px,6.5vw,78px);line-height:.94;letter-spacing:-.08em;margin:38px 0 22px;max-width:650px}
+    .hero-copy p{font-size:17px;line-height:1.65;color:rgba(255,255,255,.76);max-width:470px;margin:0}
+    .market-card{border-radius:30px;background:var(--cream);border:1px solid var(--line);padding:26px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .market-top{display:flex;justify-content:space-between;align-items:flex-start}.small{font-size:12px;color:var(--muted);font-weight:700}.market-time{font-size:12px;background:#e8f5e8;color:var(--green);padding:7px 10px;border-radius:999px;font-weight:800}
+    .index{font-size:56px;font-weight:950;letter-spacing:-.06em;margin:10px 0 2px}.down{color:var(--red);font-size:16px;font-weight:850}
+    .chart{height:112px;margin:22px 0 16px;position:relative}
+    .chart svg{width:100%;height:100%;overflow:visible}.chart .grid{stroke:#ded9cd;stroke-dasharray:4 5}.chart .area{fill:url(#area)}.chart .line{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    .signal{margin-top:auto;background:#efeadd;border-radius:18px;padding:15px 16px;display:flex;gap:12px;align-items:center}.signal-icon{font-size:25px}.signal strong{display:block;font-size:14px}.signal span{font-size:12px;color:var(--muted)}
+    .section-title{display:flex;justify-content:space-between;align-items:end;margin:64px 0 20px}.section-title h2{font-size:30px;letter-spacing:-.06em;margin:0}.section-title p{font-size:13px;color:var(--muted);margin:0}
+    .stocks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stock{background:var(--cream);border:2px solid transparent;border-radius:var(--radius);padding:20px;text-align:left;cursor:pointer;transition:.2s;box-shadow:0 5px 16px rgba(23,26,19,.04)}
+    .stock:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.stock.selected{border-color:var(--ink);background:#fff}.stock.selected:after{content:"담기 완료 ✓";display:inline-block;margin-top:15px;padding:6px 9px;border-radius:999px;background:var(--lime);font-size:11px;font-weight:900}
+    .stock-head{display:flex;justify-content:space-between;gap:12px}.symbol{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:25px;background:#eee7d8}.rank{font-size:11px;color:var(--muted);font-weight:800}
+    .stock h3{font-size:19px;margin:16px 0 4px}.ticker-name{font-size:11px;color:var(--muted);letter-spacing:.06em}.price-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:20px}.price{font-size:22px;font-weight:900}.up{color:var(--green);font-weight:900;font-size:13px}
+    .reason{border-top:1px solid var(--line);margin-top:15px;padding-top:13px;font-size:12px;color:var(--muted);line-height:1.5}
+    .order{position:sticky;bottom:18px;margin:26px auto 0;max-width:680px;background:var(--ink);color:white;border-radius:21px;padding:13px 15px 13px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 18px 45px rgba(23,26,19,.24);z-index:5}
+    .order-copy strong{display:block;font-size:14px}.order-copy span{font-size:11px;color:#aaa}.buy{border:0;background:var(--lime);border-radius:14px;padding:13px 19px;font-weight:950;cursor:pointer;white-space:nowrap}.buy:disabled{opacity:.45;cursor:not-allowed}
+    .report{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--cream);padding:25px}.panel h3{font-size:20px;margin:0 0 20px}.nutri{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.nutri div{background:#eee9de;border-radius:13px;text-align:center;padding:14px 4px}.nutri b{display:block;font-size:17px}.nutri span{font-size:10px;color:var(--muted)}
+    .rule{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.rule:last-child{border:0}.rule-num{flex:0 0 28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800}.rule strong{display:block;font-size:13px}.rule span{font-size:11px;color:var(--muted)}
+    .disclaimer{margin-top:38px;text-align:center;color:var(--muted);font-size:11px;line-height:1.6}
+    .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,130px);background:white;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:16px 20px;z-index:20;min-width:310px;transition:.35s}.toast.show{transform:translate(-50%,0)}.toast b{display:block;margin-bottom:3px}.toast span{font-size:12px;color:var(--muted)}
+    .modal{position:fixed;inset:0;background:rgba(23,26,19,.62);display:none;place-items:center;padding:20px;z-index:30}.modal.open{display:grid}.receipt{max-width:390px;width:100%;background:var(--cream);border-radius:28px;padding:29px;text-align:center;box-shadow:var(--shadow)}.receipt .big{font-size:60px}.receipt h2{font-size:28px;margin:10px 0 8px}.receipt p{color:var(--muted);font-size:13px;line-height:1.6}.receipt-line{border-top:1px dashed #aaa;border-bottom:1px dashed #aaa;padding:17px 0;margin:20px 0;display:flex;justify-content:space-between;font-weight:800}.close{width:100%;border:0;border-radius:14px;padding:14px;background:var(--ink);color:white;font-weight:900;cursor:pointer}
+    @media(max-width:760px){header{height:62px;padding:0 16px}.status span:last-child{display:none}main{padding:20px 14px 70px}.hero{grid-template-columns:1fr}.hero-copy{min-height:330px;padding:28px}.hero-copy p{font-size:14px}h1{margin-top:30px}.market-card{padding:21px}.stocks{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}.stock{min-width:80vw;scroll-snap-align:center}.section-title{margin-top:48px;align-items:start}.section-title p{max-width:150px;text-align:right}.report{grid-template-columns:1fr}.order{bottom:10px}.nutri{grid-template-columns:repeat(4,1fr)}.ticker-track{animation-duration:20s}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.ticker-track{animation:none}.stock{transition:none}}
+  </style>
+</head>
+<body>
+  <div class="ticker" aria-label="시장 속보">
+    <div class="ticker-track"><span>KOSPI <b>2,732.18</b> ▼0.82%</span><span>USD/KRW <b>1,376.40</b> ▲0.34%</span><span>GOLD <b>2,418.70</b> ▲0.51%</span><span>BAKEOUT 100 <b>97.4</b> ▼1.80%</span><span>KOSPI <b>2,732.18</b> ▼0.82%</span><span>USD/KRW <b>1,376.40</b> ▲0.34%</span><span>GOLD <b>2,418.70</b> ▲0.51%</span><span>BAKEOUT 100 <b>97.4</b> ▼1.80%</span></div>
+  </div>
+  <header>
+    <div class="brand">BAKE<i>OUT</i></div>
+    <div class="status"><i class="dot"></i><span>빵장 거래 중</span><span id="clock">15:30 마감</span></div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">🥐 오늘의 건강주 · 2026.09.07</span>
+        <h1>주식은 물려도<br>빵은 먹는다.</h1>
+        <p>진짜 시장 신호로 움직이는 하루짜리 빵 거래소. 오늘 오를 건강주를 담고, 장 마감 후 맛있는 배당을 받아보세요.</p>
+      </div>
+      <div class="market-card">
+        <div class="market-top"><div><span class="small">BAKEOUT 100</span><div class="index">97.4</div><div class="down">▼ 1.80% 오늘</div></div><span class="market-time">● MARKET OPEN</span></div>
+        <div class="chart" aria-label="베이크아웃 지수 하락 차트">
+          <svg viewBox="0 0 420 120" preserveAspectRatio="none"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ee5c42" stop-opacity=".25"/><stop offset="1" stop-color="#ee5c42" stop-opacity="0"/></linearGradient></defs><line class="grid" x1="0" y1="30" x2="420" y2="30"/><line class="grid" x1="0" y1="80" x2="420" y2="80"/><path class="area" d="M0,35 C50,28 58,47 103,43 S169,22 211,53 S270,62 309,76 S370,67 420,101 L420,120 L0,120Z"/><path class="line" d="M0,35 C50,28 58,47 103,43 S169,22 211,53 S270,62 309,76 S370,67 420,101"/></svg>
+        </div>
+        <div class="signal"><div class="signal-icon">🛡️</div><div><strong>오늘은 방어주가 유리해요</strong><span>KOSPI 하락 · 금 가격 상승 · 원화 약세</span></div></div>
+      </div>
+    </section>
+
+    <div class="section-title"><h2>오늘 뭘 담을까?</h2><p>매일 10,000 빵가루로<br>한 종목에 모의 투자해요.</p></div>
+    <section class="stocks" id="stocks" aria-label="오늘의 건강주 종목">
+      <button class="stock" data-name="ZERO 카스테라" data-symbol="ZERO" data-emoji="🧁">
+        <div class="stock-head"><span class="symbol">🧁</span><span class="rank">거래량 1위</span></div><h3>ZERO 카스테라</h3><span class="ticker-name">ZERO · 경기방어주</span><div class="price-row"><span class="price">4,280 빵</span><span class="up">▲ 8.4%</span></div><div class="reason">시장 하락 때 강해지는 달콤한 방어주. 오늘의 금 가격 상승 신호를 받았어요.</div>
+      </button>
+      <button class="stock" data-name="프로틴 머핀" data-symbol="PRO" data-emoji="💪">
+        <div class="stock-head"><span class="symbol">💪</span><span class="rank">관심 급등</span></div><h3>프로틴 머핀</h3><span class="ticker-name">PRO · 성장주</span><div class="price-row"><span class="price">3,640 빵</span><span class="up">▲ 3.7%</span></div><div class="reason">KOSDAQ과 함께 뛰는 고단백 성장주. 변동성도 포만감도 큰 편이에요.</div>
+      </button>
+      <button class="stock" data-name="말차 마들렌" data-symbol="JPY" data-emoji="🍵">
+        <div class="stock-head"><span class="symbol">🍵</span><span class="rank">환율 테마</span></div><h3>말차 마들렌</h3><span class="ticker-name">JPY · 엔화 테마주</span><div class="price-row"><span class="price">2,950 빵</span><span class="down">▼ 1.2%</span></div><div class="reason">엔화 흐름에 반응하는 향긋한 테마주. 저가 매수 기회일지도 몰라요.</div>
+      </button>
+    </section>
+
+    <div class="order" aria-live="polite"><div class="order-copy"><strong id="orderName">오늘의 건강주를 골라주세요</strong><span>장 마감까지 <b id="countdown">02:17:42</b></span></div><button class="buy" id="buy" disabled>10,000 빵 담기</button></div>
+
+    <div class="section-title"><h2>종목 리포트</h2><p>가격 신호와 영양정보는<br>서로 구분해 공개합니다.</p></div>
+    <section class="report">
+      <div class="panel"><h3>ZERO 영양 공시</h3><div class="nutri"><div><b>1.5g</b><span>당류</span></div><div><b>4.2g</b><span>단백질</span></div><div><b>118</b><span>kcal</span></div><div><b>0%</b><span>밀가루</span></div><p class="small" style="grid-column:1/-1;line-height:1.6;margin:14px 0 0">* 프로토타입용 예시 수치입니다. 실제 판매 시 제품 시험성적 및 표시사항을 기준으로 제공합니다.</p></div>
+      <div class="panel"><h3>오늘의 산정 규칙</h3><div class="rule"><span class="rule-num">1</span><div><strong>시장 방향 50%</strong><span>KOSPI 전일 대비 등락률</span></div></div><div class="rule"><span class="rule-num">2</span><div><strong>테마 신호 30%</strong><span>환율·금·업종 지수의 공개된 매칭 규칙</span></div></div><div class="rule"><span class="rule-num">3</span><div><strong>빵심 20%</strong><span>전일 이용자 투표와 가상 거래량</span></div></div></div>
+    </section>
+    <p class="disclaimer">본 화면은 서비스 콘셉트 검증용 프로토타입입니다. 표시된 시장·제품 데이터는 시연용 예시이며 투자 권유 또는 건강 효능을 의미하지 않습니다.</p>
+  </main>
+
+  <div class="toast" id="toast"><b>장바구니가 아니라 빵 계좌에 담았어요</b><span>장 마감 후 수익률과 빵 배당을 확인하세요.</span></div>
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="receiptTitle"><div class="receipt"><div class="big" id="receiptEmoji">🧁</div><span class="small">BAKEOUT 체결 알림</span><h2 id="receiptTitle">ZERO 매수 완료!</h2><p>오늘의 시장이 어떻게 끝날까요?<br>15시 30분에 결과와 빵 배당이 공개됩니다.</p><div class="receipt-line"><span>투자금</span><span>10,000 빵가루</span></div><button class="close" id="closeModal">내 빵 계좌 확인하기</button></div></div>
+
+  <script>
+    const stockButtons=[...document.querySelectorAll('.stock')];
+    const buy=document.getElementById('buy'), orderName=document.getElementById('orderName');
+    const modal=document.getElementById('modal'), toast=document.getElementById('toast');
+    let selected=null;
+    stockButtons.forEach(button=>button.addEventListener('click',()=>{
+      stockButtons.forEach(item=>item.classList.remove('selected'));
+      button.classList.add('selected'); selected=button.dataset; buy.disabled=false;
+      orderName.textContent=`${selected.name} 선택됨`; buy.textContent='10,000 빵 담기';
+    }));
+    buy.addEventListener('click',()=>{
+      if(!selected)return;
+      document.getElementById('receiptEmoji').textContent=selected.emoji;
+      document.getElementById('receiptTitle').textContent=`${selected.symbol} 매수 완료!`;
+      modal.classList.add('open'); buy.textContent='체결 완료 ✓'; buy.disabled=true;
+      localStorage.setItem('bakeoutStock',selected.name);
+    });
+    document.getElementById('closeModal').addEventListener('click',()=>{modal.classList.remove('open');toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3500)});
+    modal.addEventListener('click',event=>{if(event.target===modal)modal.classList.remove('open')});
+    function updateClock(){
+      const now=new Date(), close=new Date(); close.setHours(15,30,0,0);
+      if(now>close)close.setDate(close.getDate()+1);
+      const diff=close-now, h=String(Math.floor(diff/36e5)).padStart(2,'0'),m=String(Math.floor(diff%36e5/6e4)).padStart(2,'0'),s=String(Math.floor(diff%6e4/1e3)).padStart(2,'0');
+      document.getElementById('countdown').textContent=`${h}:${m}:${s}`;
+    }
+    updateClock();setInterval(updateClock,1000);
+  </script>
+</body>
+</html>

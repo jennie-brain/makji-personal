@@ -1,5 +1,11 @@
 # MAKJI Food FinCommerce Project (Bread Market)
 
+## 웹 프로토타입
+
+**[오늘의 건강주 — BAKEOUT 프로토타입 바로 열기](https://jennie-brain.github.io/makji-personal/)**
+
+실제 시장 신호를 빵 종목의 등락 규칙으로 바꾸고, 가상의 `빵가루`를 투자해 장 마감 후 쿠폰 배당을 받는 데일리 콘텐츠 콘셉트입니다. 다운로드 없이 브라우저에서 바로 체험할 수 있습니다.
+
 > **㈜스윗앤스위츠 MAKJI AI 기반 Food FinCommerce Platform 프로젝트**  
 > "오늘의 시장으로 빵을 산다" — Bread Market MVP 중심 프로젝트
 
