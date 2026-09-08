@@ -162,6 +162,7 @@ MAKJI 자사몰은 정적인 가격 구조로 인해 고객이 매일 방문할 
 - [MAKJI 전략 분석 2026](research/MAKJI_STRATEGIC_ANALYSIS_2026.md): 브랜드 가치제안·포지셔닝·SWOT, 국내 웰니스 베이커리 시장규모와 성장성, 국내외 경쟁사, 금융데이터 프로모션 전략
 - [웰니스 베이커리 시장 리서치](research/wellness_bakery_market_research.md): 시장 동향, 고객 페르소나, 경쟁사 및 유통 채널 분석
 - [글로벌 레퍼런스 비교](research/WELLNESS_BAKERY_DEEP_RESEARCH.md): MAKJI 시장 분석과 국내외 사례 비교
+- [오늘의 빵 배당 운영 권장안](docs/MAKJI_BREAD_DIVIDEND_RECOMMENDATIONS.md): KOSPI 기반 할인율, 제품 선정 점수, 손익·재고 안전장치, UX와 A/B 테스트
 
 ## 9. 현재 단계
 
