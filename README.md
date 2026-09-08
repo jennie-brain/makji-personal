@@ -171,6 +171,7 @@ MAKJI 자사몰은 정적인 가격 구조로 인해 고객이 매일 방문할 
 
 - `prototypes/makji-household-cpi-v1.html`: 우리 집 간식 물가지수 초기안
 - `prototypes/makji-household-cpi-v2.html`: 주가 차트 제거 및 MECE 간식 카테고리 적용안
-- `index.html`: 현재 최신 버전인 v2 배포용 화면
+- `prototypes/makji-household-cpi-v3.html`: 간편한 정보 구조, MAKJI 제품 스토리, 신뢰형 금융지표 UI 적용안
+- `index.html`: 현재 최신 버전인 v3 배포용 화면
 
 이후 변경안은 기존 파일을 덮어쓰지 않고 `v3`, `v4`처럼 새 HTML 파일로 추가합니다.
