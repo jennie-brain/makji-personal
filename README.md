@@ -177,6 +177,7 @@ MAKJI 자사몰은 정적인 가격 구조로 인해 고객이 매일 방문할 
 - `prototypes/makji-bread-dividend-v5.html`: KOSPI 변동 폭으로 할인율을 결정하는 ‘오늘의 빵 배당’ 프로토타입
 - `prototypes/makji-bread-dividend-v6.html`: 할인 규칙과 제품별 할인 한도를 반영한 사용자 흐름 프로토타입
 - `prototypes/makji-bread-dividend-v7.html`: 금융 앱 문법을 걷어내고 제품 공개·쿠폰 준비·자사몰 이동을 완성한 베이커리 리워드 UX
-- `index.html`: 현재 v6 배포용 화면이며, v7은 독립 파일에서 검수할 수 있습니다.
+- `prototypes/makji-daily-market-v8.html`: 경제지표에 따라 테마·대표 제품·제품별 혜택이 매일 바뀌는 다중 제품 마켓 UX
+- `index.html`: 현재 최신 버전인 v7 배포용 화면 (정석적 베이커리 리워드 및 완결된 전환 흐름 UX)
 
 이후 변경안은 기존 파일을 덮어쓰지 않고 `v3`, `v4`처럼 새 HTML 파일로 추가합니다.
