@@ -1,14 +1,718 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f4f8"><title>오늘의 빵 배당 | MAKJI</title><meta name="description" content="어제 KOSPI 변동 폭으로 정해지는 오늘의 MAKJI 빵 할인"><style>
-:root{--p:#6c38d0;--pd:#451d98;--lv:#efe8ff;--lime:#dcff72;--bg:#f6f4f8;--ink:#18141e;--muted:#7d7583;--line:#e8e3ec;--red:#db4054;--shadow:0 16px 42px #3b285917}*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow:hidden;font-family:Pretendard,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;color:var(--ink);letter-spacing:-.025em}body{background:#e9e6ee}button,a{font:inherit;color:inherit}button:focus-visible,a:focus-visible{outline:3px solid #1672ed;outline-offset:3px}.stage{min-height:100vh;display:grid;place-items:center;padding:28px}.phone{width:min(100%,430px);height:min(900px,calc(100vh - 56px));min-height:680px;background:var(--bg);border:8px solid #171419;border-radius:48px;overflow:hidden;box-shadow:0 35px 100px #20163140;position:relative}.screen{display:none;height:100%;overflow-y:auto;padding:20px 18px 30px;scrollbar-width:none}.screen.active{display:block;animation:enter .28s ease}@keyframes enter{from{opacity:.2;transform:translateX(12px)}}.top{height:46px;display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}.logo{font-size:18px;font-weight:1000;letter-spacing:-.065em}.logo i{font-style:normal;color:var(--p)}.date,.source{font-size:9px;color:var(--muted);font-weight:750}.ghost,.back{border:0;background:#fff;border-radius:13px;height:37px;padding:0 12px;font-size:10px;font-weight:850;cursor:pointer}.back{width:37px;font-size:20px;padding:0}.market{background:#fff;border:1px solid #ddd8e2;border-radius:18px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between}.market-name{font-size:10px;color:#625c66;font-weight:850}.market-value{font-size:20px;font-weight:900;letter-spacing:0;margin-top:3px}.market-move{text-align:right}.market-move b{font-size:13px;color:var(--red);display:block}.market-move span{font-size:9px;color:var(--muted)}
-.hero{margin-top:13px;min-height:420px;border-radius:31px;padding:24px;background:linear-gradient(145deg,var(--p),var(--pd));color:#fff;position:relative;overflow:hidden;box-shadow:0 18px 34px #48209335}.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:#ffffff0b}.hero:before{width:220px;height:220px;right:-110px;top:-100px}.hero:after{width:150px;height:150px;left:-90px;bottom:-90px}.eyebrow{font-size:11px;color:#e1d5f9;font-weight:800;position:relative;z-index:1}.hero h1{font-size:32px;line-height:1.15;letter-spacing:-.07em;margin:10px 0 4px;position:relative;z-index:1}.dividend{width:190px;height:190px;border-radius:50%;margin:21px auto 14px;background:conic-gradient(var(--lime) 0 70%,#ffffff17 70%);display:grid;place-items:center;position:relative;z-index:1;box-shadow:0 15px 35px #2e126849}.dividend:before{content:"";position:absolute;width:151px;height:151px;border-radius:50%;background:#5827b7}.dividend-value{position:relative;z-index:1;text-align:center}.dividend-value small{display:block;font-size:10px;color:#dbcef6;font-weight:800}.dividend-value strong{display:block;font-size:55px;line-height:1;letter-spacing:-.07em;margin:5px 0}.dividend-value span{font-size:9px;color:#dbcef6}.hero-copy{text-align:center;font-size:11px;color:#dfd3f7;margin:0}.cta{position:relative;z-index:2;width:100%;border:0;border-radius:17px;background:var(--lime);color:#32155f;padding:16px;font-size:14px;font-weight:950;cursor:pointer;margin-top:20px}.micro{display:flex;justify-content:center;gap:5px;align-items:center;margin:11px 0 0;font-size:9px;color:#cfc1ed}.micro i{font-style:normal}.why{display:flex;align-items:center;justify-content:center;gap:6px;border:0;background:none;color:var(--muted);font-size:10px;font-weight:800;margin:14px auto 0;cursor:pointer}
-.result{text-align:center;padding-top:4px}.check{width:66px;height:66px;margin:8px auto 13px;border-radius:24px;background:var(--lime);color:#351663;display:grid;place-items:center;font-size:32px;font-weight:1000;transform:rotate(-4deg)}.result-label{font-size:10px;color:var(--p);font-weight:900}.result h1{font-size:30px;line-height:1.18;letter-spacing:-.065em;margin:8px 0 5px}.result>p{font-size:11px;color:var(--muted);margin:0}.connector{width:2px;height:25px;background:linear-gradient(var(--p),#ddd6e5);margin:14px auto}.product{background:#fff;border:1px solid var(--line);border-radius:26px;padding:16px;text-align:left;box-shadow:var(--shadow)}.product-main{display:grid;grid-template-columns:91px 1fr;gap:14px;align-items:center}.art{width:91px;height:91px;border-radius:25px;background:linear-gradient(145deg,#ffe7a2,#dda044);position:relative;overflow:hidden}.art:before{content:"ZERO";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:1000;letter-spacing:.06em}.product small{font-size:9px;color:var(--p);font-weight:900}.product h2{font-size:17px;margin:5px 0 3px}.product p{font-size:9px;color:var(--muted);line-height:1.45;margin:0}.price{display:flex;align-items:end;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid var(--line)}.price del{font-size:10px;color:#999}.price strong{display:block;font-size:21px;margin-top:2px}.coupon{background:var(--lv);color:var(--p);border-radius:10px;padding:7px 9px;font-size:11px;font-weight:950}.actions{display:grid;grid-template-columns:48px 1fr;gap:8px;margin-top:12px}.actions button,.actions a{border:0;border-radius:15px;padding:14px 5px;text-decoration:none;text-align:center;font-size:12px;font-weight:900}.share{background:#e9e5ed;font-size:18px!important}.shop{background:var(--p);color:#fff}.notice{margin-top:12px;font-size:9px!important;line-height:1.5;color:#99929e!important}
-.rule-title{font-size:28px;line-height:1.2;margin:12px 0 5px;letter-spacing:-.06em}.rule-sub{font-size:11px;color:var(--muted);margin:0 0 22px}.rule-list{display:grid;gap:8px}.rule{height:67px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between}.rule.active{border:2px solid var(--p);background:var(--lv)}.rule span{font-size:11px;color:var(--muted)}.rule b{font-size:17px}.rule.active b{color:var(--p)}.guard{margin-top:16px;background:#fff;border-radius:20px;padding:16px}.guard h2{font-size:13px;margin:0 0 10px}.guard-line{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);font-size:10px}.guard-line span{color:var(--muted)}.rule-note{font-size:9px;line-height:1.55;color:var(--muted);margin:14px 4px}.toast{position:absolute;z-index:30;left:18px;right:18px;bottom:22px;background:#252029;color:#fff;padding:14px 16px;border-radius:15px;font-size:11px;transform:translateY(140px);transition:.3s}.toast.show{transform:none}
-@media(max-width:520px){body{background:var(--bg)}.stage{padding:0}.phone{position:fixed;inset:0;width:100vw;max-width:100vw;height:100dvh;min-height:0;border:0;border-radius:0;box-shadow:none}.screen{padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(25px,env(safe-area-inset-bottom))}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body><main class="stage"><section class="phone" aria-label="오늘의 빵 배당 모바일 프로토타입">
-<section class="screen active" id="home"><header class="top"><div class="logo">MAK<i>JI</i></div><button class="ghost" data-go="rules">산정 규칙</button></header><article class="market"><div><div class="market-name">KOSPI · 전일 종가</div><div class="market-value">3,214.08</div></div><div class="market-move"><b>↑ 0.82%</b><span>어제보다 상승</span></div></article><section class="hero"><span class="eyebrow">9월 8일 · 오늘의 빵 배당</span><h1>시장이 움직인 만큼<br>혜택이 열렸어요.</h1><div class="dividend"><div class="dividend-value"><small>오늘의 할인</small><strong>7%</strong><span>시장 변동 폭 0.82%</span></div></div><p class="hero-copy">오르든 내리든, 움직인 폭만 봐요.</p><button class="cta" data-go="result">내 빵 배당 받기</button><p class="micro"><i>●</i> 로그인은 자사몰에서 · 오늘 자정까지</p></section><button class="why" data-go="rules">7%가 된 이유 보기 →</button><p class="source" style="text-align:center;margin-top:12px">시연 데이터 · 실제 운영 시 공식 전일 종가 적용</p></section>
-<section class="screen" id="result"><header class="top"><button class="back" data-go="home" aria-label="뒤로">‹</button><span class="date">오늘의 빵 배당</span><span></span></header><div class="result"><div class="check">✓</div><span class="result-label">7% 배당이 열렸어요</span><h1>오늘 배당받을 빵</h1><p>이번 주 MAKJI 대표 제품</p><div class="connector"></div><article class="product"><div class="product-main"><div class="art"></div><div><small>WEEKLY BREAD</small><h2>ZERO 카스테라</h2><p>설탕·밀가루 ZERO<br>부드럽고 촉촉한 저당 카스테라</p></div></div><div class="price"><div><del>12,000원</del><strong>11,160원</strong></div><span class="coupon">7% OFF</span></div></article><div class="actions"><button class="share" id="share" aria-label="공유">↗</button><a class="shop" href="https://makji.kr/" target="_blank" rel="noopener">7% 쿠폰 받고 구매하기</a></div><p class="notice">자사몰 로그인 후 지급 · 제품별 최대 할인 한도 적용<br>다른 쿠폰과 중복 사용 불가 · 재고 소진 시 종료</p></div></section>
-<section class="screen" id="rules"><header class="top"><button class="back" data-go="home" aria-label="뒤로">‹</button><span class="date">공개 할인 규칙</span><span></span></header><h1 class="rule-title">어제 시장의<br>변동 폭만 봅니다.</h1><p class="rule-sub">상승·하락 어느 쪽이든 같은 기준</p><div class="rule-list"><article class="rule"><span>0.00~0.49%</span><b>5%</b></article><article class="rule active"><span>0.50~0.99% · 오늘</span><b>7%</b></article><article class="rule"><span>1.00~1.49%</span><b>9%</b></article><article class="rule"><span>1.50% 이상</span><b>12%</b></article></div><section class="guard"><h2>할인 안전장치</h2><div class="guard-line"><span>시장 규칙 결과</span><b>7%</b></div><div class="guard-line"><span>ZERO 카스테라 할인 한도</span><b>10%</b></div><div class="guard-line"><span>오늘 최종 할인</span><b>7%</b></div></section><p class="rule-note">최종 할인율은 ‘시장 규칙 할인율’과 ‘제품별 최대 허용 할인율’ 중 작은 값입니다. 주가 방향은 제품 가격이나 품질의 원인이 아니며, 매일 혜택을 정하는 공개 이벤트 규칙으로만 사용합니다.</p><button class="cta" data-go="result">7% 배당 받기</button></section><div class="toast" id="toast" role="status"></div>
-</section></main><script>
-const screens=[...document.querySelectorAll('.screen')],toast=document.getElementById('toast');function go(id){screens.forEach(s=>s.classList.toggle('active',s.id===id));document.getElementById(id).scrollTop=0}document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));document.getElementById('share').onclick=async()=>{const data={title:'오늘의 빵 배당 | MAKJI',text:'오늘 KOSPI가 열어준 빵 배당은 7%! ZERO 카스테라를 만나보세요.',url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(`${data.text} ${data.url}`);notify('빵 배당 링크를 복사했어요.')}}catch(e){if(e.name!=='AbortError')notify('공유 링크를 준비하지 못했어요.')}};function notify(message){toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2300)}
-</script></body></html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#18141e">
+  <title>MAKJI 빵마켓 (Bread Market) — 오늘의 시장으로 빵을 산다</title>
+  <meta name="description" content="KOSPI와 실시간 시장 데이터로 정해지는 투명한 빵 할인과 감정 헷지 처방전">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <style>
+    :root {
+      --primary: #6c38d0;
+      --primary-dark: #451d98;
+      --primary-light: #efe8ff;
+      --lime: #dcff72;
+      --bg: #f5f3f7;
+      --card: #ffffff;
+      --ink: #18141e;
+      --muted: #7d7583;
+      --line: #e6e1eb;
+      --red: #eb445a;
+      --blue: #2563eb;
+      --green: #10b981;
+      --gold: #f59e0b;
+      --shadow: 0 12px 32px rgba(24, 20, 30, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; min-height: 100%; font-family: Pretendard, -apple-system, sans-serif; background: #e8e4ed; color: var(--ink); letter-spacing: -0.025em; }
+    button, a { font: inherit; color: inherit; cursor: pointer; text-decoration: none; }
+    
+    /* Layout Framework */
+    .viewport {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app-frame {
+      width: 100%;
+      max-width: 440px;
+      height: 900px;
+      max-height: calc(100vh - 40px);
+      background: var(--bg);
+      border-radius: 44px;
+      box-shadow: 0 25px 70px rgba(24, 20, 30, 0.25);
+      border: 9px solid #1c1822;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Live Market Ticker */
+    .ticker-bar {
+      background: #18141e;
+      color: #fff;
+      font-size: 11px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .ticker-track {
+      display: flex;
+      gap: 16px;
+      animation: ticker 25s linear infinite;
+    }
+    .ticker-item { display: inline-flex; align-items: center; gap: 4px; }
+    .ticker-item .up { color: var(--red); font-weight: 700; }
+    .ticker-item .down { color: #60a5fa; font-weight: 700; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* App Header */
+    .app-header {
+      padding: 12px 18px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .brand-logo { font-size: 18px; font-weight: 900; letter-spacing: -0.05em; display: flex; align-items: center; gap: 6px; }
+    .brand-badge { font-size: 9px; background: var(--primary-light); color: var(--primary); padding: 3px 6px; border-radius: 6px; font-weight: 800; }
+    .header-status { font-size: 10px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    /* Screen Container */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: none;
+    }
+    .screen-content::-webkit-scrollbar { display: none; }
+    .tab-screen { display: none; animation: fadeIn 0.25s ease; }
+    .tab-screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards & Components */
+    .hero-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      border-radius: 28px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 30px rgba(108, 56, 208, 0.28);
+      margin-bottom: 16px;
+    }
+    .hero-tag { font-size: 11px; font-weight: 800; color: #d8c6fa; margin-bottom: 6px; }
+    .hero-title { font-size: 24px; font-weight: 900; line-height: 1.25; margin: 0 0 12px; letter-spacing: -0.05em; }
+    
+    .dividend-box {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 14px 0;
+    }
+    .dividend-left small { font-size: 10px; color: #d8c6fa; font-weight: 700; display: block; }
+    .dividend-left strong { font-size: 38px; font-weight: 900; line-height: 1; color: var(--lime); letter-spacing: -0.04em; }
+    .dividend-right { text-align: right; font-size: 11px; color: #ede5fd; }
+    .dividend-right b { display: block; font-size: 14px; color: #fff; }
+
+    .btn-action {
+      width: 100%;
+      background: var(--lime);
+      color: #26114b;
+      border: 0;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      transition: transform 0.15s ease;
+      display: block;
+      text-align: center;
+    }
+    .btn-action:active { transform: scale(0.98); }
+
+    /* Market Rationale Callout (Why it is logical) */
+    .rationale-callout {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #554e5b;
+      margin-bottom: 16px;
+    }
+    .rationale-callout strong { color: var(--primary); display: block; font-size: 12px; margin-bottom: 3px; }
+
+    /* Product Prescription Ticket */
+    .ticket-card {
+      background: #fff;
+      border-radius: 24px;
+      border: 1px dashed #d5cedc;
+      padding: 18px;
+      position: relative;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .ticket-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 12px; }
+    .ticket-code { font-size: 10px; font-weight: 800; color: var(--primary); background: var(--primary-light); padding: 3px 7px; border-radius: 6px; }
+    .product-row { display: grid; grid-template-columns: 74px 1fr; gap: 14px; align-items: center; }
+    .product-thumb { width: 74px; height: 74px; border-radius: 18px; background: #faf8fc; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+    .product-info h3 { margin: 0 0 4px; font-size: 16px; font-weight: 850; }
+    .product-info p { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .badge-macro { display: inline-block; font-size: 9px; font-weight: 800; background: #eef2ff; color: #4338ca; padding: 2px 6px; border-radius: 4px; margin-top: 5px; }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .price-row del { font-size: 11px; color: #a19ba6; }
+    .price-row strong { font-size: 22px; font-weight: 900; color: var(--ink); }
+    .discount-pill { background: #fee2e2; color: #dc2626; font-size: 12px; font-weight: 900; padding: 4px 8px; border-radius: 8px; }
+
+    /* Interactive Questionnaire ("우울해서 빵 샀어") */
+    .quiz-card {
+      background: #fff;
+      border-radius: 26px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .quiz-title { font-size: 17px; font-weight: 900; margin: 0 0 6px; }
+    .quiz-sub { font-size: 11px; color: var(--muted); margin: 0 0 14px; }
+    .quiz-options { display: grid; gap: 8px; }
+    .quiz-btn {
+      background: #fbf9fd;
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+    .quiz-btn.selected, .quiz-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* Prediction Poll */
+    .poll-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+    .poll-btn {
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 16px 12px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .poll-btn.red { background: #fff1f2; color: var(--red); border-color: #fecdd3; }
+    .poll-btn.blue { background: #eff6ff; color: var(--blue); border-color: #bfdbfe; }
+    .poll-btn.voted { box-shadow: 0 0 0 3px var(--primary); }
+    .poll-btn strong { display: block; font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+    .poll-btn small { font-size: 11px; font-weight: 700; opacity: 0.85; }
+
+    /* Navigation Bar */
+    .nav-bar {
+      background: #fff;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 4px 14px;
+      z-index: 10;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0;
+      color: #928b97;
+      font-size: 10px;
+      font-weight: 800;
+      border: 0;
+      background: transparent;
+      gap: 3px;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+
+    /* Toast Notification */
+    .toast {
+      position: absolute;
+      bottom: 74px;
+      left: 18px;
+      right: 18px;
+      background: #18141e;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      transform: translateY(120px);
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      z-index: 100;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+    }
+    .toast.show { transform: translateY(0); }
+
+    @media (max-width: 480px) {
+      .viewport { padding: 0; }
+      .app-frame { max-width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; border: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="viewport">
+  <div class="app-frame" role="region" aria-label="MAKJI 빵마켓 프로토타입">
+    
+    <!-- 실시간 시세 티커 -->
+    <div class="ticker-bar">
+      <div class="ticker-track">
+        <span class="ticker-item">KOSPI <b>2,542.10</b> <span class="down">▼ 1.2%</span></span>
+        <span class="ticker-item">USD/KRW <b>1,382.5</b> <span class="down">▼ 4.5원</span></span>
+        <span class="ticker-item">GOLD <b>108,400원/g</b> <span class="up">▲ 0.8%</span></span>
+        <span class="ticker-item">서울 강수확률 <b>80% ☔</b></span>
+        <span class="ticker-item">KOSPI <b>2,542.10</b> <span class="down">▼ 1.2%</span></span>
+        <span class="ticker-item">USD/KRW <b>1,382.5</b> <span class="down">▼ 4.5원</span></span>
+      </div>
+    </div>
+
+    <!-- 헤더 -->
+    <header class="app-header">
+      <div class="brand-logo">
+        MAKJI 빵마켓
+        <span class="brand-badge">Food FinCommerce</span>
+      </div>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>KRX 실시간 룰 연동 중</span>
+      </div>
+    </header>
+
+    <!-- 메인 스크롤 영역 -->
+    <main class="screen-content">
+      
+      <!-- ================= 탭 1: 거래소 홈 (배당 & 핫딜) ================= -->
+      <section class="tab-screen active" id="tab-home">
+        <div class="hero-card">
+          <div class="hero-tag">📈 9월 8일 장 마감 배당</div>
+          <h1 class="hero-title">KOSPI 변동폭만큼<br>오늘의 빵 배당이 열렸어요</h1>
+          
+          <div class="dividend-box">
+            <div class="dividend-left">
+              <small>오늘의 시장 배당율</small>
+              <strong>7% OFF</strong>
+            </div>
+            <div class="dividend-right">
+              KOSPI 변동폭 <b>1.20% 하락</b>
+              <span>변동성 구간: 1.0~1.49%</span>
+            </div>
+          </div>
+
+          <button class="btn-action" onclick="claimCoupon('DIV-7-CAST', '오늘의 배당 쿠폰 7%가 발급되었어요!')">
+            오늘의 7% 배당 쿠폰 받기
+          </button>
+        </div>
+
+        <div class="rationale-callout">
+          <strong>💡 왜 주식 지표로 빵값을 정하나요?</strong>
+          자사몰이 임의로 가격을 정하면 신뢰하기 어렵습니다. MAKJI는 국가 공인 한국거래소(KRX)의 당일 KOSPI 변동폭이라는 <b>'누구도 조작할 수 없는 공개 룰'</b>에 따라 매일의 혜택을 투명하게 결정합니다.
+        </div>
+
+        <h2 style="font-size: 15px; font-weight: 800; margin: 18px 4px 10px;">🏆 오늘의 시장 연동 배당 종목</h2>
+        
+        <div class="ticket-card">
+          <div class="ticket-header">
+            <span class="ticket-code">TICKER: $ZERO-CAS</span>
+            <span style="font-size: 11px; color: var(--muted); font-weight: 700;">오늘 자정까지 유효</span>
+          </div>
+          <div class="product-row">
+            <div class="product-thumb">🍞</div>
+            <div class="product-info">
+              <h3>막지 ZERO 카스테라</h3>
+              <p>설탕·밀가루 0g! 전통 막걸리 지게미 발효 공법으로 극강의 촉촉함</p>
+              <span class="badge-macro">당류 1.5g · 순탄수 3g · 글루텐프리</span>
+            </div>
+          </div>
+          <div class="price-row">
+            <div>
+              <del>12,000원</del>
+              <strong>11,160원</strong>
+            </div>
+            <span class="discount-pill">7% 배당 특가</span>
+          </div>
+          <a class="btn-action" style="margin-top: 14px; background: var(--primary); color: #fff;" href="https://makji.kr/" target="_blank" rel="noopener">
+            자사몰(makji.kr)에서 7% 구매하기
+          </a>
+        </div>
+      </section>
+
+      <!-- ================= 탭 2: 감정 헷지 빵 처방소 ("우울해서 빵 샀어") ================= -->
+      <section class="tab-screen" id="tab-rx">
+        <div class="quiz-card">
+          <div class="hero-tag" style="color: var(--primary);">💊 T vs F 감정 헷지 솔루션</div>
+          <h2 class="quiz-title">"나 오늘 우울해서 빵 샀어..."</h2>
+          <p class="quiz-sub">시장 데이터와 감정을 연결해, 죄책감 없는 빵을 처방해 드려요.</p>
+
+          <div style="font-size: 12px; font-weight: 800; color: var(--primary); margin-bottom: 8px;">Q1. 왜 우울한데? 무슨 일 있어?</div>
+          <div class="quiz-options">
+            <button class="quiz-btn selected" onclick="selectMood('stock', this)">
+              <span>📉 [주식 폭락] 내 계좌가 파란불이라 멘탈 바사삭...</span>
+              <span>✓</span>
+            </button>
+            <button class="quiz-btn" onclick="selectMood('rain', this)">
+              <span>☔ [날씨 우중충] 비 오고 날씨가 흐려서 센치해...</span>
+              <span></span>
+            </button>
+            <button class="quiz-btn" onclick="selectMood('diet', this)">
+              <span>🥗 [다이어트 억압] 빵 너무 땡기는데 살찔까 봐 눈물 나...</span>
+              <span></span>
+            </button>
+            <button class="quiz-btn" onclick="selectMood('fx', this)">
+              <span>💸 [고물가 스트레스] 월급 빼고 환율/물가 다 올라서 킹받아...</span>
+              <span></span>
+            </button>
+          </div>
+        </div>
+
+        <div id="rx-result" class="ticket-card" style="border-color: var(--primary);">
+          <div class="ticket-header">
+            <span class="ticket-code" id="rx-code">RX: STRESS-HEDGE-01</span>
+            <span style="font-size: 11px; color: var(--red); font-weight: 800;" id="rx-alert">● 코스피 -1.2% 하락 감지</span>
+          </div>
+
+          <div style="background: #fcfaff; border-radius: 12px; padding: 10px; margin-bottom: 12px; font-size: 11px; color: #4338ca; line-height: 1.45;" id="rx-comment">
+            "파란색은 눈에 좋지만 마음에 안 좋습니다. 살찌면 더 우울해지니, 설탕 0g 딥 초코로 세로토닌만 안전하게 충전하세요!"
+          </div>
+
+          <div class="product-row">
+            <div class="product-thumb" id="rx-icon">🍫</div>
+            <div class="product-info">
+              <h3 id="rx-name">막지 무설탕 마틸다 초코케이크</h3>
+              <p id="rx-desc">최고급 프랑스산 카카오와 알룰로스로 완성한 진한 달콤함</p>
+              <span class="badge-macro" id="rx-macro">당류 0g · 순탄수 4g · 글루텐프리</span>
+            </div>
+          </div>
+
+          <div class="price-row">
+            <div>
+              <del id="rx-orig">42,000원</del>
+              <strong id="rx-price">39,060원</strong>
+            </div>
+            <span class="discount-pill" id="rx-coupon">파란불 헷지 7% OFF</span>
+          </div>
+
+          <button class="btn-action" style="margin-top: 14px;" onclick="claimCoupon('RX-COUPON', '처방전 7% 쿠폰이 적용되었습니다! 자사몰로 이동합니다.')">
+            이 처방전으로 빵 사러 가기
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= 탭 3: 아침 9시 개장 예측 (Prediction) ================= -->
+      <section class="tab-screen" id="tab-poll">
+        <div class="hero-card" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+          <div class="hero-tag" style="color: #a5b4fc;">⏰ 매일 아침 09:00 개장</div>
+          <h2 class="hero-title" style="font-size: 21px;">오늘의 코스피 종가는?<br>1초 맞히고 빵값 0원 도전</h2>
+          <p style="font-size: 11px; color: #c7d2fe; margin: 0;">투표 즉시 1,000원 웰컴 배당권 증정! 정답자는 추가 적립금까지</p>
+        </div>
+
+        <div class="quiz-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong style="font-size: 13px;">오늘 15:30 장 마감 예측</strong>
+            <span style="font-size: 10px; color: var(--muted);">현재 KOSPI 2,542.10</span>
+          </div>
+
+          <div class="poll-grid">
+            <button class="poll-btn red" id="poll-up" onclick="votePoll('up')">
+              <strong>🔴 빨간불 (상승)</strong>
+              <small>투표율 45%</small>
+            </button>
+            <button class="poll-btn blue" id="poll-down" onclick="votePoll('down')">
+              <strong>🔵 파란불 (하락)</strong>
+              <small>투표율 55%</small>
+            </button>
+          </div>
+
+          <div id="poll-feedback" style="display:none; font-size: 11px; text-align: center; color: var(--primary); font-weight: 700; padding: 6px 0;">
+            🎉 투표 완료! 1,000원 즉시 할인권이 발급되었습니다.
+          </div>
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 800; margin: 16px 4px 8px;">⚡ 배당 쿠폰 즉시 사용 추천 (엔트리 빵)</h3>
+        <div class="ticket-card">
+          <div class="product-row">
+            <div class="product-thumb">🥯</div>
+            <div class="product-info">
+              <h3>막지 비건 잉글리시 머핀</h3>
+              <p>바쁜 출근길 속 편한 든든한 식사빵</p>
+              <span class="badge-macro">100% 식물성 원료 · 고단백</span>
+            </div>
+          </div>
+          <div class="price-row">
+            <div>
+              <del>1,500원</del>
+              <strong style="color: var(--primary);">500원</strong>
+            </div>
+            <span class="discount-pill" style="background:#dcfce7; color:#16a34a;">쿠폰가 -1,000원</span>
+          </div>
+          <a class="btn-action" style="margin-top: 12px; background: var(--primary); color: #fff;" href="https://makji.kr/" target="_blank" rel="noopener">
+            500원에 아침빵 주문하기
+          </a>
+        </div>
+      </section>
+
+      <!-- ================= 탭 4: 빵 ETF 포트폴리오 (Bundles) ================= -->
+      <section class="tab-screen" id="tab-etf">
+        <div class="hero-card" style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%);">
+          <div class="hero-tag" style="color: #a7f3d0;">🧺 Bakery ETF</div>
+          <h2 class="hero-title" style="font-size: 21px;">빵도 분산 투자가 필요해요<br>영양 목표별 맞춤 포트폴리오</h2>
+          <p style="font-size: 11px; color: #d1fae5; margin: 0;">낱개 구매 대비 15% 추가 번들 혜택</p>
+        </div>
+
+        <!-- ETF 카드 1 -->
+        <div class="ticket-card">
+          <div class="ticket-header">
+            <span class="ticket-code" style="background:#d1fae5; color:#065f46;">$GLU-DEF (안정형)</span>
+            <span style="font-weight: 800; color: #059669; font-size: 12px;">15% BUNDLE OFF</span>
+          </div>
+          <h3 style="margin: 0 0 4px; font-size: 16px;">혈당 방어 저속노화 ETF</h3>
+          <p style="font-size: 11px; color: var(--muted); margin: 0 0 10px;">식후 혈당 스파이크 절대 방어! 당류 2g 미만 데일리 디저트 팩</p>
+          
+          <div style="background:#f8fafc; border-radius: 12px; padding: 8px 12px; font-size: 10px; color:#475569; margin-bottom: 12px;">
+            종목 구성: ZERO 카스테라(40%) + 달항아리 티라미수(35%) + 제로 모닝롤(25%)
+          </div>
+
+          <div class="price-row">
+            <div>
+              <del>31,500원</del>
+              <strong>26,700원</strong>
+            </div>
+            <button class="btn-action" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="claimCoupon('ETF-DEF', '혈당방어 ETF 번들이 장바구니에 담겼습니다.')">
+              담기
+            </button>
+          </div>
+        </div>
+
+        <!-- ETF 카드 2 -->
+        <div class="ticket-card">
+          <div class="ticket-header">
+            <span class="ticket-code" style="background:#e0e7ff; color:#3730a3;">$PRO-GROW (성장형)</span>
+            <span style="font-weight: 800; color: #4338ca; font-size: 12px;">15% BUNDLE OFF</span>
+          </div>
+          <h3 style="margin: 0 0 4px; font-size: 16px;">고성장 모닝 프로틴 ETF</h3>
+          <p style="font-size: 11px; color: var(--muted); margin: 0 0 10px;">운동족과 직장인을 위한 든든한 1주일 고단백 아침식사 번들</p>
+          
+          <div style="background:#f8fafc; border-radius: 12px; padding: 8px 12px; font-size: 10px; color:#475569; margin-bottom: 12px;">
+            종목 구성: 비건 잉글리시머핀 3개 + 테트리스 통식빵 1개 + 대만 샌드위치 2개
+          </div>
+
+          <div class="price-row">
+            <div>
+              <del>20,300원</del>
+              <strong>17,200원</strong>
+            </div>
+            <button class="btn-action" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="claimCoupon('ETF-PRO', '프로틴 ETF 번들이 장바구니에 담겼습니다.')">
+              담기
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 탭 5: 산정 규칙 & 투명성 (Rules) ================= -->
+      <section class="tab-screen" id="tab-rules">
+        <h2 style="font-size: 20px; font-weight: 900; margin: 8px 0 4px;">공개 할인 산정 규칙</h2>
+        <p style="font-size: 11px; color: var(--muted); margin: 0 0 16px;">한국거래소(KRX) 공식 전일 종가 변동폭 기준</p>
+
+        <div style="display: grid; gap: 8px; margin-bottom: 16px;">
+          <div class="quiz-btn" style="background:#fff;">
+            <span>0.00% ~ 0.49% 변동 (보합장)</span>
+            <b>5% 할인</b>
+          </div>
+          <div class="quiz-btn selected" style="background:var(--primary-light);">
+            <span>0.50% ~ 0.99% 변동 (오늘 해당!)</span>
+            <b style="color:var(--primary);">7% 할인</b>
+          </div>
+          <div class="quiz-btn" style="background:#fff;">
+            <span>1.00% ~ 1.49% 변동 (활황/하락)</span>
+            <b>9% 할인</b>
+          </div>
+          <div class="quiz-btn" style="background:#fff;">
+            <span>1.50% 이상 변동 (서킷브레이커)</span>
+            <b style="color:var(--red);">12% 할인 (MAX)</b>
+          </div>
+        </div>
+
+        <div class="rationale-callout">
+          <strong>🛡️ 기업 및 소비자 보호 안전장치 (Guardrails)</strong>
+          • <b>최대 할인 한도:</b> 기업 마진 보호를 위해 어떠한 경우에도 상품가 대비 최대 15%를 초과하지 않습니다.<br>
+          • <b>쿠폰 중복 불가:</b> 시장 할인 쿠폰은 회원당 1일 1회만 발급 및 사용 가능합니다.<br>
+          • <b>인과관계의 투명성:</b> 주가 방향은 빵의 품질이나 원가 때문이 아니며, 매일의 방문 혜택을 정하는 <b>'공개된 게임 룰'</b>로만 사용됩니다.
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 하단 네비게이션 탭 -->
+    <nav class="nav-bar">
+      <button class="nav-item active" onclick="switchTab('tab-home', this)">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        <span>거래소</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('tab-rx', this)">
+        <svg viewBox="0 0 24 24"><path d="M10.5 20.5l10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg>
+        <span>감정 처방</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('tab-poll', this)">
+        <svg viewBox="0 0 24 24"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+        <span>개장 예측</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('tab-etf', this)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path></svg>
+        <span>빵 ETF</span>
+      </button>
+    </nav>
+
+    <!-- 토스트 알림창 -->
+    <div class="toast" id="toast-msg"></div>
+
+  </div>
+</div>
+
+<script>
+  // Tab Switching
+  function switchTab(screenId, btn) {
+    document.querySelectorAll('.tab-screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    
+    document.getElementById(screenId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // Toast Notification
+  function showToast(msg) {
+    const toast = document.getElementById('toast-msg');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2400);
+  }
+
+  // Coupon Claim Simulation
+  function claimCoupon(code, msg) {
+    showToast(msg);
+  }
+
+  // Emotion Diagnosis Matrix ("우울해서 빵 샀어")
+  const moodData = {
+    stock: {
+      code: 'RX: STRESS-HEDGE-01',
+      alert: '● KOSPI -1.2% 하락 감지',
+      comment: '"파란색은 눈에 좋지만 마음에 안 좋습니다. 살찌면 더 우울해지니, 설탕 0g 딥 초코로 세로토닌만 안전하게 충전하세요!"',
+      icon: '🍫',
+      name: '막지 무설탕 마틸다 초코케이크',
+      desc: '최고급 프랑스산 카카오와 알룰로스로 완성한 진한 달콤함',
+      macro: '당류 0g · 순탄수 4g · 글루텐프리',
+      orig: '42,000원',
+      price: '39,060원',
+      coupon: '파란불 헷지 7% OFF'
+    },
+    rain: {
+      code: 'RX: RAINY-DAY-02',
+      alert: '● 서울 강수확률 80% 비 예보',
+      comment: '"비 오는 날엔 파전 대신 막걸리 발효 부산물로 빚은 카스테라! 은은한 발효 풍미와 따뜻한 차로 멘탈을 달래보세요."',
+      icon: '🍞',
+      name: '막지 ZERO 카스테라',
+      desc: '부드럽고 촉촉한 글루텐프리 저당 카스테라',
+      macro: '당류 1.5g · 술지게미 업사이클링 · 단백질 8g',
+      orig: '12,000원',
+      price: '10,800원',
+      coupon: '비오는날 특가 10% OFF'
+    },
+    diet: {
+      code: 'RX: GUILT-FREE-03',
+      alert: '● 혈당 스파이크 위험 방어',
+      comment: '"참다가 폭식 터지면 끝장입니다. 밀가루 0g, 순탄수 3g 잉글리시 머핀은 먹어도 살 안 찝니다. 죄책감 없이 드세요!"',
+      icon: '🥯',
+      name: '막지 비건 잉글리시 머핀 & 모닝롤',
+      desc: '식사 대용으로 부담 없는 은은하고 담백한 식사빵',
+      macro: '밀가루 0g · 100% 식물성 · 순탄수 3g',
+      orig: '6,000원',
+      price: '4,800원',
+      coupon: '길티프리 처방 20% OFF'
+    },
+    fx: {
+      code: 'RX: FX-INFLATION-04',
+      alert: '● 고물가 생활비 방어 헷지',
+      comment: '"밖에서 비싼 디저트 사 먹지 말고, 에어프라이어로 갓 구워 먹는 가성비 끝판왕 홈베이킹으로 지갑을 지키세요."',
+      icon: '🥐',
+      name: '막지 글루텐프리 냉동생지 3종',
+      desc: '집에서 직접 만드는 프리미엄 글루텐프리 빵 세트',
+      macro: '가성비 3종 세트 · 쌀가루 반죽',
+      orig: '21,000원',
+      price: '18,000원',
+      coupon: '물가방어 3,000원 쿠폰'
+    }
+  };
+
+  function selectMood(key, btn) {
+    document.querySelectorAll('.quiz-btn').forEach(b => {
+      b.classList.remove('selected');
+      b.querySelector('span:last-child').textContent = '';
+    });
+    btn.classList.add('selected');
+    btn.querySelector('span:last-child').textContent = '✓';
+
+    const data = moodData[key];
+    document.getElementById('rx-code').textContent = data.code;
+    document.getElementById('rx-alert').textContent = data.alert;
+    document.getElementById('rx-comment').textContent = data.comment;
+    document.getElementById('rx-icon').textContent = data.icon;
+    document.getElementById('rx-name').textContent = data.name;
+    document.getElementById('rx-desc').textContent = data.desc;
+    document.getElementById('rx-macro').textContent = data.macro;
+    document.getElementById('rx-orig').textContent = data.orig;
+    document.getElementById('rx-price').textContent = data.price;
+    document.getElementById('rx-coupon').textContent = data.coupon;
+  }
+
+  // Poll Vote
+  function votePoll(choice) {
+    document.getElementById('poll-up').classList.toggle('voted', choice === 'up');
+    document.getElementById('poll-down').classList.toggle('voted', choice === 'down');
+    document.getElementById('poll-feedback').style.display = 'block';
+    showToast('투표 완료! 1,000원 즉시 할인권이 발급되었어요.');
+  }
+</script>
+</body>
+</html>
