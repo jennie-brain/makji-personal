@@ -138,18 +138,27 @@ MAKJI 자사몰은 정적인 가격 구조로 인해 고객이 매일 방문할 
 
 ```text
 .
-├── README.md
-├── RFP.pdf
-├── BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md
-├── index.html
-└── research/
-    ├── MAKJI_STRATEGIC_ANALYSIS_2026.md
-    ├── wellness_bakery_market_research.md
-    ├── WELLNESS_BAKERY_DEEP_RESEARCH.md
-    └── report-source.md
+├── index.html                                 # 🌐 실시간 웹 프로토타입 메인 엔트리
+├── README.md                                  # 🧭 프로젝트 종합 대시보드
+├── .gitignore
+├── docs/                                      # 📄 서비스 기획, 스펙 및 RFP 문서
+│   ├── BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md  # 빵마켓 서비스 기획안 & 와이어프레임 명세서
+│   ├── RFP.pdf                                # 기업연계 프로젝트 공식 RFP
+│   └── images/                                # 기획/마케팅 시각화 에셋
+│       ├── bread_prescription_ui.jpg
+│       └── meta_ad_creative.jpg
+├── research/                                  # 📊 시장 리서치 & 분석 보고서
+│   ├── MAKJI_STRATEGIC_ANALYSIS_2026.md       # MAKJI 전략 분석 2026 (SWOT, 포지셔닝)
+│   ├── wellness_bakery_market_research.md     # 웰니스 베이커리 시장 심층 리서치
+│   ├── WELLNESS_BAKERY_DEEP_RESEARCH.md       # 글로벌 레퍼런스 비교 분석
+│   └── report-source.md                       # 리서치 세부 데이터 소스
+└── prototypes/                                # 🧪 서브/참고용 프로토타입 아카이브
+    ├── makji-mobile-prototype.html            # 모바일 뷰 프로토타입
+    └── proto.html                             # 인터랙션 테스트용 프로토타입
 ```
 
-- [서비스 기획안 및 와이어프레임](BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md): 사용자 여정, 핵심 기능, 화면별 와이어프레임, 데이터 연동 구조
+- [서비스 기획안 및 와이어프레임](docs/BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md): 사용자 여정, 핵심 기능, 화면별 와이어프레임, 감정 헷지 처방전, 데이터 연동 구조
+- [공식 RFP 문서](docs/RFP.pdf): 기업연계 프로젝트 요구사항 및 타임라인
 - [MAKJI 전략 분석 2026](research/MAKJI_STRATEGIC_ANALYSIS_2026.md): 브랜드 가치제안·포지셔닝·SWOT, 국내 웰니스 베이커리 시장규모와 성장성, 국내외 경쟁사, 금융데이터 프로모션 전략
 - [웰니스 베이커리 시장 리서치](research/wellness_bakery_market_research.md): 시장 동향, 고객 페르소나, 경쟁사 및 유통 채널 분석
 - [글로벌 레퍼런스 비교](research/WELLNESS_BAKERY_DEEP_RESEARCH.md): MAKJI 시장 분석과 국내외 사례 비교
