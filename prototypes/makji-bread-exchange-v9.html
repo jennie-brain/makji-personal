@@ -1,4 +1,4 @@
-<!-- MAKJI ‘오늘의 빵 배당’ 프로토타입 v7: premium bakery reward experience -->
+<!-- MAKJI 빵 거래소 프로토타입 v9: bread exchange dashboard and event popups -->
 <!doctype html>
 <html lang="ko">
 <head>
@@ -515,6 +515,22 @@
     .shop-link { display:block; text-decoration:none; background:var(--primary); color:#fff; padding:15px; border-radius:16px; font-size:13px; font-weight:900; }
     .rule-row.current { background:var(--primary-light); }
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+    /* v8 daily market */
+    .daily-head{display:flex;justify-content:space-between;align-items:flex-start;margin:10px 0 16px}.daily-head h1{font:400 31px/1.15 "DM Serif Display","Noto Sans KR",serif;margin:0}.daily-head p{font-size:11px;color:var(--muted);margin:7px 0 0}.notify{width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:#fff;font-size:18px}
+    .signal-rail{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px 12px}.signal{min-width:112px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 11px}.signal small{display:block;color:var(--muted);font-size:9px;font-weight:700}.signal b{font-size:12px}.signal em{font-style:normal;font-size:9px;margin-left:4px}.signal .up{color:var(--red)}.signal .down{color:var(--blue)}
+    .theme-card{background:var(--primary);color:#fff;border-radius:25px;padding:20px;position:relative;overflow:hidden;margin-bottom:19px}.theme-card:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06);right:-55px;top:-70px}.theme-card small{color:#eed5dc;font-size:9px;font-weight:800}.theme-card h2{font-size:23px;margin:5px 0}.theme-card p{font-size:10px;line-height:1.55;color:#f1dde3;margin:0 0 13px}.theme-rule{display:inline-block;background:#fff1c8;color:#4a331a;border-radius:20px;padding:6px 9px;font-size:9px;font-weight:800}
+    .section-row{display:flex;align-items:center;justify-content:space-between;margin:17px 0 10px}.section-row h3{margin:0;font-size:17px}.section-row button{border:0;background:transparent;color:var(--muted);font-size:10px;font-weight:800}
+    .market-list{display:grid;gap:11px;padding-bottom:20px}.market-item{border:1px solid var(--line);background:#fff;border-radius:21px;padding:12px;display:grid;grid-template-columns:82px 1fr;gap:12px;text-align:left;cursor:pointer}.market-item:active{transform:scale(.99)}.market-visual{height:82px;border-radius:17px;display:grid;place-items:center;font-size:36px;position:relative}.sweet{background:#f4dce3}.light{background:#dfead7}.meal{background:#f7e6bb}.market-visual b{position:absolute;right:5px;top:5px;background:var(--primary);color:#fff;border-radius:9px;padding:4px 5px;font-size:8px}.market-copy small{font-size:9px;color:var(--primary);font-weight:900}.market-copy h4{margin:3px 0;font-size:14px}.market-copy p{margin:0;color:var(--muted);font-size:9px;line-height:1.4}.market-price{display:flex;align-items:end;justify-content:space-between;margin-top:7px}.market-price strong{font-size:14px}.market-price span{font-size:9px;color:var(--primary);font-weight:900}.heart{position:absolute!important;right:7px!important;bottom:7px!important;top:auto!important;width:25px;height:25px;border:0;border-radius:50%;background:#fff!important;color:var(--primary)!important;padding:0!important}.heart.saved{background:var(--primary)!important;color:#fff!important}
+    .market-note{background:#f6ead8;border-radius:16px;padding:12px;font-size:9px;line-height:1.55;color:#675b50;margin-bottom:18px}.product-icon{font-size:38px}.daily-bottom{position:sticky;bottom:-30px;background:linear-gradient(transparent,var(--bg) 28%);padding:28px 0 8px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.daily-bottom button{border-radius:14px;padding:12px;border:1px solid var(--line);background:#fff;font-size:10px;font-weight:800}.daily-bottom .accent{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .product-icon:before,.product-icon:after{display:none}.product-icon{font-size:38px!important}
+    /* v9 bread exchange */
+    .exchange{background:#f4f6f8;color:#17202a;padding:0}.exchange .top-nav{padding:14px 17px 6px;margin:0;background:#fff}.exchange .logo{font-family:"Noto Sans KR";font-size:18px;font-weight:900}.exchange .logo span{color:#e04b3f}.live{font-size:9px;font-weight:800;color:#16855b}.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#19b778;margin-right:5px;box-shadow:0 0 0 4px #d9f4e9}.exchange-pad{padding:12px 15px 90px}.exchange-title{display:flex;justify-content:space-between;align-items:end;margin:8px 0 13px}.exchange-title h1{font-size:23px;margin:0}.exchange-title p{font-size:9px;color:#74808b;margin:4px 0 0}.clock{font-size:11px;font-weight:800;background:#fff;border:1px solid #dde2e6;border-radius:10px;padding:7px 9px}
+    .event-banner{border:0;width:100%;border-radius:17px;padding:15px;text-align:left;color:#fff;background:linear-gradient(120deg,#243447,#344b63);display:flex;justify-content:space-between;align-items:center;box-shadow:0 10px 24px rgba(31,47,64,.16)}.event-banner.golden{background:linear-gradient(120deg,#6e4e08,#c18a16)}.event-banner.danger{background:linear-gradient(120deg,#671d22,#b53643)}.event-banner.warn{background:linear-gradient(120deg,#4b3722,#8b6233)}.event-banner small{font-size:8px;opacity:.75}.event-banner b{display:block;font-size:15px;margin-top:3px}.event-banner span{font-size:18px}
+    .mini-index{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:11px 0}.idx{background:#fff;border:1px solid #e0e5e9;border-radius:13px;padding:9px}.idx small{font-size:8px;color:#7b8791}.idx b{display:block;font-size:12px;margin-top:2px}.idx em{font-style:normal;font-size:8px}.red{color:#d1433a}.blue{color:#2671a9}.gold{color:#a87309}
+    .board{background:#fff;border:1px solid #dfe4e8;border-radius:18px;overflow:hidden}.board-head{padding:13px 14px 9px;display:flex;justify-content:space-between;align-items:center}.board-head h2{font-size:15px;margin:0}.board-head span{font-size:8px;color:#7a8690}.quote-head,.quote{display:grid;grid-template-columns:1fr 63px 58px;align-items:center}.quote-head{background:#f7f8f9;padding:7px 13px;color:#89939c;font-size:8px}.quote{padding:12px 13px;border-top:1px solid #edf0f2;cursor:pointer}.quote:active{background:#f8fafb}.asset{display:grid;grid-template-columns:37px 1fr;gap:8px;align-items:center}.asset-icon{width:37px;height:37px;border-radius:11px;background:#f5ead8;display:grid;place-items:center;font-size:20px}.asset b{display:block;font-size:11px}.asset small{font-size:8px;color:#7b858e}.quote-price{text-align:right}.quote-price b{display:block;font-size:11px}.quote-price small{font-size:8px;color:#77828b}.change{text-align:right;font-size:10px;font-weight:800}.trade-btn{border:0;border-radius:9px;padding:6px 8px;background:#fff0ed;color:#c23b32;font-size:9px;font-weight:900}
+    .portfolio{margin-top:11px;background:#172838;color:#fff;border-radius:18px;padding:14px}.portfolio-top{display:flex;justify-content:space-between;align-items:center}.portfolio small{font-size:8px;color:#aebbc6}.portfolio strong{font-size:18px}.basket{display:flex;gap:7px;margin-top:11px;min-height:38px}.basket-empty{font-size:9px;color:#aebbc6;padding:11px 0}.basket-chip{background:#2a4052;border-radius:9px;padding:7px 9px;font-size:9px}.basket-chip b{display:block;color:#ffd57e}.checkout{margin-top:11px;width:100%;border:0;border-radius:11px;padding:11px;background:#f2bd4c;color:#2f2718;font-size:10px;font-weight:900}.checkout:disabled{opacity:.45}
+    .exchange-nav{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e0e5e9;display:grid;grid-template-columns:repeat(3,1fr);padding:7px 8px 13px}.exchange-nav button{border:0;background:transparent;font-size:9px;color:#71808b}.exchange-nav b{display:block;font-size:17px;margin-bottom:2px}.exchange-nav .active{color:#e04b3f;font-weight:900}
+    .trade-modal{display:none;position:absolute;inset:0;background:rgba(15,23,30,.55);z-index:80;align-items:flex-end}.trade-modal.open{display:flex}.modal-card{width:100%;background:#fff;border-radius:25px 25px 0 0;padding:12px 18px 24px;animation:sheetUp .24s ease-out}.modal-handle{width:36px;height:4px;border-radius:5px;background:#d8dde0;margin:0 auto 15px}.modal-icon{width:52px;height:52px;border-radius:16px;background:#f5ead8;display:grid;place-items:center;font-size:29px}.modal-title{display:flex;gap:11px;align-items:center}.modal-title h2{font-size:17px;margin:0}.modal-title p{font-size:9px;color:#71808a;margin:3px 0 0}.order-box{display:flex;justify-content:space-between;align-items:center;margin:17px 0;background:#f5f7f8;border-radius:14px;padding:12px}.qty{display:flex;align-items:center;gap:12px}.qty button{width:30px;height:30px;border:1px solid #d8dfe3;background:#fff;border-radius:9px;font-weight:900}.qty b{font-size:16px}.modal-price{text-align:right}.modal-price small{font-size:8px;color:#7a858e;display:block}.modal-price b{font-size:15px}.buy{width:100%;border:0;border-radius:13px;padding:13px;background:#e04b3f;color:#fff;font-size:11px;font-weight:900}.campaign-note{font-size:8px;line-height:1.5;color:#8a949c;margin:10px 3px 0}.event-modal .modal-card{padding-bottom:27px}.event-symbol{width:70px;height:70px;border-radius:22px;background:#fff3d1;display:grid;place-items:center;font-size:38px;margin:4px auto 12px}.event-modal h2{text-align:center;font-size:22px;margin:0}.event-modal .lead{text-align:center;color:#6e7880;font-size:10px;line-height:1.5}.benefit-box{background:#f5f7f8;border-radius:15px;padding:13px;margin:14px 0;font-size:10px;line-height:1.6}.benefit-box b{color:#d1433a}.event-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.event-actions button{border:1px solid #dce1e4;background:#fff;border-radius:12px;padding:11px;font-size:9px;font-weight:800}.event-actions .main{background:#172838;color:#fff;border-color:#172838}
   </style>
 </head>
 <body>
@@ -523,19 +539,48 @@
 
   <!-- 대표 및 팀 시연용 시뮬레이션 바 (KOSPI 시나리오별 실시간 검증) -->
   <div class="sim-bar" aria-label="시장 시나리오 시뮬레이터">
-    <span class="sim-label">⚡ 시장 시나리오 테스트:</span>
-    <select class="sim-select" id="sim-scenario" onchange="applyScenario(this.value)">
-      <option value="tue">화요일 (+0.82% 상승) ➔ 7% 배당</option>
-      <option value="mon">월요일 (+0.31% 보합) ➔ 5% 배당</option>
-      <option value="wed">수요일 (-1.12% 하락) ➔ 9% 배당</option>
-      <option value="thu">목요일 (+1.67% 급변) ➔ 한도 10% 가드레일 발동</option>
+    <span class="sim-label">⚡ 거래소 이벤트 테스트:</span>
+    <select class="sim-select" id="sim-scenario" onchange="applyEvent(this.value)">
+      <option value="normal">정상 거래</option>
+      <option value="sidecar">사이드카 발동</option>
+      <option value="breaker">서킷브레이커 발동</option>
+      <option value="golden">금 최고가 · 골든타임</option>
     </select>
   </div>
 
   <section class="phone" aria-label="오늘의 빵 배당 모바일 프로토타입">
 
+    <article class="screen exchange active" id="view-exchange">
+      <header class="top-nav"><div class="logo">MAK<span>JI</span> EXCHANGE</div><span class="live">장 운영 중</span></header>
+      <div class="exchange-pad">
+        <div class="exchange-title"><div><h1>오늘의 빵 거래소</h1><p>주식 1주 대신, 먹을 수 있는 빵 1개를 거래합니다.</p></div><div class="clock" id="market-clock">14:32:08</div></div>
+        <button class="event-banner" id="event-banner" onclick="openEvent()"><div><small>MARKET EVENT</small><b id="event-title">오늘은 정상 거래 중이에요</b></div><span>›</span></button>
+        <div class="mini-index"><div class="idx"><small>KOSPI</small><b>3,214.08</b><em class="red">↑0.82%</em></div><div class="idx"><small>GOLD</small><b>$2,548</b><em class="gold">최고가 -0.4%</em></div><div class="idx"><small>곡물</small><b>284.10</b><em class="blue">↓0.60%</em></div></div>
+        <section class="board"><div class="board-head"><h2>실시간 빵 시세</h2><span>가격 단위 · 빵 1개</span></div><div class="quote-head"><span>빵 종목</span><span style="text-align:right">1개 가격</span><span style="text-align:right">거래</span></div><div id="quote-list"></div></section>
+        <section class="portfolio"><div class="portfolio-top"><div><small>나의 빵 바구니</small><br><strong><span id="basket-count">0</span>개</strong></div><div style="text-align:right"><small>예상 결제금액</small><br><strong id="basket-total">0원</strong></div></div><div class="basket" id="basket"><span class="basket-empty">아직 담은 빵이 없습니다.</span></div><button class="checkout" id="checkout" disabled onclick="showToast('자사몰 주문서로 안전하게 연결합니다')">바구니 주문하러 가기</button></section>
+      </div>
+      <nav class="exchange-nav"><button class="active"><b>⌁</b>거래소</button><button onclick="showScreen('view-market')"><b>▦</b>오늘의 마켓</button><button onclick="showToast('로그인 후 주문 내역을 확인할 수 있어요')"><b>◯</b>내 빵</button></nav>
+    </article>
+
+    <!-- 매일 경제 신호에 따라 상품과 순서가 달라지는 마켓 홈 -->
+    <article class="screen" id="view-market">
+      <header class="top-nav"><div class="logo">MAK<span>JI</span></div><button class="btn-ghost" onclick="showScreen('view-rules')">선정 원칙</button></header>
+      <div class="daily-head"><div><h1>오늘 열린<br>세 개의 빵 마켓</h1><p id="market-date">9월 8일 화요일 · 매일 오전 9시 변경</p></div><button class="notify" onclick="toggleNotify(this)" aria-label="오늘의 마켓 알림 받기">♢</button></div>
+      <div class="signal-rail" aria-label="오늘의 경제 신호">
+        <div class="signal"><small>KOSPI</small><b id="sig-kospi">3,214.08</b><em class="up" id="sig-kospi-move">↑0.82%</em></div>
+        <div class="signal"><small>생활물가</small><b>116.42</b><em class="up">↑0.3%</em></div>
+        <div class="signal"><small>곡물지수</small><b>284.10</b><em class="down">↓0.6%</em></div>
+        <div class="signal"><small>원/달러</small><b>1,386.2</b><em class="up">↑0.2%</em></div>
+      </div>
+      <section class="theme-card"><small>TODAY'S MARKET THEME</small><h2 id="theme-title">생활비 방어장</h2><p id="theme-copy">물가 부담은 덜고, 한 끼와 간식은 든든하게.<br>오늘은 식사빵과 가벼운 간식 혜택이 커졌어요.</p><span class="theme-rule" id="theme-rule">KOSPI 변동 폭 0.82% → 기본 혜택 7%</span></section>
+      <div class="section-row"><h3>오늘의 대표 빵 3개</h3><button onclick="showToast('판매 가능 상품 중 매일 다시 선정해요')">어떻게 골랐나요?</button></div>
+      <div class="market-list" id="market-list"></div>
+      <div class="market-note">경제지표는 오늘의 테마와 기본 할인율을 정합니다. 실제 상품은 재고, 할인 후 수익성, 최근 관심도 기준을 통과한 제품 중에서 선정합니다.</div>
+      <div class="daily-bottom"><button onclick="showScreen('view-home')">오늘 할인 계산 보기</button><button class="accent" onclick="shareMarket()">오늘 마켓 공유하기</button></div>
+    </article>
+
     <!-- ================= 1. 첫 화면: 오늘의 시장과 할인율 ================= -->
-    <article class="screen active" id="view-home">
+    <article class="screen" id="view-home">
       <header class="top-nav">
         <div class="logo">MAK<span>JI</span></div>
         <button class="btn-ghost" onclick="showScreen('view-rules')">산정 규칙</button>
@@ -598,7 +643,7 @@
     <!-- ================= 2. 두 번째 화면: 배당 제품 공개 ================= -->
     <article class="screen" id="view-result">
       <header class="top-nav">
-        <button class="btn-back" onclick="showScreen('view-home')" aria-label="뒤로">‹</button>
+        <button class="btn-back" onclick="showScreen('view-market')" aria-label="마켓으로 돌아가기">‹</button>
         <span style="font-size: 11px; font-weight: 850; color: var(--muted);">오늘의 빵 배당</span>
         <div style="width: 36px;"></div>
       </header>
@@ -615,24 +660,24 @@
 
         <div class="product-card">
           <div class="product-top">
-            <div class="product-art" role="img" aria-label="노릇한 ZERO 카스테라 일러스트"></div>
+            <div class="product-art product-icon" id="product-icon" role="img" aria-label="오늘의 제품">🍞</div>
             <div class="product-meta">
               <small>WEEKLY BREAD</small>
-              <h3>ZERO 카스테라</h3>
-              <p>설탕·밀가루 ZERO! 부드럽고 촉촉한 글루텐프리 저당 카스테라</p>
+              <h3 id="product-name">ZERO 카스테라</h3>
+              <p id="product-desc">설탕·밀가루 ZERO, 부드럽고 촉촉한 글루텐프리 카스테라</p>
             </div>
           </div>
 
           <div class="price-box">
             <div>
-              <del>12,000원</del>
+              <del id="product-original">12,000원</del>
               <strong id="ui-res-price">11,160원</strong>
             </div>
             <span class="coupon-badge" id="ui-res-pill">7% OFF</span>
           </div>
           <div class="reason-card">
             <span>✦</span>
-            <div><b>왜 이 빵인가요?</b><p>이번 주 판매 가능 재고와 할인 후 수익성을 통과한 대표 제품입니다. 주가지수는 할인율만 결정합니다.</p></div>
+            <div><b>왜 이 빵인가요?</b><p id="product-reason">판매 가능 재고와 할인 후 수익성을 통과한 대표 제품입니다.</p></div>
           </div>
         </div>
 
@@ -661,7 +706,7 @@
       <div class="handoff">
         <div class="handoff-icon">🎟️</div>
         <h2><span id="ui-ready-rate">7%</span> 쿠폰이<br>준비되었습니다.</h2>
-        <p class="handoff-sub">자사몰에서 로그인하면 쿠폰이 자동 발급되고 ZERO 카스테라에 바로 적용됩니다.</p>
+        <p class="handoff-sub">자사몰에서 로그인하면 쿠폰이 자동 발급되고 <span id="handoff-product">ZERO 카스테라</span>에 바로 적용됩니다.</p>
         <div class="handoff-steps">
           <div class="handoff-step"><i>1</i><div><b>MAKJI 자사몰로 이동</b><span>오늘의 혜택 정보가 함께 전달됩니다.</span></div></div>
           <div class="handoff-step"><i>2</i><div><b>로그인 또는 회원가입</b><span>쿠폰함에 빵 배당이 발급됩니다.</span></div></div>
@@ -732,6 +777,9 @@
     <!-- 토스트 피드백 -->
     <div class="toast" id="toast"></div>
 
+    <div class="trade-modal" id="trade-modal" onclick="modalBackdrop(event,'trade-modal')"><section class="modal-card" role="dialog" aria-modal="true"><div class="modal-handle"></div><div class="modal-title"><div class="modal-icon" id="trade-icon">🍞</div><div><h2 id="trade-name">ZERO 카스테라</h2><p>현재가 · 빵 1개 기준</p></div></div><div class="order-box"><div class="qty"><button onclick="changeQty(-1)">−</button><b><span id="trade-qty">1</span>개</b><button onclick="changeQty(1)">＋</button></div><div class="modal-price"><small>주문 예상금액</small><b id="trade-total">11,160원</b></div></div><button class="buy" onclick="addBasket()">빵 매수하기</button><p class="campaign-note">‘매수’는 재미를 위한 표현이며 실제 금융상품 거래가 아닙니다. 선택한 빵은 일반 상품 주문으로 자사몰 장바구니에 연결됩니다.</p></section></div>
+    <div class="trade-modal event-modal" id="event-modal" onclick="modalBackdrop(event,'event-modal')"><section class="modal-card" role="dialog" aria-modal="true"><div class="modal-handle"></div><div class="event-symbol" id="event-symbol">📈</div><h2 id="popup-title">정상 거래 중</h2><p class="lead" id="popup-lead">모든 빵을 평소와 같이 거래할 수 있습니다.</p><div class="benefit-box" id="popup-benefit">현재 적용 중인 특별 시장 이벤트가 없습니다.</div><div class="event-actions"><button onclick="closeModal('event-modal')">닫기</button><button class="main" onclick="closeModal('event-modal')">혜택 확인하기</button></div><p class="campaign-note">사이드카와 서킷브레이커는 실제 거래소 제도를 차용한 캠페인 명칭입니다. 표시된 발동 조건과 혜택은 MAKJI가 정한 프로모션 규칙입니다.</p></section></div>
+
   </section>
 </main>
 
@@ -784,19 +832,33 @@
     }
   };
 
+  const products = {
+    castella:{name:'ZERO 카스테라',icon:'🍞',type:'가벼운 간식',desc:'설탕·밀가루 ZERO, 촉촉한 글루텐프리 카스테라',price:12000,extra:0,visual:'light',reason:'가벼운 간식 관심도와 판매 가능 재고 점수가 오늘 가장 높아요.'},
+    morning:{name:'제로 무설탕 모닝롤',icon:'🥖',type:'든든한 식사',desc:'매일 부담 없이 곁들이는 담백한 식사빵',price:9800,extra:2,visual:'meal',reason:'생활물가 상승일에 식사 대용 제품의 재구매 점수를 반영했어요.'},
+    financier:{name:'글루텐프리 휘낭시에',icon:'🧈',type:'달콤한 디저트',desc:'고소하고 진한 풍미를 담은 작은 디저트',price:14500,extra:1,visual:'sweet',reason:'최근 디저트 관심도와 할인 후 수익성이 기준을 통과했어요.'},
+    muffin:{name:'비건 잉글리시 머핀',icon:'🥯',type:'든든한 식사',desc:'식물성 재료로 만든 담백한 브런치 빵',price:11800,extra:1,visual:'meal',reason:'식사빵 재구매 가능성과 재고 건전성이 높게 측정됐어요.'},
+    choco:{name:'마틸다 초코케이크',icon:'🍫',type:'달콤한 디저트',desc:'진한 초콜릿 풍미를 가볍게 즐기는 케이크',price:18900,extra:0,visual:'sweet',reason:'변동이 큰 날 선호되는 위로 간식의 최근 관심도를 반영했어요.'},
+    scone:{name:'글루텐프리 스콘',icon:'🥐',type:'가벼운 간식',desc:'차와 함께 즐기는 담백한 글루텐프리 스콘',price:13200,extra:2,visual:'light',reason:'곡물지수 테마와 판매 가능 재고 조건을 함께 통과했어요.'}
+  };
+  const assortments={tue:['morning','castella','financier'],mon:['muffin','scone','castella'],wed:['choco','castella','morning'],thu:['financier','choco','scone']};
   let currentScenario = scenarios.tue;
+  let currentScenarioKey = 'tue';
+  let currentProduct = products.castella;
   let revealTimer;
 
   function applyScenario(key) {
     currentScenario = scenarios[key];
+    currentScenarioKey = key;
     renderUI();
     showToast(`시나리오 변경: KOSPI 변동 ${currentScenario.kospiDiff} ➔ 최종 할인 ${currentScenario.finalRate}%`);
   }
 
   function renderUI() {
     const s = currentScenario;
-    const origPrice = 12000;
-    const discountedPrice = Math.round(origPrice * (1 - s.finalRate / 100));
+    renderMarket();
+    const origPrice = currentProduct.price;
+    const productRate = Math.min(s.finalRate + currentProduct.extra, 12);
+    const discountedPrice = Math.round(origPrice * (1 - productRate / 100) / 10) * 10;
 
     // 화면 1
     document.getElementById('ui-hero-date').textContent = `${s.date} · 오늘의 빵 배당`;
@@ -813,11 +875,17 @@
     document.getElementById('ui-why-rate').textContent = s.finalRate + '%';
 
     // 화면 2
-    document.getElementById('ui-res-tag').textContent = `${s.finalRate}% 배당이 열렸어요`;
-    document.getElementById('ui-ready-rate').textContent = s.finalRate + '%';
+    document.getElementById('ui-res-tag').textContent = `${productRate}% 배당이 열렸어요`;
+    document.getElementById('ui-ready-rate').textContent = productRate + '%';
+    document.getElementById('product-name').textContent = currentProduct.name;
+    document.getElementById('product-desc').textContent = currentProduct.desc;
+    document.getElementById('product-original').textContent = origPrice.toLocaleString() + '원';
+    document.getElementById('product-icon').textContent = currentProduct.icon;
+    document.getElementById('product-reason').textContent = currentProduct.reason;
+    document.getElementById('handoff-product').textContent = currentProduct.name;
     document.getElementById('ui-res-price').textContent = discountedPrice.toLocaleString() + '원';
-    document.getElementById('ui-res-pill').textContent = `${s.finalRate}% OFF`;
-    document.getElementById('ui-shop-btn-text').textContent = `${s.finalRate}% 쿠폰 받고 구매하기`;
+    document.getElementById('ui-res-pill').textContent = `${productRate}% OFF`;
+    document.getElementById('ui-shop-btn-text').textContent = `${productRate}% 쿠폰 받고 구매하기`;
 
     // 서명 토큰 URL 생성 (권장안 8항)
     const payload = JSON.stringify({ campaign: 'bread_dividend', date: s.date, rate: s.finalRate, sku: 'ZERO-CAS' });
@@ -839,6 +907,21 @@
   }
 
   // 화면 전환 (한 화면에 한 가지 행동만 요청하는 권장안 7항 엄수)
+  function renderMarket() {
+    const s=currentScenario, keys=assortments[currentScenarioKey];
+    document.getElementById('sig-kospi').textContent=s.kospiVal;
+    const move=document.getElementById('sig-kospi-move'); move.textContent=(s.isUp?'↑':'↓')+s.absMove.toFixed(2)+'%'; move.className=s.isUp?'up':'down';
+    const themes={tue:['생활비 방어장','식사빵과 가벼운 간식 혜택이 커졌어요.'],mon:['담백한 일상장','조용한 시장에는 매일 먹기 좋은 빵을 모았어요.'],wed:['마음 방어장','변동이 큰 날에는 달콤한 위로를 골랐어요.'],thu:['디저트 특별장','큰 움직임이 있던 오늘, 인기 디저트 혜택이 열렸어요.']};
+    document.getElementById('theme-title').textContent=themes[currentScenarioKey][0];
+    document.getElementById('theme-copy').textContent=themes[currentScenarioKey][1];
+    document.getElementById('theme-rule').textContent=`KOSPI 변동 폭 ${s.absMove.toFixed(2)}% → 기본 혜택 ${s.finalRate}%`;
+    document.getElementById('market-list').innerHTML=keys.map((key,i)=>{const p=products[key],rate=Math.min(s.finalRate+p.extra,12),sale=Math.round(p.price*(1-rate/100)/10)*10;return `<div class="market-item" onclick="selectProduct('${key}')"><div class="market-visual ${p.visual}">${p.icon}<b>${rate}%</b><button class="heart" onclick="toggleSave(event,this,'${p.name}')" aria-label="${p.name} 찜하기">♡</button></div><div class="market-copy"><small>${i+1} · ${p.type} 마켓</small><h4>${p.name}</h4><p>${p.desc}</p><div class="market-price"><strong>${sale.toLocaleString()}원</strong><span>오늘만 ${rate}%</span></div></div></div>`}).join('');
+  }
+  function selectProduct(key){currentProduct=products[key];renderUI();showScreen('view-result');track('product_select',{product:key})}
+  function toggleSave(e,button,name){e.stopPropagation();button.classList.toggle('saved');button.textContent=button.classList.contains('saved')?'♥':'♡';showToast(button.classList.contains('saved')?`${name}을 찜했어요`:'찜에서 삭제했어요')}
+  function toggleNotify(button){button.classList.toggle('saved');button.textContent=button.classList.contains('saved')?'●':'♢';showToast(button.classList.contains('saved')?'내일 마켓 알림을 신청했어요':'알림을 해제했어요')}
+  function shareMarket(){shareResult()}
+
   function showScreen(id) {
     clearTimeout(revealTimer);
     document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
@@ -894,8 +977,37 @@
     document.getElementById(target).classList.add('active');
   });
 
+  const exchangeProducts=[
+    {id:'castella',name:'ZERO 카스테라',code:'ZERO-CAS',icon:'🍞',price:11160,change:'+2.8%'},
+    {id:'morning',name:'무설탕 모닝롤',code:'ZERO-MOR',icon:'🥖',price:8920,change:'+1.4%'},
+    {id:'financier',name:'GF 휘낭시에',code:'GF-FIN',icon:'🧈',price:13340,change:'-0.7%'},
+    {id:'choco',name:'마틸다 초코케이크',code:'CHO-MAT',icon:'🍫',price:17600,change:'+3.1%'}
+  ];
+  const eventData={
+    normal:{title:'오늘은 정상 거래 중이에요',symbol:'📈',popup:'모든 빵 정상 거래',lead:'원하는 빵을 1개부터 자유롭게 담을 수 있습니다.',benefit:'현재 적용 중인 특별 시장 이벤트가 없습니다.',kind:''},
+    sidecar:{title:'빵 사이드카 발동 · 배송비 정지',symbol:'🛵',popup:'10분간 배송비가 멈춥니다',lead:'시장 변동이 커져 MAKJI가 배송비 부담을 잠시 정지했습니다.',benefit:'<b>10분 안에 빵 2개 이상 매수하면 배송비 0원</b><br>캠페인 조건: KOSPI 절대 변동 폭 2% 이상',kind:'warn'},
+    breaker:{title:'빵 서킷브레이커 · 가격 동결',symbol:'⏸️',popup:'오늘 빵값을 멈췄습니다',lead:'급격한 시장 변동에도 고객의 빵 가격은 더 오르지 않습니다.',benefit:'<b>60분간 대표 빵 3종 가격 동결 + 12% 쿠폰</b><br>캠페인 조건: KOSPI 절대 변동 폭 4% 이상',kind:'danger'},
+    golden:{title:'금 최고가 근접 · 골든타임',symbol:'✨',popup:'지금은 황금빛 빵 시간',lead:'금 가격이 최고가를 경신하면 노릇한 디저트 혜택이 열립니다.',benefit:'<b>휘낭시에·카스테라 15% + 골드 패키지</b><br>캠페인 조건: 금 현물 종가 사상 최고가 경신',kind:'golden'}
+  };
+  let tradeProduct=exchangeProducts[0],tradeQty=1,basket=[];
+  function renderQuotes(){document.getElementById('quote-list').innerHTML=exchangeProducts.map(p=>`<div class="quote" onclick="openTrade('${p.id}')"><div class="asset"><div class="asset-icon">${p.icon}</div><div><b>${p.name}</b><small>${p.code} · 1개</small></div></div><div class="quote-price"><b>${p.price.toLocaleString()}원</b><small class="${p.change[0]==='-'?'blue':'red'}">${p.change}</small></div><div style="text-align:right"><button class="trade-btn">1개 매수</button></div></div>`).join('')}
+  function openTrade(id){tradeProduct=exchangeProducts.find(p=>p.id===id);tradeQty=1;document.getElementById('trade-icon').textContent=tradeProduct.icon;document.getElementById('trade-name').textContent=tradeProduct.name;updateTrade();openModal('trade-modal')}
+  function changeQty(n){tradeQty=Math.max(1,Math.min(9,tradeQty+n));updateTrade()}
+  function updateTrade(){document.getElementById('trade-qty').textContent=tradeQty;document.getElementById('trade-total').textContent=(tradeProduct.price*tradeQty).toLocaleString()+'원';document.querySelector('.buy').textContent=`빵 ${tradeQty}개 매수하기`}
+  function addBasket(){for(let i=0;i<tradeQty;i++)basket.push(tradeProduct);renderBasket();closeModal('trade-modal');showToast(`${tradeProduct.name} ${tradeQty}개를 담았어요`)}
+  function renderBasket(){document.getElementById('basket-count').textContent=basket.length;document.getElementById('basket-total').textContent=basket.reduce((s,p)=>s+p.price,0).toLocaleString()+'원';document.getElementById('basket').innerHTML=basket.length?basket.slice(-4).map(p=>`<span class="basket-chip">${p.icon} <b>${p.name}</b></span>`).join(''):'<span class="basket-empty">아직 담은 빵이 없습니다.</span>';document.getElementById('checkout').disabled=!basket.length}
+  function applyEvent(key){const e=eventData[key],banner=document.getElementById('event-banner');banner.className='event-banner '+e.kind;document.getElementById('event-title').textContent=e.title;document.getElementById('event-symbol').textContent=e.symbol;document.getElementById('popup-title').textContent=e.popup;document.getElementById('popup-lead').textContent=e.lead;document.getElementById('popup-benefit').innerHTML=e.benefit;openEvent()}
+  function openEvent(){openModal('event-modal')}
+  function openModal(id){document.getElementById(id).classList.add('open')}
+  function closeModal(id){document.getElementById(id).classList.remove('open')}
+  function modalBackdrop(e,id){if(e.target===document.getElementById(id))closeModal(id)}
+  setInterval(()=>{const d=new Date();document.getElementById('market-clock').textContent=d.toLocaleTimeString('ko-KR',{hour12:false})},1000);
+
   // 초기 렌더링: #view-result처럼 화면별 직접 검수도 지원
   renderUI();
+  renderQuotes();
+  const previewEvent = new URLSearchParams(location.search).get('event');
+  if (previewEvent && eventData[previewEvent]) applyEvent(previewEvent);
   const initialView = location.hash.slice(1);
   if (initialView && document.getElementById(initialView)) {
     document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
