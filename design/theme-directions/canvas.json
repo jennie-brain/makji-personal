@@ -1,0 +1,11 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 390, "h": 844, "title": "현재 브랜드 · 따뜻한 베이커리" },
+    { "file": "DirectionA.dc.html", "x": 470, "y": 0, "w": 390, "h": 844, "title": "모던 블루 · 신뢰" },
+    { "file": "DirectionB.dc.html", "x": 940, "y": 0, "w": 390, "h": 844, "title": "프로페셔널 데이터" }
+  ],
+  "annotations": [
+    { "id": "note-compare", "x": 0, "y": -110, "w": 1330, "text": "MAKJI STOCK 테마 방향 비교 — 세 화면 모두 동일한 홈 화면 콘텐츠(BREAD-DAQ 지수, 마틸다 초코케이크 예측 퀴즈, 모닝 빵레터)를 사용하고 톤&매너만 다릅니다. 왼쪽부터: 현재 브랜드(귀여운 베이커리) / 모던 블루(신뢰) / 프로페셔널 데이터(증권 터미널)." }
+  ],
+  "launch": { "view": "canvas" }
+}
