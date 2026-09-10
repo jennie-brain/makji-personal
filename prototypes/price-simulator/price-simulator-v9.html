@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAKJI 빵 시세 시뮬레이터 v9 | 양방향 트렌드(±5%) & 쿠폰·마진 방어 모델</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #ff6b18;
+      --primary-dark: #e55609;
+      --primary-light: #fff4ed;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --up-red: #ef4444;
+      --up-bg: #fef2f2;
+      --down-blue: #2563eb;
+      --down-bg: #eff6ff;
+      --tier-low: #10b981;
+      --tier-mid: #3b82f6;
+      --tier-high: #8b5cf6;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* 버전 스위처 */
+    .version-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .version-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .version-link {
+      padding: 4px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .version-link.old { background: #334155; color: #cbd5e1; }
+    .version-link.active { background: var(--primary); color: #fff; font-weight: 800; }
+    .version-link:hover { opacity: 0.85; }
+
+    header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-area h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-area p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-v9 { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .badge-clean { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .badge-synergy { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+    /* 핵심 지표 4선 카드 */
+    .diag-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .diag-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .diag-card .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .diag-card .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .diag-card .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* 컨트롤 패널 */
+    .control-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .control-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preset-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover { background: #e2e8f0; }
+    .preset-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      margin: 16px 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .slider-box {
+      background: #f8fafc;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border: 1px solid #edf2f7;
+    }
+
+    .slider-box.trend-box { border-left: 4px solid #ef4444; }
+    .slider-box.fx-box { border-left: 4px solid #d97706; }
+    .slider-box.tier1-box { border-left: 4px solid var(--tier-low); }
+    .slider-box.tier2-box { border-left: 4px solid var(--tier-mid); }
+    .slider-box.tier3-box { border-left: 4px solid var(--tier-high); }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .slider-top label {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slider-val {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #cbd5e1;
+      outline: none;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .slider-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* 🎁 쿠폰 & 마진 시너지 카드 */
+    .synergy-card {
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+      border: 2px solid #fde68a;
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .synergy-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .synergy-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .synergy-select-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .synergy-select {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #f59e0b;
+      background: #fff;
+      font-weight: 700;
+      color: #78350f;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .synergy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .synergy-stat {
+      background: #fff;
+      border: 1px solid #fef3c7;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.05);
+    }
+
+    .synergy-stat .label {
+      font-size: 12px;
+      color: #78350f;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .synergy-stat .val {
+      font-size: 19px;
+      font-weight: 800;
+      color: #1e293b;
+    }
+
+    .synergy-conclusion {
+      background: #ecfdf5;
+      border: 1px solid #6ee7b7;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #065f46;
+      line-height: 1.6;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* 테이블 영역 */
+    .table-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      overflow-x: auto;
+    }
+
+    .table-panel h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th:first-child, td:first-child { text-align: left; }
+    th:nth-child(2), td:nth-child(2) { text-align: left; }
+
+    tr:hover td { background-color: #f8fafc; }
+
+    .tag-tier {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tag-tier1 { background: #d1fae5; color: #065f46; }
+    .tag-tier2 { background: #dbeafe; color: #1e40af; }
+    .tag-tier3 { background: #ede9fe; color: #5b21b6; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .status-up { background: var(--up-bg); color: var(--up-red); }
+    .status-down { background: var(--down-bg); color: var(--down-blue); }
+
+    .coupon-price {
+      font-weight: 800;
+      color: #059669;
+      background: #ecfdf5;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* 차트 영역 */
+    .chart-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .product-select-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 380px;
+      width: 100%;
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      body { padding: 12px; }
+      header { padding: 16px; }
+      .control-panel, .table-panel, .chart-panel, .synergy-card { padding: 16px; }
+      .brand-area h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 버전 전환 바 -->
+  <div class="version-bar">
+    <div style="font-weight: 700;">📌 MAKJI 데일리 시세 시뮬레이터 버전 셀렉터</div>
+    <div class="version-links">
+      <a href="price-simulator-v1.html" class="version-link old">v1</a>
+      <a href="price-simulator-v2.html" class="version-link old">v2</a>
+      <a href="price-simulator-v3.html" class="version-link old">v3</a>
+      <a href="price-simulator-v4.html" class="version-link old">v4</a>
+      <a href="price-simulator-v5.html" class="version-link old">v5</a>
+      <a href="price-simulator-v6.html" class="version-link old">v6</a>
+      <a href="price-simulator-v7.html" class="version-link old">v7</a>
+      <a href="price-simulator-v8.html" class="version-link old">v8 (2대 지표 슬림)</a>
+      <a href="price-simulator-v9.html" class="version-link active">v9 (양방향 트렌드 ±5% & 쿠폰 마진 방어)</a>
+    </div>
+  </div>
+
+  <!-- 메인 헤더 -->
+  <header>
+    <div class="brand-area">
+      <h1>🥐 MAKJI 빵 시세 시뮬레이터 v9.0</h1>
+      <p>양방향 트렌드(±5.0%) & 환율(±3.0%) 2대 실물 지표 연동 및 퀴즈 쿠폰(500원) 시너지 마진 방어 시뮬레이션</p>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-v9">🔥 5상승 vs 5하락 밸런스</span>
+      <span class="badge badge-clean">🛡️ KOSPI 100% 영구 배제</span>
+      <span class="badge badge-synergy">🎁 퀴즈 쿠폰 시너지 마진 55%+</span>
+    </div>
+  </header>
+
+  <!-- 핵심 진단 4선 카드 -->
+  <div class="diag-grid">
+    <div class="diag-card">
+      <div class="title">오늘의 10종 평균 변동률</div>
+      <div class="value" id="statAvgRate" style="color: #ef4444;">+0.21%</div>
+      <div class="desc">상승과 하락이 절묘하게 균형을 이루는 주식 전광판</div>
+    </div>
+    <div class="diag-card">
+      <div class="title">상승 vs 하락 품목 비율</div>
+      <div class="value" id="statBalance" style="color: #1e293b;">5종(▲) vs 5종(▼)</div>
+      <div class="desc">100% 하락 지루함 탈피! 매일 손에 땀을 쥐는 거래소 UX</div>
+    </div>
+    <div class="diag-card">
+      <div class="title">퀴즈 500원 쿠폰 평균 할인 체감</div>
+      <div class="value" id="statCouponBenefit" style="color: #059669;">-16.4%</div>
+      <div class="desc">시세가 올라도 쿠폰 쓰면 정가 이하 구매 성공!</div>
+    </div>
+    <div class="diag-card">
+      <div class="title">쿠폰 적용 시 평균 영업 마진율</div>
+      <div class="value" id="statMargin" style="color: #2563eb;">56.2%</div>
+      <div class="desc">원가율 40% 기준 역마진 위험 제로(0%) 철통 방어</div>
+    </div>
+  </div>
+
+  <!-- 🎁 퀴즈 쿠폰 & 게이미피케이션 시너지 마진 분석기 카드 -->
+  <div class="synergy-card">
+    <div class="synergy-header">
+      <div class="synergy-title">
+        <span>🎁 퀴즈 500원 쿠폰 & 게이미피케이션 시너지 마진 분석기</span>
+      </div>
+      <div class="synergy-select-box">
+        <span>분석 대상 상품:</span>
+        <select id="synergyProductSelect" class="synergy-select" onchange="updateSynergyCard()">
+          <!-- JS에서 동적 주입 -->
+        </select>
+      </div>
+    </div>
+
+    <div class="synergy-grid">
+      <div class="synergy-stat">
+        <div class="label">기본 정가 / 제조원가 (40%)</div>
+        <div class="val" id="synBaseCost">3,800원 / 1,520원</div>
+      </div>
+      <div class="synergy-stat">
+        <div class="label">오늘의 실시간 시세 (v9)</div>
+        <div class="val" id="synTodayPrice" style="color: #ef4444;">4,010원 (+210원 ▲)</div>
+      </div>
+      <div class="synergy-stat">
+        <div class="label">퀴즈 500원 쿠폰 적용 결제액</div>
+        <div class="val coupon-price" id="synPayPrice">3,510원</div>
+      </div>
+      <div class="synergy-stat">
+        <div class="label">고객 체감 정가 대비 할인율</div>
+        <div class="val" id="synCustomerBenefit" style="color: #059669;">-290원 (-7.6%) 득템!</div>
+      </div>
+      <div class="synergy-stat">
+        <div class="label">회사 잔여 영업 마진 (마진율)</div>
+        <div class="val" id="synCompanyMargin" style="color: #2563eb;">1,990원 (56.7%)</div>
+      </div>
+    </div>
+
+    <div class="synergy-conclusion">
+      <span style="font-size: 20px;">💡</span>
+      <span id="synConclusionText">
+        <strong>커머스 인사이트:</strong> 휘낭시에가 검색 급증으로 오늘 +210원 올랐지만, 고객이 '내일 빵값 퀴즈' 500원 쿠폰을 먹이면 <strong>정가 대비 290원 싸게 구매(-7.6%)</strong>하여 승리의 우월감을 느끼고, 회사는 <strong>56.7%의 탄탄한 영업 마진</strong>을 완벽히 방어합니다!
+      </span>
+    </div>
+  </div>
+
+  <!-- 제어 슬라이더 컨트롤 패널 -->
+  <div class="control-panel">
+    <div class="control-header">
+      <div class="control-title">
+        <span>⚙️ 수요·공급 2대 실물 지표 & 3단계 캡 정밀 조정기</span>
+      </div>
+      <div class="preset-group">
+        <button class="preset-btn active" onclick="applyV9Preset('standard', this)">① 표준 5:5 밸런스</button>
+        <button class="preset-btn" onclick="applyV9Preset('dynamic', this)">② 역동적 거래소장</button>
+        <button class="preset-btn" onclick="applyV9Preset('margin', this)">③ 마진 철통 방어형</button>
+        <button class="preset-btn" onclick="applyV9Preset('festa', this)">④ 줍줍 감사 페스타</button>
+      </div>
+    </div>
+
+    <div class="section-title">📊 1. 수요·공급 2대 실물 지표 파라미터 (코스피 완전 배제)</div>
+    <div class="slider-grid">
+      <!-- 1. 트렌드 양방향 -->
+      <div class="slider-box trend-box">
+        <div class="slider-top">
+          <label>🔥/🌊 [수요] NAVER 검색 트렌드 양방향 한도 (Trend Momentum)</label>
+          <span class="slider-val" id="valTrendCap" style="color: #ef4444;">±5.0%</span>
+        </div>
+        <input type="range" id="inputTrendCap" min="1.0" max="8.0" step="0.5" value="5.0" oninput="updateV9Simulation()">
+        <div class="slider-hint">검색 폭증 시 인기 프리미엄(▲), 수요 안정 시 줍줍 감사 세일(▼) (±X%)</div>
+      </div>
+
+      <!-- 2. 환율 한도 -->
+      <div class="slider-box fx-box">
+        <div class="slider-top">
+          <label>💵 [공급] USD/KRW 환율 비용 압력 한도 (한국은행 ECOS API)</label>
+          <span class="slider-val" id="valFxCap" style="color: #d97706;">±3.0%</span>
+        </div>
+        <input type="range" id="inputFxCap" min="1.0" max="5.0" step="0.5" value="3.0" oninput="updateV9Simulation()">
+        <div class="slider-hint">프랑스산 버터, 초콜릿, 밀가루 수입 원자재의 실질 원가 변동폭 (±X%)</div>
+      </div>
+    </div>
+
+    <div class="section-title">🛡️ 2. 가격대별 3단계 차등 안전장치 (Tiered Caps)</div>
+    <div class="slider-grid">
+      <div class="slider-box tier1-box">
+        <div class="slider-top">
+          <label>🟢 Tier 1 캡 (1만원 미만 5종: 머핀, 샌드위치, 휘낭시에, 스콘, 모닝롤)</label>
+          <span class="slider-val" id="valTier1Cap" style="color: var(--tier-low);">±10%</span>
+        </div>
+        <input type="range" id="inputTier1Cap" min="5" max="15" step="1" value="10" oninput="updateV9Simulation()">
+        <div class="slider-hint">가벼운 데일리 디저트로 등락 체감 극대화</div>
+      </div>
+
+      <div class="slider-box tier2-box">
+        <div class="slider-top">
+          <label>🔵 Tier 2 캡 (1만~2만원 3종: 테트리스, ZERO 카스테라, 티라미수)</label>
+          <span class="slider-val" id="valTier2Cap" style="color: var(--tier-mid);">±7%</span>
+        </div>
+        <input type="range" id="inputTier2Cap" min="4" max="10" step="1" value="7" oninput="updateV9Simulation()">
+        <div class="slider-hint">적정 등락폭으로 일상 구매 전환 촉진</div>
+      </div>
+
+      <div class="slider-box tier3-box">
+        <div class="slider-top">
+          <label>🟣 Tier 3 캡 (2만원 이상 2종: 냉동생지 3종, 마틸다 초코케이크)</label>
+          <span class="slider-val" id="valTier3Cap" style="color: var(--tier-high);">±5%</span>
+        </div>
+        <input type="range" id="inputTier3Cap" min="2" max="8" step="1" value="5" oninput="updateV9Simulation()">
+        <div class="slider-hint">고가 품목의 과도한 가격 출렁임 및 마진 리스크 철통 방어</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 오늘(D-Day) MAKJI 10종 제품 분해 테이블 -->
+  <div class="table-panel">
+    <h2>
+      <span>🧾 오늘(D-Day) 10종 빵 전광판 & 2대 지표 분해 시세표</span>
+      <span style="font-size: 13px; font-weight: 500; color: var(--text-muted);">
+        환율 원가 변동: <strong>+0.95%</strong> (소폭 상승 압력)
+      </span>
+    </h2>
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>상품명</th>
+          <th>티어</th>
+          <th>기본정가</th>
+          <th>[수요] 트렌드</th>
+          <th>[공급] 환율</th>
+          <th>최종 등락률</th>
+          <th>오늘 최종시세</th>
+          <th>전일비 (원)</th>
+          <th>상태</th>
+          <th>퀴즈 500원 쿠폰가</th>
+        </tr>
+      </thead>
+      <tbody id="todayTableBody">
+        <!-- JS 생성 -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 14일 시계열 차트 영역 -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <div class="chart-title">📈 14일간 빵 시세 시계열 인터랙티브 차트</div>
+      <div class="product-select-tabs" id="productTabs">
+        <!-- JS 동적 생성 -->
+      </div>
+    </div>
+    <div class="chart-container">
+      <canvas id="v9ChartCanvas"></canvas>
+    </div>
+  </div>
+
+  <!-- 14일 전 제품 가격 매트릭스 테이블 -->
+  <div class="table-panel">
+    <h2>📅 14일간 10종 전 제품 시계열 가격 매트릭스 (원)</h2>
+    <table>
+      <thead>
+        <tr id="matrixHeader">
+          <th>날짜</th>
+          <th>머핀 (1.5k)</th>
+          <th>샌드위치 (2.4k)</th>
+          <th>휘낭시에 (3.8k)</th>
+          <th>스콘 (3.8k)</th>
+          <th>모닝롤 (4.5k)</th>
+          <th>테트리스 (11k)</th>
+          <th>카스테라 (12k)</th>
+          <th>티라미수 (15k)</th>
+          <th>생지3종 (21k)</th>
+          <th>마틸다 (42k)</th>
+        </tr>
+      </thead>
+      <tbody id="matrixBody">
+        <!-- JS 생성 -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // 10종 상품 기본 메타데이터
+    const PRODUCTS = [
+      { id: 'p1', name: '비건 잉글리시 머핀', basePrice: 1500, tier: 'Tier 1', tierKey: 't1', cost: 600 },
+      { id: 'p2', name: '대만식 샌드위치', basePrice: 2400, tier: 'Tier 1', tierKey: 't1', cost: 960 },
+      { id: 'p3', name: '휘낭시에', basePrice: 3800, tier: 'Tier 1', tierKey: 't1', cost: 1520 },
+      { id: 'p4', name: '글루텐프리 스콘', basePrice: 3800, tier: 'Tier 1', tierKey: 't1', cost: 1520 },
+      { id: 'p5', name: '모닝롤', basePrice: 4500, tier: 'Tier 1', tierKey: 't1', cost: 1800 },
+      { id: 'p6', name: '테트리스 브레드', basePrice: 11000, tier: 'Tier 2', tierKey: 't2', cost: 4400 },
+      { id: 'p7', name: 'ZERO 카스테라', basePrice: 12000, tier: 'Tier 2', tierKey: 't2', cost: 4800 },
+      { id: 'p8', name: '티라미수', basePrice: 15000, tier: 'Tier 2', tierKey: 't2', cost: 6000 },
+      { id: 'p9', name: '냉동생지 3종', basePrice: 21000, tier: 'Tier 3', tierKey: 't3', cost: 8400 },
+      { id: 'p10', name: '마틸다 초코케이크', basePrice: 42000, tier: 'Tier 3', tierKey: 't3', cost: 16800 }
+    ];
+
+    // 14일간 환율 전일비 (D-13 ~ D-Day)
+    const USD_CHANGES = [
+      0.003, -0.004, -0.006, 0.002, 0.005, -0.001, -0.002,
+      0.004, -0.003, 0.001, 0.006, -0.004, -0.002, 0.0032
+    ];
+
+    // 14일간 각 상품별 네이버 검색 상대지수 (0.0 ~ 1.0, 0.5가 중립선)
+    // 0.5 초과면 양수(+), 0.5 미만이면 음수(-)
+    // D-Day(인덱스 13): p10(0.88), p3(0.95), p6(0.82), p1(0.75), p8(0.62) -> 5종 상승!
+    // p2(0.18), p4(0.08), p5(0.02), p7(0.00), p9(0.10) -> 5종 하락!
+    const TREND_SCORES = {
+      p1:  [0.60, 0.70, 0.45, 0.40, 0.55, 0.75, 0.65, 0.52, 0.42, 0.62, 0.72, 0.58, 0.50, 0.75],
+      p2:  [0.45, 0.55, 0.35, 0.30, 0.40, 0.60, 0.50, 0.42, 0.32, 0.50, 0.58, 0.45, 0.38, 0.18],
+      p3:  [0.70, 0.85, 0.40, 0.30, 0.55, 0.90, 0.75, 0.60, 0.40, 0.70, 0.85, 0.65, 0.50, 0.95],
+      p4:  [0.35, 0.30, 0.25, 0.20, 0.30, 0.40, 0.35, 0.30, 0.22, 0.35, 0.40, 0.32, 0.28, 0.08],
+      p5:  [0.30, 0.25, 0.20, 0.15, 0.25, 0.35, 0.30, 0.25, 0.18, 0.28, 0.35, 0.28, 0.22, 0.02],
+      p6:  [0.65, 0.72, 0.42, 0.35, 0.55, 0.80, 0.70, 0.55, 0.42, 0.65, 0.75, 0.60, 0.48, 0.82],
+      p7:  [0.30, 0.20, 0.15, 0.10, 0.20, 0.30, 0.25, 0.20, 0.15, 0.25, 0.30, 0.22, 0.18, 0.00],
+      p8:  [0.55, 0.60, 0.40, 0.35, 0.52, 0.68, 0.60, 0.50, 0.40, 0.58, 0.65, 0.55, 0.45, 0.62],
+      p9:  [0.40, 0.35, 0.25, 0.20, 0.30, 0.45, 0.38, 0.32, 0.25, 0.35, 0.42, 0.35, 0.28, 0.10],
+      p10: [0.68, 0.78, 0.40, 0.32, 0.58, 0.85, 0.72, 0.55, 0.38, 0.65, 0.80, 0.60, 0.45, 0.88]
+    };
+
+    const V9_PRESETS = {
+      standard:  { trend: 5.0, fx: 3.0, tier1: 10, tier2: 7, tier3: 5 },
+      dynamic:   { trend: 7.0, fx: 4.0, tier1: 12, tier2: 10, tier3: 7 },
+      margin:    { trend: 3.0, fx: 2.0, tier1: 8, tier2: 5, tier3: 3 },
+      festa:     { trend: 6.0, fx: 2.0, tier1: 10, tier2: 7, tier3: 5 }
+    };
+
+    let v9State = {
+      maxTrendCap: 0.05,
+      maxFxImpact: 0.03,
+      tier1Cap: 0.10,
+      tier2Cap: 0.07,
+      tier3Cap: 0.05,
+      rounding: 10,
+      selectedProductId: 'p10'
+    };
+
+    let v9ChartInstance = null;
+
+    function roundPrice(val, step) {
+      if (step === 0) return Math.round(val);
+      return Math.round(val / step) * step;
+    }
+
+    function getProductCap(prod) {
+      if (prod.tierKey === 't1') return v9State.tier1Cap;
+      if (prod.tierKey === 't2') return v9State.tier2Cap;
+      return v9State.tier3Cap;
+    }
+
+    // 핵심 계산: 양방향 트렌드 + 환율
+    function calculateV9ProductDay(prod, dayIdx) {
+      const score = TREND_SCORES[prod.id][dayIdx];
+      const fxChange = USD_CHANGES[dayIdx];
+
+      // 트렌드 점수 0.5를 기준으로 편차 산출 (-1.0 ~ +1.0)
+      const trendDeviation = (score - 0.5) / 0.5;
+      const trendImpact = trendDeviation * v9State.maxTrendCap;
+
+      // 환율 변동률 * 3.0 (최대 한도 clamp)
+      let fxImpact = fxChange * 3.0;
+      if (fxImpact > v9State.maxFxImpact) fxImpact = v9State.maxFxImpact;
+      if (fxImpact < -v9State.maxFxImpact) fxImpact = -v9State.maxFxImpact;
+
+      const rawTotalRate = trendImpact + fxImpact;
+      const cap = getProductCap(prod);
+      let finalRate = rawTotalRate;
+      let isCapped = false;
+      let capType = 'normal';
+
+      if (rawTotalRate > cap) {
+        finalRate = cap;
+        isCapped = true;
+        capType = 'upper';
+      } else if (rawTotalRate < -cap) {
+        finalRate = -cap;
+        isCapped = true;
+        capType = 'lower';
+      }
+
+      const finalPrice = roundPrice(prod.basePrice * (1 + finalRate), v9State.rounding);
+      const diffPrice = finalPrice - prod.basePrice;
+
+      return {
+        score,
+        trendImpact,
+        fxImpact,
+        rawTotalRate,
+        finalRate,
+        finalPrice,
+        diffPrice,
+        cap,
+        isCapped,
+        capType
+      };
+    }
+
+    function updateV9Simulation() {
+      v9State.maxTrendCap = parseFloat(document.getElementById('inputTrendCap').value) / 100;
+      v9State.maxFxImpact = parseFloat(document.getElementById('inputFxCap').value) / 100;
+      v9State.tier1Cap = parseFloat(document.getElementById('inputTier1Cap').value) / 100;
+      v9State.tier2Cap = parseFloat(document.getElementById('inputTier2Cap').value) / 100;
+      v9State.tier3Cap = parseFloat(document.getElementById('inputTier3Cap').value) / 100;
+
+      document.getElementById('valTrendCap').innerText = '±' + (v9State.maxTrendCap * 100).toFixed(1) + '%';
+      document.getElementById('valFxCap').innerText = '±' + (v9State.maxFxImpact * 100).toFixed(1) + '%';
+      document.getElementById('valTier1Cap').innerText = '±' + (v9State.tier1Cap * 100).toFixed(0) + '%';
+      document.getElementById('valTier2Cap').innerText = '±' + (v9State.tier2Cap * 100).toFixed(0) + '%';
+      document.getElementById('valTier3Cap').innerText = '±' + (v9State.tier3Cap * 100).toFixed(0) + '%';
+
+      renderV9TodayTable();
+      calcV9Diagnostics();
+      updateSynergyCard();
+      renderV9Chart();
+      renderV9MatrixTable();
+    }
+
+    function applyV9Preset(name, btnEl) {
+      const p = V9_PRESETS[name];
+      if (!p) return;
+
+      document.getElementById('inputTrendCap').value = p.trend;
+      document.getElementById('inputFxCap').value = p.fx;
+      document.getElementById('inputTier1Cap').value = p.tier1;
+      document.getElementById('inputTier2Cap').value = p.tier2;
+      document.getElementById('inputTier3Cap').value = p.tier3;
+
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      updateV9Simulation();
+    }
+
+    function renderV9TodayTable() {
+      const tbody = document.getElementById('todayTableBody');
+      tbody.innerHTML = '';
+
+      PRODUCTS.forEach((prod, idx) => {
+        const res = calculateV9ProductDay(prod, 13);
+        const tr = document.createElement('tr');
+
+        const tierClass = prod.tierKey === 't1' ? 'tag-tier1' : (prod.tierKey === 't2' ? 'tag-tier2' : 'tag-tier3');
+        const isUp = res.finalRate >= 0;
+        const statusClass = isUp ? 'status-up' : 'status-down';
+        const statusText = isUp ? (res.finalRate >= 0.04 ? '🔥 급상승' : '🔥 상승') : '🌊 하락';
+        const rateColor = isUp ? 'var(--up-red)' : 'var(--down-blue)';
+        const sign = isUp ? '+' : '';
+
+        // 퀴즈 쿠폰(500원) 적용 가격
+        const couponPrice = Math.max(0, res.finalPrice - 500);
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${prod.name}</strong></td>
+          <td><span class="tag-tier ${tierClass}">${prod.tier}</span></td>
+          <td>${prod.basePrice.toLocaleString()}원</td>
+          <td style="color: ${res.trendImpact >= 0 ? 'var(--up-red)' : 'var(--down-blue)'}; font-weight:600;">
+            ${res.trendImpact >= 0 ? '+' : ''}${(res.trendImpact * 100).toFixed(2)}%
+          </td>
+          <td style="color: #d97706; font-weight:600;">
+            +${(res.fxImpact * 100).toFixed(2)}%
+          </td>
+          <td style="color: ${rateColor}; font-weight:800;">
+            ${sign}${(res.finalRate * 100).toFixed(2)}%
+            ${res.isCapped ? '<span style="font-size:10px; color:#ef4444;">[캡]</span>' : ''}
+          </td>
+          <td><strong style="color: ${rateColor}; font-size:14px;">${res.finalPrice.toLocaleString()}원</strong></td>
+          <td style="color: ${rateColor}; font-weight:700;">
+            ${sign}${res.diffPrice.toLocaleString()}원
+          </td>
+          <td>
+            <span class="status-badge ${statusClass}">${statusText}</span>
+          </td>
+          <td>
+            <span class="coupon-price">${couponPrice.toLocaleString()}원</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function calcV9Diagnostics() {
+      let totalRate = 0;
+      let upCount = 0;
+      let downCount = 0;
+      let totalDiscountRateWithCoupon = 0;
+      let totalMarginRateWithCoupon = 0;
+
+      PRODUCTS.forEach(prod => {
+        const res = calculateV9ProductDay(prod, 13);
+        totalRate += res.finalRate;
+        if (res.finalRate >= 0) upCount++;
+        else downCount++;
+
+        const couponPrice = res.finalPrice - 500;
+        const benefit = (prod.basePrice - couponPrice) / prod.basePrice;
+        totalDiscountRateWithCoupon += benefit;
+
+        const margin = (couponPrice - prod.cost) / couponPrice;
+        totalMarginRateWithCoupon += margin;
+      });
+
+      const avgRate = (totalRate / PRODUCTS.length) * 100;
+      const avgBenefit = (totalDiscountRateWithCoupon / PRODUCTS.length) * 100;
+      const avgMargin = (totalMarginRateWithCoupon / PRODUCTS.length) * 100;
+
+      const statAvgRateEl = document.getElementById('statAvgRate');
+      statAvgRateEl.innerText = (avgRate >= 0 ? '+' : '') + avgRate.toFixed(2) + '%';
+      statAvgRateEl.style.color = avgRate >= 0 ? 'var(--up-red)' : 'var(--down-blue)';
+
+      document.getElementById('statBalance').innerText = `${upCount}종(▲) vs ${downCount}종(▼)`;
+      document.getElementById('statCouponBenefit').innerText = `-${avgBenefit.toFixed(1)}% 체감`;
+      document.getElementById('statMargin').innerText = `${avgMargin.toFixed(1)}% 방어`;
+    }
+
+    // 쿠폰 & 마진 시너지 카드 업데이트
+    function updateSynergyCard() {
+      const selectEl = document.getElementById('synergyProductSelect');
+      const prodId = selectEl.value || v9State.selectedProductId;
+      const prod = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[9];
+
+      const res = calculateV9ProductDay(prod, 13);
+      const isUp = res.finalRate >= 0;
+      const couponPrice = Math.max(0, res.finalPrice - 500);
+      const diffFromBase = prod.basePrice - couponPrice; // 양수면 정가보다 쌈
+      const benefitPct = (diffFromBase / prod.basePrice) * 100;
+      const marginWon = couponPrice - prod.cost;
+      const marginPct = (marginWon / couponPrice) * 100;
+
+      document.getElementById('synBaseCost').innerText = `${prod.basePrice.toLocaleString()}원 / ${prod.cost.toLocaleString()}원`;
+      
+      const todayEl = document.getElementById('synTodayPrice');
+      todayEl.innerText = `${res.finalPrice.toLocaleString()}원 (${isUp ? '+' : ''}${res.diffPrice.toLocaleString()}원 ${isUp ? '▲' : '▼'})`;
+      todayEl.style.color = isUp ? 'var(--up-red)' : 'var(--down-blue)';
+
+      document.getElementById('synPayPrice').innerText = `${couponPrice.toLocaleString()}원`;
+      
+      const custEl = document.getElementById('synCustomerBenefit');
+      if (diffFromBase >= 0) {
+        custEl.innerText = `-${diffFromBase.toLocaleString()}원 (-${benefitPct.toFixed(1)}%) 득템!`;
+        custEl.style.color = '#059669';
+      } else {
+        custEl.innerText = `+${Math.abs(diffFromBase).toLocaleString()}원 결제`;
+        custEl.style.color = '#d97706';
+      }
+
+      document.getElementById('synCompanyMargin').innerText = `${marginWon.toLocaleString()}원 (${marginPct.toFixed(1)}%)`;
+
+      const conclusionEl = document.getElementById('synConclusionText');
+      if (isUp) {
+        conclusionEl.innerHTML = `
+          <strong>커머스 인사이트:</strong> ${prod.name}이(가) 실시간 검색 폭증으로 오늘 <strong>+${res.diffPrice.toLocaleString()}원 상승</strong>했으나, 고객이 '내일 빵값 퀴즈' 500원 쿠폰을 적용하면 <strong>정가 대비 -${diffFromBase.toLocaleString()}원 할인(-${benefitPct.toFixed(1)}%)</strong>으로 구매하여 승리감을 느끼고, 회사는 <strong>${marginPct.toFixed(1)}%의 견고한 영업 마진</strong>을 지켜냅니다!
+        `;
+      } else {
+        conclusionEl.innerHTML = `
+          <strong>커머스 인사이트:</strong> ${prod.name}이(가) 오늘 <strong>${res.diffPrice.toLocaleString()}원 줍줍 특가</strong>로 하락한 상태에서 500원 쿠폰까지 더해져 <strong>최종 ${couponPrice.toLocaleString()}원(-${benefitPct.toFixed(1)}%)</strong>이라는 역대급 혜택이 발생하며 고객 구매 전환이 폭발합니다!
+        `;
+      }
+    }
+
+    function initSynergySelect() {
+      const select = document.getElementById('synergyProductSelect');
+      select.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.innerText = `${p.name} (${p.basePrice.toLocaleString()}원)`;
+        if (p.id === 'p10') opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function initProductTabs() {
+      const container = document.getElementById('productTabs');
+      container.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${p.id === v9State.selectedProductId ? 'active' : ''}`;
+        btn.innerText = p.name;
+        btn.onclick = () => {
+          v9State.selectedProductId = p.id;
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('synergyProductSelect').value = p.id;
+          updateSynergyCard();
+          renderV9Chart();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function renderV9Chart() {
+      const prod = PRODUCTS.find(p => p.id === v9State.selectedProductId) || PRODUCTS[9];
+      const labels = [];
+      const prices = [];
+      const basePrices = [];
+
+      for (let i = 0; i < 14; i++) {
+        labels.push(i === 13 ? 'D-Day (오늘)' : `D-${13 - i}`);
+        const res = calculateV9ProductDay(prod, i);
+        prices.push(res.finalPrice);
+        basePrices.push(prod.basePrice);
+      }
+
+      const ctx = document.getElementById('v9ChartCanvas').getContext('2d');
+      if (v9ChartInstance) v9ChartInstance.destroy();
+
+      v9ChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: `${prod.name} 일별 시세 (원)`,
+              data: prices,
+              borderColor: '#ff6b18',
+              backgroundColor: 'rgba(255, 107, 24, 0.08)',
+              borderWidth: 3,
+              tension: 0.3,
+              fill: true,
+              pointBackgroundColor: prices.map((p, idx) => idx === 13 ? '#ef4444' : '#ff6b18'),
+              pointRadius: prices.map((p, idx) => idx === 13 ? 7 : 4),
+              pointHoverRadius: 8
+            },
+            {
+              label: '고정 기본정가',
+              data: basePrices,
+              borderColor: '#94a3b8',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              fill: false,
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.raw.toLocaleString()}원`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function(val) { return val.toLocaleString() + '원'; }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderV9MatrixTable() {
+      const tbody = document.getElementById('matrixBody');
+      tbody.innerHTML = '';
+
+      for (let day = 0; day < 14; day++) {
+        const tr = document.createElement('tr');
+        const dayLabel = day === 13 ? '<strong style="color:var(--primary);">D-Day (오늘)</strong>' : `D-${13 - day}`;
+        let cells = `<td>${dayLabel}</td>`;
+
+        PRODUCTS.forEach(prod => {
+          const res = calculateV9ProductDay(prod, day);
+          const isUp = res.finalRate >= 0;
+          const color = day === 13 ? (isUp ? 'var(--up-red)' : 'var(--down-blue)') : '#334155';
+          const weight = day === 13 ? '800' : '500';
+          cells += `<td style="color: ${color}; font-weight: ${weight};">${res.finalPrice.toLocaleString()}</td>`;
+        });
+
+        tr.innerHTML = cells;
+        tbody.appendChild(tr);
+      }
+    }
+
+    window.onload = () => {
+      initSynergySelect();
+      initProductTabs();
+      updateV9Simulation();
+    };
+  </script>
+</body>
+</html>

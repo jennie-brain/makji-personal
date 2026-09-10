@@ -2,11 +2,37 @@
 
 > 실제 시장의 변화를 오늘의 할인으로 연결하는 MAKJI 자사몰 데일리 커머스 프로젝트
 
-## 프로토타입
+## 프로토타입 & 시뮬레이터
 
-**[오늘의 건강주 — BAKEOUT 프로토타입 체험하기](https://jennie-brain.github.io/makji-personal/)**
+- **[MAKJI STOCK v11.0 9/9 MVP 공식 프로토타입 (`prototype-v11.html`)](./prototypes/stock/prototype-v11.html)** / [메인 파일 (`makji-stock-prototype.html`)](./prototypes/stock/makji-stock-prototype.html)
+  - 🏠 **홈 빵지수 제거 & 간결화**: 홈 화면 진입 즉시 **"🎯 내일의 빵 예측하기 [ A / B ]"** 투표가 메인으로 배치 (성공 시 500원 코드 `BREAD2026` 발급) ➔ 모닝 빵뉴스 ➔ 오늘의 빵운세
+  - 📈 **Bread Market 화면**: 빵지수(BREAD-DAQ)는 마켓 탭에서만 요약 제공 + 당일 변동폭 **TOP 1 메인 강조 카드** + **TOP 5 랭킹** + 10종 전체 시세표 & 토스 멀티뷰 차트 (최근 7일/30일 추이)
+  - 🎮 **이벤트 화면**: 황금 식빵 자르기 게임 (1일 1회 500원 쿠폰 캡) + 바삭 포춘쿠키 빵운세
+  - 🚫 **폐기/미확정 요소 전면 배제**: '우울해서 빵 샀어', 'ETF', 'FX' 등 9/9 회의록에 없는 군더더기 완전 삭제!
+- **[MAKJI STOCK v10.0 풀 유저 플로우 & RFP 확장 프로토타입 (`prototype-v10.html`)](./prototypes/stock/prototype-v10.html)**
+  - 🗺️ **발표덱용 End-to-End User Flow 5단계 완성**: 홈(시장지표) ➔ 시세표(토스 멀티뷰) ➔ RFP확장(ETF·FX) ➔ 미니게임(500원 쿠폰) ➔ 장바구니/카페24 결제 주문서 ➔ 주문 완료(재방문 알림 훅)
+  - 💼 **RFP ② Bakery ETF (나만의 빵 포트폴리오)**: 웰니스 블루칩 ETF, 저혈당 안심 포뮬러 ETF 원클릭 일괄 담기
+  - 💱 **RFP ③ FX Bakery (실시간 환율 연동 빵)**: 엔화(JPY) 하락 연계 말차 샌드(-15%), 유로(EUR) 연계 프랑스 버터 휘낭시에
+  - 📊 **RFP ④ Bread Index (브랜드 종합 지수)**: 판매량(40%)+재구매율(25%)+검색트렌드(20%)+환율(15%) 가중치 1,024.5p 실시간 연동
+  - 🛒 **카페24 결제 전환 연계**: 미니게임 500원 쿠폰 자동 적용, 투명 영수증, 간편결제(토스/카카오/네이버페이) 시뮬레이션 및 주문완료 뷰 탑재
+- **[MAKJI STOCK v9.0 멀티뷰 차트 & 미니게임천국 프로토타입 (`prototype-v9.html`)](./prototypes/stock/prototype-v9.html)**
+  - 📊 **토스증권 스타일 3대 차트 멀티뷰 탑재**: 간편 라인(기본) + 일봉 캔들스틱 + 혜택 밴드 듀얼 모드 지원
+  - 🔍 **심플 툴팁**: 하루 1회 가격 변동에 맞춰 날짜 + 최종 시세 + 등락폭만 직관적 표시
+  - 🎮 **MAKJI 미니게임천국 5종 완비**: 골든 슬라이스, 식빵 탑 쌓기, 달려라 식빵, 빵 짝맞추기, 황금 포춘쿠키
+  - 🛡️ **마진 방어 1일 1회 데일리 쿠폰 캡**: 당일 첫 판 500원 쿠폰 1장 지급 후, 2회차부터는 TOP 10 랭킹 달성을 위한 무제한 경쟁!
+  - 🏆 **TOP 10 명예의 전당 랭킹**: 닉네임 입력 후 실시간 소팅 및 10위 캡 유지
+- **[BREAD-DAQ 3대 차트 시각화 비교 뷰어 (`chart-options-preview.html`)](./prototypes/experiments/chart-options-preview.html)**
+  - 토스 간편 라인 vs 일봉 캔들스틱 vs 정가 대비 혜택 밴드 인터랙티브 비교
+- **[MAKJI STOCK v8.0 미니게임천국 프로토타입 (`prototype-v8.html`)](./prototypes/stock/prototype-v8.html)**
+- **[MAKJI STOCK v7.0 프로토타입 (`prototype-v7.html`)](./prototypes/stock/prototype-v7.html)**
+  - 코스피 100% 영구 배제! 수요(네이버 검색트렌드 ±5%) + 공급(한국은행 ECOS 환율 ±3%) 2대 실물 지표 연동 (5상승 vs 5하락)
+- **[MAKJI 빵 시세 시뮬레이터 v9.0 (`price-simulator-v9.html`)](./prototypes/price-simulator/price-simulator-v9.html)**
+  - 양방향 트렌드(±5.0%) 슬라이더, 환율(±3.0%) 슬라이더, 3단계 차등 캡(±10%, ±7%, ±5%)
+  - **[신규] 🎁 퀴즈 쿠폰 & 게이미피케이션 시너지 마진 분석기**: 500원 쿠폰 적용 시 고객 체감 할인 및 회사 영업 마진 55% 이상 방어율 실시간 검증
+- **[빵 시세 시스템 공식 명세서 v9.0 (`PRICE_SIMULATOR_V9.md`)](./docs/price-simulator/PRICE_SIMULATOR_V9.md)**
 
-시장 신호를 빵 종목의 등락 규칙으로 바꾸고, 가상의 `빵가루`를 투자해 장 마감 후 쿠폰 배당을 받는 데일리 콘텐츠 콘셉트입니다. 별도 설치 없이 브라우저에서 체험할 수 있습니다.
+
+
 
 ## 1. 프로젝트 개요
 

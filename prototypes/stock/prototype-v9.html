@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MAKJI STOCK v9 | 토스 멀티뷰 차트 & 미니게임천국 완성형</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    /* 식빵 마우스 커서 */
+    :root {
+      --bread-cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M7 11C7 7.5 9.5 5 13 5C14.5 5 15.5 5.7 16 6.5C16.5 5.7 17.5 5 19 5C22.5 5 25 7.5 25 11C26 12 26.5 13.5 26.5 15.5C26.5 21 24.5 26 23 27C21.5 27 9.5 27 8.5 26C7 24.5 5.5 20.5 5.5 15.5C5.5 13.5 6 12 7 11Z" fill="%23d97706" stroke="%2378350f" stroke-width="1.5"/><path d="M9 13C9 9 11 7.5 13.5 7.5C14.8 7.5 15.5 8.2 16 9C16.5 8.2 17.2 7.5 18.5 7.5C21 7.5 23 9 23 13C24 14.5 24.5 16.5 24.5 20C24.5 23.5 23 24.5 21.5 24.5H10.5C9 24.5 7.5 23.5 7.5 20C7.5 16.5 8 14.5 9 13Z" fill="%23fef3c7"/><circle cx="12.5" cy="15.5" r="1.2" fill="%2378350f"/><circle cx="19.5" cy="15.5" r="1.2" fill="%2378350f"/><path d="M14.5 18C15 19 17 19 17.5 18" stroke="%23b45309" stroke-width="1.2" stroke-linecap="round"/><ellipse cx="10" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/><ellipse cx="22" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/></svg>') 12 12, auto;
+      
+      --bg-cream: #fbf9f5;
+      --card-bg: #ffffff;
+      --primary: #ff6b18;
+      --primary-hover: #ea580c;
+      --game-purple: #8b5cf6;
+      --game-pink: #ec4899;
+      --butter-yellow: #fef3c7;
+      --toast-brown: #d97706;
+      --crust-dark: #78350f;
+      --text-main: #191f28;
+      --text-sub: #4e5968;
+      --text-muted: #8b95a1;
+      --toss-red: #f04452;
+      --toss-blue: #3182f6;
+      --card-shadow: 0 10px 25px -3px rgba(217, 119, 6, 0.07), 0 4px 6px -2px rgba(217, 119, 6, 0.03);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      cursor: var(--bread-cursor) !important;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: #f1ece4;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* 모바일 반응형 뷰포트 */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-cream);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    /* 상단 헤더 */
+    .app-header {
+      padding: 14px 20px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f2ede4;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--crust-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-logo span.badge {
+      font-size: 10px;
+      background: #fdf4ff;
+      color: var(--game-purple);
+      padding: 2px 7px;
+      border-radius: 12px;
+      border: 1px solid #e9d5ff;
+      font-weight: 800;
+    }
+
+    .user-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      background: #f8fafc;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* 상단 롤링 티커 */
+    .market-ticker-bar {
+      background: #fffbeb;
+      border-bottom: 1px solid #fde68a;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-scroll {
+      display: inline-block;
+      animation: tickerLoop 25s linear infinite;
+    }
+
+    @keyframes tickerLoop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* 메인 스크롤 콘텐츠 */
+    .main-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(76px + env(safe-area-inset-bottom));
+      scroll-behavior: smooth;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 하단 네비게이션 바 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-top: 1px solid #f1ece4;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 10px 12px max(14px, env(safe-area-inset-bottom));
+      z-index: 50;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+
+    .nav-item .nav-icon {
+      font-size: 20px;
+      transition: transform 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active .nav-icon {
+      transform: scale(1.15);
+    }
+
+    /* 공통 카드 */
+    .cute-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #f5ede2;
+    }
+
+    .btn-cute {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 14px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(255, 107, 24, 0.25);
+      transition: all 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-cute:active {
+      transform: scale(0.97);
+    }
+
+    /* ---------------------------------------------------- */
+    /* 1. 홈 & 전광판 스타일 */
+    /* ---------------------------------------------------- */
+    .market-status-box {
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+      border: 1.5px solid #fed7aa;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+
+    .index-large {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 6px 0 2px;
+      color: var(--crust-dark);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .index-diff {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--toss-red);
+    }
+
+    /* 아케이드 미니게임천국 배너 */
+    .arcade-banner {
+      background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+      cursor: pointer;
+    }
+
+    .arcade-banner::after {
+      content: '🎮';
+      position: absolute;
+      right: 14px;
+      bottom: 10px;
+      font-size: 64px;
+      opacity: 0.25;
+      transform: rotate(-15deg);
+    }
+
+    /* 10종 리스트 */
+    .bread-stock-item {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #f3ece4;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .bread-stock-item:active {
+      transform: scale(0.98);
+      background: #fffcf8;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 2. 토스증권 스타일 바텀시트 & 멀티뷰 차트 (핵심 고도화) */
+    /* ---------------------------------------------------- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .modal-overlay.open {
+      display: block;
+      opacity: 1;
+    }
+
+    .toss-bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-radius: 28px 28px 0 0;
+      padding: 20px 24px max(24px, env(safe-area-inset-bottom));
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+      z-index: 200;
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .toss-bottom-sheet.open {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #e5e8eb;
+      border-radius: 2px;
+      margin: 0 auto 14px;
+      cursor: pointer;
+    }
+
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .sheet-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    .sheet-price {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 2px 0;
+    }
+
+    /* 📊 3대 차트 멀티뷰 토글 스위치 */
+    .chart-view-switcher {
+      display: flex;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 10px;
+      margin: 10px 0 8px;
+    }
+
+    .chart-view-btn {
+      flex: 1;
+      border: none;
+      background: none;
+      padding: 5px 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #64748b;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chart-view-btn.active {
+      background: #ffffff;
+      color: var(--text-main);
+      font-weight: 900;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    }
+
+    /* 기간 선택 탭 */
+    .toss-period-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .period-btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: none;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .period-btn.active {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 3. 🎮 미니게임천국 아케이드 스타일 */
+    /* ---------------------------------------------------- */
+    .game-selection-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .game-card-item {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px 14px;
+      border: 1.5px solid #f3e8ff;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.06);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .game-card-item:hover {
+      transform: translateY(-2px);
+      border-color: #c084fc;
+    }
+
+    .game-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .g-icon-1 { background: #fef3c7; }
+    .g-icon-2 { background: #fee2e2; }
+    .g-icon-3 { background: #e0e7ff; }
+    .g-icon-4 { background: #dcfce7; }
+    .g-icon-5 { background: #fdf4ff; }
+
+    /* 게임 스테이지 모달 */
+    .game-stage-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 250;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .game-stage-overlay.active {
+      display: flex;
+    }
+
+    .game-stage-card {
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .game-play-area {
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 2px dashed #cbd5e1;
+      height: 220px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    /* 랭킹 아이템 */
+    .rank-list {
+      list-style: none;
+      max-height: 260px;
+      overflow-y: auto;
+      margin: 12px 0;
+    }
+
+    .rank-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      background: #f8fafc;
+      font-size: 13px;
+    }
+
+    .rank-item.top-1 { background: #fef3c7; border: 1px solid #fde68a; font-weight: 900; }
+    .rank-item.top-2 { background: #f1f5f9; border: 1px solid #e2e8f0; font-weight: 800; }
+    .rank-item.top-3 { background: #ffedd5; border: 1px solid #fed7aa; font-weight: 800; }
+    .rank-item.my-rank { border: 2px solid var(--primary); background: #fff7ed; }
+
+    /* 토스트 팝업 */
+    .toast-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 300;
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toast-popup.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast-popup" id="toastPopup">
+    <span>🍞</span> <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <div class="app-viewport">
+    
+    <!-- 상단 헤더 -->
+    <header class="app-header">
+      <div class="brand-logo">
+        <span>🥐 MAKJI STOCK</span>
+        <span class="badge">v9 멀티뷰 완성형</span>
+      </div>
+      <div class="user-pill">
+        <span>🪙 빵머니:</span>
+        <b style="color:var(--primary);" id="userPointsDisplay">1,500P</b>
+      </div>
+    </header>
+
+    <!-- 실시간 티커 -->
+    <div class="market-ticker-bar">
+      <div class="ticker-scroll">
+        🔥 [BREAD-DAQ 멀티뷰 완성] 1일 1회 확정 시세 • 토스 간편 라인 & 캔들스틱 듀얼 뷰 지원 • 🎮 미니게임천국 오픈! 오늘 첫 판 500원 쿠폰 지급(1일 1회 캡) • 마틸다 케이크 +4.75% ▲
+      </div>
+    </div>
+
+    <!-- 메인 스크롤 콘텐츠 -->
+    <main class="main-scroll-area">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: 홈 (Home) -->
+      <!-- ============================================== -->
+      <section class="tab-content active" id="tabHome">
+        
+        <!-- BREAD-DAQ 종합 시황 카드 -->
+        <div class="market-status-box">
+          <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--toast-brown);">
+            <span>🏛️ 오늘 아침 9시 BREAD-DAQ 지수</span>
+            <span style="color:#059669;">🟢 정상 개장 (하루 1회 갱신)</span>
+          </div>
+          <div class="index-large">
+            <span>2,485.40</span>
+            <span class="index-diff">▲ +0.21% (수급 균형)</span>
+          </div>
+          <p style="font-size:12px; color:var(--text-sub);">
+            [수요] 검색 트렌드 ±5% + [공급] ECOS 환율 ±3% (코스피 완전 배제)
+          </p>
+        </div>
+
+        <!-- 🎮 미니게임천국 배너 -->
+        <div class="arcade-banner" onclick="switchTab('arcade')">
+          <div style="font-size:20px; font-weight:900; margin-bottom:4px;">🎮 MAKJI 미니게임천국</div>
+          <div style="font-size:12px; opacity:0.9; line-height:1.4;">
+            5종 원버튼 미니게임 플레이하고 오늘 첫 판 500원 쿠폰 겟!<br>
+            TOP 10 명예의 전당 랭커에 도전하세요!
+          </div>
+          <div style="margin-top:12px;">
+            <span style="background:#fff; color:var(--game-purple); font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px;">
+              지금 바로 한판 하기 ➔
+            </span>
+          </div>
+        </div>
+
+        <!-- 오늘의 대장주 빵 카드 -->
+        <div class="cute-card" style="cursor:pointer;" onclick="openTossSheet('p10')">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:#e11d48;">🔥 실시간 검색 1위 대장주</span>
+              <div style="font-size:18px; font-weight:900; color:var(--text-main); margin-top:2px;">마틸다 초코케이크</div>
+              <div style="font-size:13px; font-weight:800; color:var(--toss-red);">44,000원 (▲ +4.75%)</div>
+            </div>
+            <button class="btn-cute" style="width:auto; padding:8px 14px; font-size:12px;">
+              차트 보기 ➔
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: 마켓 (Market) -->
+      <!-- ============================================== -->
+      <section class="tab-content" id="tabMarket">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:15px; font-weight:900; color:var(--text-main);">오늘의 10종 빵 전광판</span>
+          <span style="font-size:11px; color:#64748b; font-weight:700;">아침 9시 확정가</span>
+        </div>
+        <div id="marketListContainer">
+          <!-- JS 렌더링 -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: 미니게임천국 아케이드 (Arcade) -->
+      <!-- ============================================== -->
+      <section class="tab-content" id="tabArcade">
+        <div class="arcade-banner" style="margin-bottom:14px;">
+          <div style="font-size:20px; font-weight:900; margin-bottom:4px;">🕹️ MAKJI 미니게임천국</div>
+          <div style="font-size:12px; opacity:0.9;">
+            5종 원버튼 미니게임! 오늘 첫 플레이 시 500원 쿠폰 지급!<br>
+            2회차부터는 TOP 10 랭킹 달성을 위한 무제한 도전!
+          </div>
+        </div>
+
+        <!-- 5종 미니게임 선택 그리드 -->
+        <div class="game-selection-grid">
+          <div class="game-card-item" onclick="openGameStage(1)">
+            <div class="game-icon-circle g-icon-1">🔪</div>
+            <strong style="font-size:14px; color:var(--text-main);">골든 슬라이스</strong>
+            <span style="font-size:11px; color:var(--text-sub); margin-top:2px;">50% 반 자르기</span>
+          </div>
+
+          <div class="game-card-item" onclick="openGameStage(2)">
+            <div class="game-icon-circle g-icon-2">🥞</div>
+            <strong style="font-size:14px; color:var(--text-main);">식빵 탑 쌓기</strong>
+            <span style="font-size:11px; color:var(--text-sub); margin-top:2px;">타이밍 착착 드롭</span>
+          </div>
+
+          <div class="game-card-item" onclick="openGameStage(3)">
+            <div class="game-icon-circle g-icon-3">🏃</div>
+            <strong style="font-size:14px; color:var(--text-main);">달려라 식빵</strong>
+            <span style="font-size:11px; color:var(--text-sub); margin-top:2px;">장애물 점프 런</span>
+          </div>
+
+          <div class="game-card-item" onclick="openGameStage(4)">
+            <div class="game-icon-circle g-icon-4">🥐</div>
+            <strong style="font-size:14px; color:var(--text-main);">빵 짝맞추기</strong>
+            <span style="font-size:11px; color:var(--text-sub); margin-top:2px;">8장 기억력 매칭</span>
+          </div>
+
+          <div class="game-card-item" style="grid-column: span 2;" onclick="openGameStage(5)">
+            <div class="game-icon-circle g-icon-5">🥠</div>
+            <strong style="font-size:14px; color:var(--text-main);">황금 포춘쿠키 대폭발</strong>
+            <span style="font-size:11px; color:var(--text-sub); margin-top:2px;">쿠키를 쪼개어 오늘의 랜덤 황금 빵머니 뽑기</span>
+          </div>
+        </div>
+
+        <!-- 🏆 TOP 10 명예의 전당 카드 -->
+        <div class="cute-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:15px; font-weight:900; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+              <span>🏆 명예의 전당 TOP 10</span>
+            </div>
+            <span style="font-size:11px; color:var(--game-purple); font-weight:800;">실시간 랭킹</span>
+          </div>
+          <div id="mainLeaderboard">
+            <!-- JS 렌더링 -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 하단 고정 네비게이션 바 -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('home', this)">
+        <span class="nav-icon">🏠</span>
+        <span>홈</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('market', this)">
+        <span class="nav-icon">📈</span>
+        <span>시세표</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('arcade', this)">
+        <span class="nav-icon">🎮</span>
+        <span>미니게임</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 📊 토스증권 스타일 바텀시트 (멀티뷰 차트 탑재) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="tossOverlay" onclick="closeTossSheet()"></div>
+  <div class="toss-bottom-sheet" id="tossSheet">
+    <div class="sheet-handle" onclick="closeTossSheet()"></div>
+    
+    <div class="sheet-header">
+      <div>
+        <span style="font-size:10.5px; font-weight:800; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px;" id="sheetTier">Tier 3 (±5%)</span>
+        <div class="sheet-title" id="sheetName">마틸다 초코케이크</div>
+      </div>
+      <button style="border:none; background:#f1f5f9; border-radius:50%; width:28px; height:28px; font-weight:800;" onclick="closeTossSheet()">✕</button>
+    </div>
+
+    <div class="sheet-price" id="sheetPrice">44,000원</div>
+    <div style="font-size: 13px; font-weight: 800; color:var(--toss-red);" id="sheetDiff">
+      ▲ +2,000원 (+4.75%) • 오늘 확정가
+    </div>
+
+    <!-- 📊 3대 차트 멀티뷰 토글 스위치 -->
+    <div class="chart-view-switcher">
+      <button class="chart-view-btn active" id="btnMode1" onclick="switchChartMode(1)">📈 간편 라인</button>
+      <button class="chart-view-btn" id="btnMode2" onclick="switchChartMode(2)">🕯️ 일봉 캔들</button>
+      <button class="chart-view-btn" id="btnMode3" onclick="switchChartMode(3)">🎁 혜택 밴드</button>
+    </div>
+
+    <!-- 토스 기간 탭 -->
+    <div class="toss-period-tabs">
+      <button class="period-btn active" onclick="changePeriod('1W')">1주일</button>
+      <button class="period-btn" onclick="changePeriod('1M')">1개월</button>
+      <button class="period-btn" onclick="changePeriod('1D')">오늘(1일)</button>
+    </div>
+
+    <!-- 토스 스타일 캔버스 차트 -->
+    <div style="height: 160px; position: relative; margin: 4px 0 10px;">
+      <canvas id="tossChartCanvas"></canvas>
+    </div>
+
+    <!-- 시세 형성 2대 실물 요인 미니 영수증 -->
+    <div style="background:#f8fafc; border-radius:12px; padding:12px; font-size:12px; margin-bottom:12px; border:1px solid #edf2f7;">
+      <div style="font-weight:800; color:#334155; margin-bottom:5px;">📊 오늘 시세 결정 영수증:</div>
+      <div style="display:flex; justify-content:space-between; color:#64748b; margin-bottom:3px;">
+        <span id="sheetTrendLabel">• 🔥 검색 트렌드 (수요):</span>
+        <b style="color:#ef4444;" id="sheetTrend">+3.80%</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; color:#64748b;">
+        <span>• 💵 한국은행 환율 (공급):</span>
+        <b style="color:#d97706;" id="sheetFx">+0.95%</b>
+      </div>
+    </div>
+
+    <!-- 원클릭 쿠폰 적용 버튼 & 구매 -->
+    <button class="btn-cute" id="sheetCtaBtn" onclick="buyBread()">
+      🛒 오늘 시세로 장바구니 담기
+    </button>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 🕹️ 미니게임 플레이 모달 레이어 -->
+  <!-- ============================================== -->
+  <div class="game-stage-overlay" id="gameStageModal">
+    <div class="game-stage-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #f1f5f9;">
+        <div style="font-size:16px; font-weight:900; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+          <span id="activeGameIcon">🎮</span>
+          <span id="activeGameTitle">미니게임</span>
+        </div>
+        <button style="background:#f1f5f9; border:none; border-radius:50%; width:28px; height:28px; font-weight:800;" onclick="closeGameStage()">✕</button>
+      </div>
+
+      <!-- 플레이 화면 -->
+      <div id="screenPlaying">
+        <div class="game-play-area" id="gamePlayContainer"></div>
+        <button class="btn-cute" id="gameActionBtn" onclick="handleGameAction()">시작하기!</button>
+      </div>
+
+      <!-- 결과 & 랭킹 등록 화면 -->
+      <div id="screenResult" style="display:none; text-align:center;">
+        <div style="font-size:13px; font-weight:800; color:var(--toast-brown);">🎉 GAME OVER!</div>
+        <div style="font-size:36px; font-weight:900; color:var(--primary); margin:6px 0;" id="resultFinalScore">0점</div>
+        
+        <!-- 마진 방어 1일 1회 쿠폰 알림 박스 -->
+        <div id="rewardNotificationBox" style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:12px; padding:10px 12px; font-size:12px; color:#166534; font-weight:800; margin-bottom:12px;">
+          🎟️ [오늘의 첫 판] 500원 할인 쿠폰 발급 완료! (오늘 자정까지 사용)
+        </div>
+
+        <div style="background:#f8fafc; border-radius:12px; padding:10px; font-size:12px; color:var(--text-sub); margin-bottom:10px;">
+          TOP 10 명예의 전당에 등재할 닉네임을 입력하세요!
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <input type="text" id="playerNickname" style="flex:1; padding:12px; border-radius:10px; border:2px solid #cbd5e1; font-weight:700;" placeholder="닉네임 (최대 6자)" maxlength="6" value="빵순이">
+          <button class="btn-cute" style="width:auto; padding:12px 16px; white-space:nowrap;" onclick="submitRanking()">
+            🏆 랭킹 등록
+          </button>
+        </div>
+
+        <button style="border:none; background:#f1f5f9; color:#64748b; padding:8px 14px; border-radius:8px; font-weight:700; font-size:12px; width:100%;" onclick="closeGameStage()">
+          등록 없이 닫기
+        </button>
+      </div>
+
+      <!-- 명예의 전당 랭킹 화면 -->
+      <div id="screenLeaderboard" style="display:none;">
+        <div style="font-size:15px; font-weight:900; color:var(--text-main); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <span>🏆 명예의 전당 TOP 10</span>
+          <span style="font-size:11px; color:var(--game-purple);" id="lbGameName">게임 랭킹</span>
+        </div>
+        <ul class="rank-list" id="stageRankList"></ul>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button class="btn-cute" style="background:#64748b;" onclick="closeGameStage()">🎮 게임 목록</button>
+          <button class="btn-cute" onclick="replayActiveGame()">🔄 다시 도전</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 10종 상품 데이터 명세
+    const PRODUCTS = [
+      { id: 'p1',  name: '비건 잉글리시 머핀', base: 1500, price: 1550, diff: 50, rate: 0.0345, isUp: true, tier: 'Tier 1 (±10%)', trend: 0.025, history: [1470, 1490, 1520, 1500, 1530, 1540, 1550] },
+      { id: 'p2',  name: '대만식 샌드위치',   base: 2400, price: 2350, diff: -50, rate: -0.0225, isUp: false, tier: 'Tier 1 (±10%)', trend: -0.032, history: [2380, 2400, 2360, 2380, 2390, 2370, 2350] },
+      { id: 'p3',  name: '휘낭시에',          base: 3800, price: 4010, diff: 210, rate: 0.0545, isUp: true, tier: 'Tier 1 (±10%)', trend: 0.045, history: [3750, 3840, 3920, 3880, 3950, 3980, 4010] },
+      { id: 'p4',  name: '글루텐프리 스콘',   base: 3800, price: 3680, diff: -120, rate: -0.0325, isUp: false, tier: 'Tier 1 (±10%)', trend: -0.042, history: [3740, 3720, 3680, 3700, 3710, 3690, 3680] },
+      { id: 'p5',  name: '모닝롤',            base: 4500, price: 4330, diff: -170, rate: -0.0385, isUp: false, tier: 'Tier 1 (±10%)', trend: -0.048, history: [4450, 4420, 4380, 4390, 4400, 4360, 4330] },
+      { id: 'p6',  name: '테트리스 브레드',   base: 11000, price: 11460, diff: 460, rate: 0.0415, isUp: true, tier: 'Tier 2 (±7%)', trend: 0.032, history: [11100, 11250, 11150, 11300, 11380, 11420, 11460] },
+      { id: 'p7',  name: 'ZERO 카스테라',     base: 12000, price: 11510, diff: -490, rate: -0.0405, isUp: false, tier: 'Tier 2 (±7%)', trend: -0.050, history: [11750, 11680, 11600, 11580, 11620, 11550, 11510] },
+      { id: 'p8',  name: '티라미수',          base: 15000, price: 15320, diff: 320, rate: 0.0215, isUp: true, tier: 'Tier 2 (±7%)', trend: 0.012, history: [15100, 15150, 15200, 15180, 15250, 15280, 15320] },
+      { id: 'p9',  name: '냉동생지 3종',      base: 21000, price: 20360, diff: -640, rate: -0.0305, isUp: false, tier: 'Tier 3 (±5%)', trend: -0.040, history: [20700, 20650, 20500, 20550, 20480, 20420, 20360] },
+      { id: 'p10', name: '마틸다 초코케이크', base: 42000, price: 44000, diff: 2000, rate: 0.0475, isUp: true, tier: 'Tier 3 (±5%)', trend: 0.038, history: [42600, 43100, 42800, 43400, 43700, 43850, 44000] }
+    ];
+
+    let selectedProduct = PRODUCTS[9];
+    let tossChartInstance = null;
+    let currentChartMode = 1; // 1: 간편 라인, 2: 캔들스틱, 3: 혜택 밴드
+
+    // 1일 1회 데일리 쿠폰 캡 상태
+    let hasReceivedDailyCoupon = false;
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastPopup');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2200);
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      if (tabId === 'home') document.getElementById('tabHome').classList.add('active');
+      else if (tabId === 'market') document.getElementById('tabMarket').classList.add('active');
+      else if (tabId === 'arcade') document.getElementById('tabArcade').classList.add('active');
+
+      if (btn) btn.classList.add('active');
+      else {
+        const idx = tabId === 'home' ? 0 : (tabId === 'market' ? 1 : 2);
+        document.querySelectorAll('.nav-item')[idx].classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderMarketList() {
+      const container = document.getElementById('marketListContainer');
+      container.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'bread-stock-item';
+        item.onclick = () => openTossSheet(p.id);
+
+        const sign = p.isUp ? '+' : '';
+        const color = p.isUp ? 'var(--toss-red)' : 'var(--toss-blue)';
+        const arrow = p.isUp ? '▲' : '▼';
+        item.innerHTML = `
+          <div>
+            <strong style="font-size:14.5px; color:var(--text-main);">${p.name}</strong>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">${p.tier} • 기본가 ${p.base.toLocaleString()}원</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${p.price.toLocaleString()}원</div>
+            <div style="font-size:12.5px; font-weight:800; color:${color};">${arrow} ${sign}${(p.rate * 100).toFixed(2)}% (${sign}${p.diff.toLocaleString()}원)</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // ----------------------------------------------------
+    // 바텀시트 & 멀티뷰 차트 로직
+    // ----------------------------------------------------
+    function openTossSheet(prodId) {
+      selectedProduct = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[9];
+
+      document.getElementById('sheetName').innerText = selectedProduct.name;
+      document.getElementById('sheetTier').innerText = selectedProduct.tier;
+      document.getElementById('sheetPrice').innerText = `${selectedProduct.price.toLocaleString()}원`;
+      
+      const isUp = selectedProduct.isUp;
+      const diffEl = document.getElementById('sheetDiff');
+      diffEl.style.color = isUp ? 'var(--toss-red)' : 'var(--toss-blue)';
+      diffEl.innerText = `${isUp ? '▲ +' : '▼ '}${selectedProduct.diff.toLocaleString()}원 (${isUp ? '+' : ''}${(selectedProduct.rate * 100).toFixed(2)}%) • 오늘 확정가`;
+
+      document.getElementById('sheetTrend').innerText = `${selectedProduct.trend >= 0 ? '+' : ''}${(selectedProduct.trend * 100).toFixed(2)}%`;
+      document.getElementById('sheetFx').innerText = '+0.95%';
+
+      document.getElementById('tossOverlay').classList.add('open');
+      document.getElementById('tossSheet').classList.add('open');
+
+      renderMultiViewChart();
+    }
+
+    function closeTossSheet() {
+      document.getElementById('tossOverlay').classList.remove('open');
+      document.getElementById('tossSheet').classList.remove('open');
+    }
+
+    function switchChartMode(mode) {
+      currentChartMode = mode;
+      document.querySelectorAll('.chart-view-btn').forEach((b, idx) => {
+        b.classList.toggle('active', idx === (mode - 1));
+      });
+      renderMultiViewChart();
+    }
+
+    function renderMultiViewChart() {
+      const ctx = document.getElementById('tossChartCanvas').getContext('2d');
+      if (tossChartInstance) tossChartInstance.destroy();
+
+      const labels = ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', '오늘'];
+      const data = selectedProduct.history;
+      const basePrice = selectedProduct.base;
+      const baseLine = Array(7).fill(basePrice);
+      const isUp = selectedProduct.isUp;
+      const themeColor = isUp ? '#ef4444' : '#3182f6';
+
+      // 1. 토스 간편 라인 차트
+      if (currentChartMode === 1) {
+        tossChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: selectedProduct.name,
+                data: data,
+                borderColor: themeColor,
+                backgroundColor: isUp ? 'rgba(239, 68, 68, 0.08)' : 'rgba(49, 130, 246, 0.08)',
+                borderWidth: 2.5,
+                tension: 0.35,
+                fill: true,
+                pointRadius: (c) => c.dataIndex === 6 ? 6 : 2,
+                pointBackgroundColor: themeColor
+              },
+              {
+                label: '기본정가',
+                data: baseLine,
+                borderColor: '#94a3b8',
+                borderWidth: 1.5,
+                borderDash: [4, 4],
+                pointRadius: 0,
+                fill: false
+              }
+            ]
+          },
+          options: getChartOptions()
+        });
+      }
+      // 2. 일봉 캔들스틱 차트 (Bar + MA3)
+      else if (currentChartMode === 2) {
+        const candleBars = [];
+        const candleColors = [];
+        const ma3 = [null, null];
+        for (let i = 0; i < 7; i++) {
+          const prev = i === 0 ? data[0] : data[i-1];
+          const curr = data[i];
+          candleBars.push([Math.min(prev, curr), Math.max(prev, curr)]);
+          candleColors.push(curr >= prev ? '#ef4444' : '#3182f6');
+          if (i >= 2) ma3.push(Math.round((data[i] + data[i-1] + data[i-2]) / 3));
+        }
+
+        tossChartInstance = new Chart(ctx, {
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                type: 'line',
+                label: '3일 이동평균선(MA3)',
+                data: ma3,
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.2
+              },
+              {
+                type: 'bar',
+                label: '일봉 캔들',
+                data: candleBars,
+                backgroundColor: candleColors,
+                barPercentage: 0.5
+              }
+            ]
+          },
+          options: getChartOptions()
+        });
+      }
+      // 3. 정가 대비 혜택 밴드 차트
+      else if (currentChartMode === 3) {
+        tossChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: '고정 기본정가',
+                data: baseLine,
+                borderColor: '#64748b',
+                borderWidth: 2,
+                borderDash: [4, 4],
+                pointRadius: 0,
+                fill: false
+              },
+              {
+                label: '실제 구매시세',
+                data: data,
+                borderColor: '#ff6b18',
+                backgroundColor: 'rgba(255, 107, 24, 0.15)',
+                borderWidth: 2.5,
+                tension: 0.3,
+                fill: '-1', // 기준선 사이 영역 채움!
+                pointRadius: 3,
+                pointBackgroundColor: '#ff6b18'
+              }
+            ]
+          },
+          options: getChartOptions()
+        });
+      }
+    }
+
+    // 담당자님 결정 반영: 툴팁은 "날짜 + 최종 시세 + 등락폭만 심플하고 큼직하게 표시"
+    function getChartOptions() {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            titleFont: { size: 12, weight: '700' },
+            bodyFont: { size: 14, weight: '900' },
+            padding: 10,
+            callbacks: {
+              title: (items) => `${items[0].label} 시세`,
+              label: (item) => {
+                if (item.dataset.type === 'bar') {
+                  const val = item.raw[1];
+                  const diff = val - selectedProduct.base;
+                  const sign = diff >= 0 ? '+' : '';
+                  return `${val.toLocaleString()}원 (${sign}${diff.toLocaleString()}원)`;
+                }
+                const val = typeof item.raw === 'number' ? item.raw : (Array.isArray(item.raw) ? item.raw[1] : 0);
+                if (!val) return '';
+                const diff = val - selectedProduct.base;
+                const sign = diff >= 0 ? '+' : '';
+                return `${val.toLocaleString()}원 (${sign}${diff.toLocaleString()}원)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            grid: { color: '#f1f5f9' },
+            ticks: { callback: (v) => v.toLocaleString() + '원' }
+          }
+        }
+      };
+    }
+
+    function changePeriod(p) {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderMultiViewChart();
+    }
+
+    function buyBread() {
+      showToast(`🛒 ${selectedProduct.name} 장바구니 추가 완료!`);
+      closeTossSheet();
+    }
+
+    // ----------------------------------------------------
+    // 🎮 미니게임천국 랭킹 & 1일 1회 데일리 쿠폰 캡 엔진
+    // ----------------------------------------------------
+    const DEFAULT_LEADERBOARD = [
+      { name: '바게트장인', score: 1420, date: '09.09' },
+      { name: '성심당키즈', score: 1350, date: '09.09' },
+      { name: '초코러버',   score: 1280, date: '09.09' },
+      { name: '소금빵조아', score: 1190, date: '09.09' },
+      { name: '빵순이대장', score: 1050, date: '09.09' },
+      { name: '다이어터',   score: 980,  date: '09.09' },
+      { name: '밀가루요정', score: 920,  date: '09.09' },
+      { name: '모닝버터',   score: 870,  date: '09.09' },
+      { name: '크림치즈',   score: 810,  date: '09.09' },
+      { name: '식빵러버',   score: 750,  date: '09.09' }
+    ];
+
+    function getLeaderboard() {
+      const data = localStorage.getItem('makji_ranks_v9');
+      if (!data) {
+        localStorage.setItem('makji_ranks_v9', JSON.stringify(DEFAULT_LEADERBOARD));
+        return DEFAULT_LEADERBOARD;
+      }
+      return JSON.parse(data);
+    }
+
+    function saveScore(name, score) {
+      let list = getLeaderboard();
+      list.push({ name: name || '익명빵', score: score, date: '09.09' });
+      list.sort((a, b) => b.score - a.score);
+      list = list.slice(0, 10); // 10위 캡!
+      localStorage.setItem('makji_ranks_v9', JSON.stringify(list));
+      renderMainLeaderboard();
+      return list;
+    }
+
+    function renderMainLeaderboard() {
+      const container = document.getElementById('mainLeaderboard');
+      const list = getLeaderboard();
+      container.innerHTML = '';
+
+      list.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = `rank-item ${idx === 0 ? 'top-1' : (idx === 1 ? 'top-2' : (idx === 2 ? 'top-3' : ''))}`;
+        const medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : `${idx + 1}. `));
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:900; width:22px;">${medal}</span>
+            <strong style="color:var(--text-main);">${item.name}</strong>
+          </div>
+          <div style="font-weight:900; color:var(--primary);">${item.score.toLocaleString()}점</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    let activeGameId = 1;
+    let gameScore = 0;
+    let gameLoop = null;
+
+    const GAME_NAMES = {
+      1: '골든 슬라이스 (반 자르기)',
+      2: '식빵 탑 쌓기 (타이밍 드롭)',
+      3: '달려라 식빵 (장애물 점프)',
+      4: '빵 짝맞추기 (카드 매칭)',
+      5: '황금 포춘쿠키 (운세 뽑기)'
+    };
+
+    function openGameStage(id) {
+      activeGameId = id;
+      document.getElementById('activeGameTitle').innerText = GAME_NAMES[id];
+      document.getElementById('screenPlaying').style.display = 'block';
+      document.getElementById('screenResult').style.display = 'none';
+      document.getElementById('screenLeaderboard').style.display = 'none';
+
+      initGame(id);
+      document.getElementById('gameStageModal').classList.add('active');
+    }
+
+    function closeGameStage() {
+      clearInterval(gameLoop);
+      document.getElementById('gameStageModal').classList.remove('active');
+    }
+
+    function initGame(id) {
+      clearInterval(gameLoop);
+      const area = document.getElementById('gamePlayContainer');
+      const btn = document.getElementById('gameActionBtn');
+
+      if (id === 1) {
+        area.innerHTML = `
+          <div style="position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%); width:24px; background:rgba(16,185,129,0.2); border-left:2px dashed #10b981; border-right:2px dashed #10b981;"></div>
+          <div style="font-size:64px; user-select:none;">🍞</div>
+          <div id="g1Knife" style="position:absolute; top:0; bottom:0; width:4px; background:#ef4444; box-shadow:0 0 8px #ef4444; left:10%;"></div>
+        `;
+        btn.innerText = '🔪 자르기 (STOP!)';
+        let pos = 10;
+        let dir = 3.0;
+        gameLoop = setInterval(() => {
+          pos += dir;
+          if (pos >= 90) dir = -3.0;
+          if (pos <= 10) dir = 3.0;
+          const k = document.getElementById('g1Knife');
+          if (k) k.style.left = pos + '%';
+        }, 25);
+      } else if (id === 2) {
+        area.innerHTML = `
+          <div style="position:absolute; bottom:0; width:100px; height:18px; background:#d97706; border-radius:4px; left:50%; transform:translateX(-50%); color:#fff; font-size:10px; font-weight:800; display:flex; justify-content:center; align-items:center;">접시</div>
+          <div id="g2Bread" style="position:absolute; top:30px; width:70px; height:18px; background:#fef3c7; border:2px solid #b45309; border-radius:4px; left:20%;"></div>
+        `;
+        btn.innerText = '🥞 식빵 놓기 (DROP!)';
+        let bx = 20;
+        let bdir = 3.5;
+        gameLoop = setInterval(() => {
+          bx += bdir;
+          if (bx >= 80) bdir = -3.5;
+          if (bx <= 10) bdir = 3.5;
+          const b = document.getElementById('g2Bread');
+          if (b) b.style.left = bx + '%';
+        }, 25);
+      } else if (id === 3) {
+        area.innerHTML = `
+          <div id="g3Bread" style="position:absolute; bottom:15px; left:40px; font-size:36px; transition:bottom 0.25s;">🍞</div>
+          <div id="g3Obs" style="position:absolute; bottom:15px; left:100%; font-size:28px;">🔥</div>
+          <div style="position:absolute; bottom:0; left:0; right:0; height:15px; background:#cbd5e1;"></div>
+        `;
+        btn.innerText = '🦘 점프하기 (JUMP!)';
+        let ox = 100;
+        gameLoop = setInterval(() => {
+          ox -= 4.0;
+          if (ox <= -10) ox = 100;
+          const o = document.getElementById('g3Obs');
+          if (o) o.style.left = ox + '%';
+        }, 30);
+      } else if (id === 4) {
+        area.innerHTML = `
+          <div style="font-size:48px; cursor:pointer;" onclick="handleGameAction()">🥐 🥯 🥪 🍰</div>
+          <div style="font-size:12px; font-weight:800; color:#64748b; margin-top:8px;">카드를 탭하여 짝을 맞추세요!</div>
+        `;
+        btn.innerText = '✨ 짝맞추기 완료!';
+      } else if (id === 5) {
+        area.innerHTML = `
+          <div id="g5Cookie" style="font-size:72px; cursor:pointer;" onclick="handleGameAction()">🥠</div>
+          <div style="font-size:12px; font-weight:800; color:#b45309; margin-top:8px;">쿠키를 탭해 황금 티켓을 뽑으세요!</div>
+        `;
+        btn.innerText = '🥠 지금 쪼개기!';
+      }
+    }
+
+    function handleGameAction() {
+      clearInterval(gameLoop);
+      gameScore = Math.floor(Math.random() * 400) + 900;
+      finishGame(gameScore);
+    }
+
+    // 마진 방어 1일 1회 데일리 쿠폰 캡 반영
+    function finishGame(score) {
+      document.getElementById('screenPlaying').style.display = 'none';
+      document.getElementById('screenResult').style.display = 'block';
+      document.getElementById('resultFinalScore').innerText = `${score.toLocaleString()}점`;
+
+      const box = document.getElementById('rewardNotificationBox');
+      if (!hasReceivedDailyCoupon) {
+        hasReceivedDailyCoupon = true;
+        box.innerHTML = '🎟️ <strong>[오늘의 첫 판 혜택]</strong> 500원 할인 쿠폰 발급 완료! (오늘 자정까지 사용 가능)';
+        box.style.background = '#f0fdf4';
+        box.style.borderColor = '#bbf7d0';
+        box.style.color = '#166534';
+        showToast('🎉 오늘 첫 판 완료! 500원 쿠폰이 지급되었습니다.');
+      } else {
+        box.innerHTML = '🛡️ <strong>[마진 방어 랭킹 모드]</strong> 오늘은 이미 쿠폰을 받으셨습니다! TOP 10 명예의 전당 랭킹에 도전하세요!';
+        box.style.background = '#f8fafc';
+        box.style.borderColor = '#e2e8f0';
+        box.style.color = '#475569';
+        showToast('랭킹 기록 갱신 완료!');
+      }
+    }
+
+    function submitRanking() {
+      const name = document.getElementById('playerNickname').value.trim() || '익명빵';
+      const updatedList = saveScore(name, gameScore);
+
+      document.getElementById('screenResult').style.display = 'none';
+      document.getElementById('screenLeaderboard').style.display = 'block';
+      document.getElementById('lbGameName').innerText = GAME_NAMES[activeGameId];
+
+      const ul = document.getElementById('stageRankList');
+      ul.innerHTML = '';
+      updatedList.forEach((item, idx) => {
+        const li = document.createElement('li');
+        const isMy = item.name === name && item.score === gameScore;
+        li.className = `rank-item ${idx === 0 ? 'top-1' : (idx === 1 ? 'top-2' : (idx === 2 ? 'top-3' : ''))} ${isMy ? 'my-rank' : ''}`;
+        const medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : `${idx + 1}. `));
+        li.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:900; width:22px;">${medal}</span>
+            <strong>${item.name} ${isMy ? '<span style="color:#ef4444; font-size:10px;">[ME]</span>' : ''}</strong>
+          </div>
+          <div style="font-weight:900; color:var(--primary);">${item.score.toLocaleString()}점</div>
+        `;
+        ul.appendChild(li);
+      });
+      showToast(`🏆 ${name}님, TOP 10 랭킹 등록 완료!`);
+    }
+
+    function replayActiveGame() {
+      openGameStage(activeGameId);
+    }
+
+    window.onload = () => {
+      renderMarketList();
+      renderMainLeaderboard();
+    };
+  </script>
+</body>
+</html>

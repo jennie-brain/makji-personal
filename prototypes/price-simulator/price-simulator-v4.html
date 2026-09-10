@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAKJI 빵 시세 시뮬레이터 v4 | 가격대별 3단계 차등 상하한선 결합형</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #ff6b18;
+      --primary-dark: #e55609;
+      --primary-light: #fff4ed;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --up-red: #ef4444;
+      --up-bg: #fef2f2;
+      --down-blue: #2563eb;
+      --down-bg: #eff6ff;
+      --tier-low: #10b981;
+      --tier-mid: #3b82f6;
+      --tier-high: #8b5cf6;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* 버전 스위처 */
+    .version-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .version-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .version-link {
+      padding: 4px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .version-link.v1 { background: #334155; color: #cbd5e1; }
+    .version-link.v2 { background: #334155; color: #cbd5e1; }
+    .version-link.v3 { background: #334155; color: #cbd5e1; }
+    .version-link.v4 { background: var(--primary); color: #fff; }
+    .version-link:hover { opacity: 0.85; }
+
+    header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-area h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-area h1 span.badge {
+      font-size: 12px;
+      font-weight: 700;
+      background: #fdf2f8;
+      color: #db2777;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(219, 39, 119, 0.3);
+    }
+
+    .brand-area p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* 3단계 차등 상하한선 스펙 배너 */
+    .tier-spec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .tier-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tier-card.tier-1 { border-top: 4px solid var(--tier-low); }
+    .tier-card.tier-2 { border-top: 4px solid var(--tier-mid); }
+    .tier-card.tier-3 { border-top: 4px solid var(--tier-high); }
+
+    .tier-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      width: fit-content;
+    }
+
+    .tier-badge.t1 { background: #ecfdf5; color: #059669; }
+    .tier-badge.t2 { background: #eff6ff; color: #2563eb; }
+    .tier-badge.t3 { background: #f5f3ff; color: #7c3aed; }
+
+    .tier-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .tier-limit {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .tier-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* 성분 로직 요약 바 */
+    .logic-summary-bar {
+      background: #1e293b;
+      color: #fff;
+      padding: 16px 24px;
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+    }
+
+    .logic-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logic-tag {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    /* 실시간 지표 진단 배너 */
+    .diagnostic-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .diag-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .diag-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .diag-card .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .diag-card .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* 탭 네비게이션 */
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* 카드 박스 */
+    .content-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 테이블 스타일 */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2) {
+      text-align: left;
+    }
+
+    tr:hover td { background: #fbfcfe; }
+
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .pill-green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .pill-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .pill-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .pill-purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+    .val-down { color: var(--down-blue); font-weight: 700; }
+    .val-up { color: var(--up-red); font-weight: 700; }
+    .val-flat { color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- 버전 스위처 -->
+  <div class="version-bar">
+    <div>🚀 MAKJI 가격 모델 버전 아카이브</div>
+    <div class="version-links">
+      <a href="./price-simulator-v1.html" class="version-link v1">v1 (기존 원안 60:25:15)</a>
+      <a href="./price-simulator-v2.html" class="version-link v2">v2 (골든 웨이브 25:50:25)</a>
+      <a href="./price-simulator-v3.html" class="version-link v3">v3 (성분별 독립 한도 모델)</a>
+      <a href="./price-simulator-v4.html" class="version-link v4">v4 (가격대별 3단계 차등 캡 결합형) ★</a>
+    </div>
+  </div>
+
+  <!-- 헤더 -->
+  <header>
+    <div class="brand-area">
+      <h1>
+        🍞 MAKJI 빵 시세 시뮬레이터
+        <span class="badge">v4.0 가격대별 3단계 차등 안전장치</span>
+      </h1>
+      <p>성분별 가격 형성 로직 + 3대 가격 구간별(1만 미만 ±10% / 1~2만 ±7% / 2만 이상 ±5%) 안전장치 완벽 결합</p>
+    </div>
+    <div>
+      <a href="https://makji.kr/" target="_blank" style="padding: 8px 16px; background: #f1f5f9; color: var(--text); border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;">🔗 막지 공식몰 (makji.kr)</a>
+    </div>
+  </header>
+
+  <!-- 3단계 가격대별 차등 상하한선 기준 카드 -->
+  <div class="tier-spec-grid">
+    <!-- 1. 1만원 미만 -->
+    <div class="tier-card tier-1">
+      <span class="tier-badge t1">Tier 1 • 저가 상품군 (5종)</span>
+      <div class="tier-title">1만원 미만 상품</div>
+      <div class="tier-limit" style="color: #059669;">하루 최대 ±10%</div>
+      <div class="tier-desc">
+        • 대상: 머핀, 샌드위치, 휘낭시에, 스콘, 모닝롤<br>
+        • 예시: <b>3,800원 ➔ 3,420원 ~ 4,180원</b><br>
+        • 효과: 저가 상품은 가격 변화가 확실히 보여 커머스 재미 극대화
+      </div>
+    </div>
+
+    <!-- 2. 1만~2만원 미만 -->
+    <div class="tier-card tier-2">
+      <span class="tier-badge t2">Tier 2 • 중가 상품군 (3종)</span>
+      <div class="tier-title">1만 ~ 2만원 미만 상품</div>
+      <div class="tier-limit" style="color: #2563eb;">하루 최대 ±7%</div>
+      <div class="tier-desc">
+        • 대상: 테트리스 브레드, ZERO 카스테라, 티라미수<br>
+        • 예시: <b>15,000원 ➔ 13,950원 ~ 16,050원</b><br>
+        • 효과: 부담 없는 적정 가격 등락폭으로 일상 구매 유도
+      </div>
+    </div>
+
+    <!-- 3. 2만원 이상 -->
+    <div class="tier-card tier-3">
+      <span class="tier-badge t3">Tier 3 • 고가 상품군 (2종)</span>
+      <div class="tier-title">2만원 이상 상품</div>
+      <div class="tier-limit" style="color: #7c3aed;">하루 최대 ±5%</div>
+      <div class="tier-desc">
+        • 대상: 냉동생지 3종, 마틸다 초코케이크<br>
+        • 예시: <b>42,000원 ➔ 39,900원 ~ 44,100원</b><br>
+        • 효과: 하루 수천 원씩 과도하게 출렁이는 마진 리스크 철통 방어
+      </div>
+    </div>
+  </div>
+
+  <!-- 성분별 가격 형성 로직 요약 바 -->
+  <div class="logic-summary-bar">
+    <div class="logic-item">
+      <span class="logic-tag" style="background:#059669;">성분 1</span>
+      <span>🎁 <b>NAVER 검색트렌드</b> 인기 배당 할인 (0% ~ -6%)</span>
+    </div>
+    <div class="logic-item">
+      <span class="logic-tag" style="background:#2563eb;">성분 2</span>
+      <span>📈 <b>KOSPI</b> 시장 신호 (-1% ~ +1%)</span>
+    </div>
+    <div class="logic-item">
+      <span class="logic-tag" style="background:#d97706;">성분 3</span>
+      <span>💵 <b>USD/KRW</b> 비용 압력 (-3% ~ +3%)</span>
+    </div>
+    <div class="logic-item">
+      <span class="logic-tag" style="background:#db2777;">최종 안전망</span>
+      <span>🛡️ <b>가격대별 차등 캡</b> (±10% / ±7% / ±5%)</span>
+    </div>
+  </div>
+
+  <!-- 진단 지표 배너 -->
+  <div class="diagnostic-bar">
+    <div class="diag-card">
+      <div class="label">오늘 10종 평균 변동률</div>
+      <div class="value" id="diagAvgChange" style="color: #059669;">-0.0%</div>
+      <div class="desc">3단계 차등 캡 적용 후 실질 변동률</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">오늘 할인 혜택 품목 수</div>
+      <div class="value" id="diagDiscountCount">0개 / 10개</div>
+      <div class="desc">정가보다 저렴해진 상품 개수</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">차등 안전장치 발동 상품</div>
+      <div class="value" id="diagTierCapHit" style="color: #7c3aed;">0개</div>
+      <div class="desc">구간별 한도(±10/±7/±5%)에 걸려 보호된 품목</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">비즈니스 마진 안전성</div>
+      <div class="value" style="color: #059669;">완벽 보호</div>
+      <div class="desc">고가 케이크 일일 최대 변동 ±2,100원 내 제어</div>
+    </div>
+  </div>
+
+  <!-- 탭 네비게이션 -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('tab-today')">📋 오늘(D-Day) 10종 빵 3단계 차등 캡 시세표</button>
+    <button class="tab-btn" onclick="switchTab('tab-chart')">📈 14일간 제품별 가격 변동 추이 차트</button>
+    <button class="tab-btn" onclick="switchTab('tab-matrix')">📅 14일 전체 시계열 가격 매트릭스</button>
+    <button class="tab-btn" onclick="switchTab('tab-logic')">💡 3단계 차등 안전장치 작동 메커니즘 리포트</button>
+  </div>
+
+  <!-- 탭 1: 오늘 시세표 -->
+  <div id="tab-today" class="tab-pane active">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">🍞 MAKJI 10종 제품 실시간 시세 및 3단계 안전장치 적용표</div>
+        <span style="font-size: 13px; color: var(--text-muted);">
+          * 오늘 거시 지표: KOSPI -1.20% (-1.00%p) | 환율 +0.65% (+1.95%p)
+        </span>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>순번</th>
+              <th>제품명</th>
+              <th>기본가격</th>
+              <th>가격 구간</th>
+              <th>적용 상하한선</th>
+              <th>허용 가격 범위</th>
+              <th>성분 합산 변동률</th>
+              <th>최종 적용 변동률</th>
+              <th>오늘 최종 시세</th>
+              <th>기본가 대비 변동액</th>
+              <th>안전장치 판정</th>
+            </tr>
+          </thead>
+          <tbody id="v4TodayTable">
+            <!-- JS 동적 렌더링 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 2: 14일 추이 차트 -->
+  <div id="tab-chart" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">📊 14일간 일자별 가격 변동 흐름 (구간별 상하한 밴드)</div>
+        <div>
+          <label style="font-size: 13px; font-weight: 600; margin-right: 8px;">제품 선택:</label>
+          <select id="v4ProductSelect" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);" onchange="renderV4Chart()"></select>
+        </div>
+      </div>
+      <div style="height: 420px; position: relative;">
+        <canvas id="v4PriceChart"></canvas>
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px; text-align: center;">
+        * 초록색 실선: 최종 시세 | 회색 점선: 기본가격 | 붉은/푸른 밴드: 해당 제품 구간의 차등 상하한선 (±10%, ±7%, ±5%)
+      </p>
+    </div>
+  </div>
+
+  <!-- 탭 3: 14일 전체 매트릭스 -->
+  <div id="tab-matrix" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">📅 14일간 10종 전 제품 일자별 정확한 시세표 (원)</div>
+      </div>
+      <div class="table-container">
+        <table id="v4MatrixTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 4: 메커니즘 분석 리포트 -->
+  <div id="tab-logic" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">💡 왜 가격대별 3단계 차등 상하한선이 필수적인가?</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid var(--border);">
+          <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #059669;">🎯 1. 저가 상품 (1만원 미만): 확실한 체감 재미 (±10%)</h4>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+            1,500원짜리 머핀이나 3,800원짜리 휘낭시에는 하루 변동폭이 2~3% 수준이면 가격 차이가 30~50원에 불과해 고객이 시세가 바뀌었다는 느낌을 전혀 받지 못합니다. 따라서 <b>±10%</b>까지 시원하게 열어주어 380원 할인된 3,420원처럼 확실한 득템 체감을 선사합니다.
+          </p>
+        </div>
+
+        <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid var(--border);">
+          <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #7c3aed;">🛡️ 2. 고가 상품 (2만원 이상): 마진 붕괴 원천 차단 (±5%)</h4>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+            42,000원짜리 마틸다 초코케이크에 10% 할인을 적용하면 하루에 4,200원씩 마진이 증발합니다. 반대로 10%가 오르면 하루 만에 46,200원이 되어 고객의 심리적 저항선(4만원대 초반)을 깨뜨립니다. 따라서 <b>±5%</b>로 엄격히 제한하여 최대 변동을 ±2,100원(39,900원 ~ 44,100원) 내로 묶어둡니다.
+          </p>
+        </div>
+
+        <div style="background: #f0fdf4; padding: 20px; border-radius: 10px; border: 1px solid #a7f3d0; grid-column: 1 / -1;">
+          <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 8px; color: #059669;">✨ v4 완성형 모델의 작동 원리</h4>
+          <p style="font-size: 13px; color: #1e293b; line-height: 1.7;">
+            성분 공식 <code>[인기 배당 0~-6% + KOSPI ±1% + 환율 ±3%]</code>에 의해 계산된 원시 변동률이 얼마가 나오든, 최종 단계에서 <b>해당 상품의 가격 구간(Tier)에 해당하는 캡(-10% / -7% / -5%)</b>을 씌워줍니다.<br>
+            예컨대 오늘처럼 인기 배당과 KOSPI 하락이 겹쳐 <b>-6.5% 할인</b>이 발생했을 때:
+            <br>• 1만원 미만(휘낭시에): -6.5% 전액 적용 ➔ <b>3,550원 대폭 할인!</b>
+            <br>• 2만원 이상(마틸다 케이크): -6.5%가 아닌 <b>-5.0% 캡 자동 발동</b> ➔ <b>39,900원으로 마진 안전 방어!</b>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 10개 제품 정의 (가격대별 3단계 차등 상하한선 메타데이터)
+    const PRODUCTS = [
+      { id: 'p1', name: '비건 잉글리시 머핀', basePrice: 1500, tier: '1만원 미만', cap: 0.10, tierClass: 't1' },
+      { id: 'p2', name: '대만식 샌드위치', basePrice: 2400, tier: '1만원 미만', cap: 0.10, tierClass: 't1' },
+      { id: 'p3', name: '휘낭시에', basePrice: 3800, tier: '1만원 미만', cap: 0.10, tierClass: 't1' },
+      { id: 'p4', name: '글루텐프리 스콘', basePrice: 3800, tier: '1만원 미만', cap: 0.10, tierClass: 't1' },
+      { id: 'p5', name: '모닝롤', basePrice: 4500, tier: '1만원 미만', cap: 0.10, tierClass: 't1' },
+      { id: 'p6', name: '테트리스 브레드', basePrice: 11000, tier: '1만~2만원', cap: 0.07, tierClass: 't2' },
+      { id: 'p7', name: 'ZERO 카스테라', basePrice: 12000, tier: '1만~2만원', cap: 0.07, tierClass: 't2' },
+      { id: 'p8', name: '티라미수', basePrice: 15000, tier: '1만~2만원', cap: 0.07, tierClass: 't2' },
+      { id: 'p9', name: '냉동생지 3종', basePrice: 21000, tier: '2만원 이상', cap: 0.05, tierClass: 't3' },
+      { id: 'p10', name: '마틸다 초코케이크', basePrice: 42000, tier: '2만원 이상', cap: 0.05, tierClass: 't3' }
+    ];
+
+    const DATES = [
+      '8/27(수)', '8/28(목)', '8/29(금)', '8/30(토)', '8/31(일)',
+      '9/01(월)', '9/02(화)', '9/03(수)', '9/04(목)', '9/05(금)',
+      '9/06(토)', '9/07(일)', '9/08(월)', '9/09(오늘)'
+    ];
+
+    const KOSPI_CHANGES = [
+      0.008, -0.004, 0.012, 0.0, 0.0,
+      -0.015, -0.008, 0.005, 0.011, -0.003,
+      0.0, 0.0, 0.007, -0.012
+    ];
+
+    const USD_CHANGES = [
+      -0.002, 0.005, -0.004, 0.0, 0.0,
+      0.009, 0.004, -0.003, -0.006, 0.002,
+      0.0, 0.0, -0.004, 0.0065
+    ];
+
+    const TREND_SCORES = {
+      p1: [0.4, 0.3, 0.6, 0.8, 0.7, 0.2, 0.5, 0.3, 0.6, 0.7, 0.8, 0.7, 0.4, 0.6],
+      p2: [0.3, 0.4, 0.3, 0.5, 0.5, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.5, 0.3, 0.4],
+      p3: [0.6, 0.4, 0.8, 0.9, 0.8, 0.3, 0.7, 0.6, 0.5, 0.8, 0.9, 0.8, 0.5, 0.85],
+      p4: [0.5, 0.4, 0.5, 0.7, 0.7, 0.3, 0.4, 0.4, 0.5, 0.6, 0.8, 0.7, 0.4, 0.7],
+      p5: [0.3, 0.3, 0.2, 0.4, 0.4, 0.2, 0.3, 0.3, 0.3, 0.4, 0.5, 0.4, 0.3, 0.35],
+      p6: [0.6, 0.4, 0.6, 0.8, 0.8, 0.3, 0.5, 0.4, 0.6, 0.7, 0.9, 0.8, 0.5, 0.75],
+      p7: [0.7, 0.6, 0.5, 0.9, 0.9, 0.4, 0.7, 0.6, 0.6, 0.8, 0.95, 0.9, 0.6, 0.9],
+      p8: [0.5, 0.4, 0.6, 0.7, 0.7, 0.3, 0.5, 0.4, 0.5, 0.6, 0.8, 0.7, 0.4, 0.65],
+      p9: [0.4, 0.3, 0.4, 0.6, 0.6, 0.2, 0.4, 0.3, 0.4, 0.5, 0.7, 0.6, 0.4, 0.55],
+      p10: [0.8, 0.5, 0.9, 1.0, 0.95, 0.4, 0.8, 0.7, 0.6, 0.85, 1.0, 0.95, 0.6, 0.98]
+    };
+
+    let v4State = {
+      maxTrendDividend: 0.06, // 0 ~ -6%
+      maxKospiImpact: 0.01,   // -1 ~ +1%
+      maxFxImpact: 0.03,      // -3 ~ +3%
+      rounding: 10
+    };
+
+    let v4ChartInstance = null;
+
+    function roundPrice(val, step) {
+      if (step === 0) return Math.round(val);
+      return Math.round(val / step) * step;
+    }
+
+    // v4 핵심 계산 로직: 성분별 로직 + 가격대별 3단계 차등 캡
+    function calculateV4ProductDay(prod, dayIdx) {
+      const trendScore = TREND_SCORES[prod.id][dayIdx];
+      const kospiChange = KOSPI_CHANGES[dayIdx];
+      const fxChange = USD_CHANGES[dayIdx];
+
+      // 1. 성분 로직
+      const trendImpact = -1 * (trendScore * v4State.maxTrendDividend);
+
+      let kospiImpact = kospiChange;
+      if (kospiImpact > v4State.maxKospiImpact) kospiImpact = v4State.maxKospiImpact;
+      if (kospiImpact < -v4State.maxKospiImpact) kospiImpact = -v4State.maxKospiImpact;
+
+      let fxImpact = fxChange * 3.0;
+      if (fxImpact > v4State.maxFxImpact) fxImpact = v4State.maxFxImpact;
+      if (fxImpact < -v4State.maxFxImpact) fxImpact = -v4State.maxFxImpact;
+
+      const rawRate = trendImpact + kospiImpact + fxImpact;
+
+      // 2. 가격대별 3단계 차등 캡 적용 (1만 미만: ±10% / 1~2만: ±7% / 2만 이상: ±5%)
+      let finalRate = rawRate;
+      let isCapped = false;
+      let capType = 'normal';
+
+      if (rawRate > prod.cap) {
+        finalRate = prod.cap;
+        isCapped = true;
+        capType = 'upper';
+      } else if (rawRate < -prod.cap) {
+        finalRate = -prod.cap;
+        isCapped = true;
+        capType = 'lower';
+      }
+
+      const finalPrice = roundPrice(prod.basePrice * (1 + finalRate), v4State.rounding);
+      const diffPrice = finalPrice - prod.basePrice;
+
+      return {
+        rawRate,
+        finalRate,
+        finalPrice,
+        diffPrice,
+        isCapped,
+        capType,
+        minPrice: roundPrice(prod.basePrice * (1 - prod.cap), v4State.rounding),
+        maxPrice: roundPrice(prod.basePrice * (1 + prod.cap), v4State.rounding)
+      };
+    }
+
+    function renderV4TodayTable() {
+      const tbody = document.getElementById('v4TodayTable');
+      tbody.innerHTML = '';
+      const dayIdx = 13; // 오늘
+
+      let discountCount = 0;
+      let totalRateSum = 0;
+      let capHitCount = 0;
+
+      PRODUCTS.forEach((p, idx) => {
+        const res = calculateV4ProductDay(p, dayIdx);
+        totalRateSum += res.finalRate;
+        if (res.finalRate < 0) discountCount++;
+        if (res.isCapped) capHitCount++;
+
+        const tr = document.createElement('tr');
+
+        let capBadge = '<span class="pill pill-blue">정상 범위 내</span>';
+        if (res.isCapped) {
+          if (res.capType === 'lower') {
+            capBadge = `<span class="pill pill-purple">🛡️ ${p.tier} 하한선(-${(p.cap*100).toFixed(0)}%) 보호</span>`;
+          } else {
+            capBadge = `<span class="pill pill-red">🛡️ ${p.tier} 상한선(+${(p.cap*100).toFixed(0)}%) 제한</span>`;
+          }
+        }
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><b>${p.name}</b></td>
+          <td>${p.basePrice.toLocaleString()}원</td>
+          <td><span class="tier-badge ${p.tierClass}">${p.tier}</span></td>
+          <td style="font-weight:700;">±${(p.cap * 100).toFixed(0)}%</td>
+          <td style="font-size:12px; color:var(--text-muted);">${res.minPrice.toLocaleString()} ~ ${res.maxPrice.toLocaleString()}원</td>
+          <td style="color:#64748b;">${res.rawRate > 0 ? '+' : ''}${(res.rawRate * 100).toFixed(2)}%</td>
+          <td style="font-weight:800; color:${res.finalRate < 0 ? '#2563eb' : '#ef4444'};">
+            ${res.finalRate > 0 ? '+' : ''}${(res.finalRate * 100).toFixed(2)}%
+          </td>
+          <td style="font-size:15px; font-weight:800;">${res.finalPrice.toLocaleString()}원</td>
+          <td class="${res.diffPrice < 0 ? 'val-down' : (res.diffPrice > 0 ? 'val-up' : 'val-flat')}">
+            ${res.diffPrice > 0 ? '+' : ''}${res.diffPrice.toLocaleString()}원
+          </td>
+          <td>${capBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('diagAvgChange').innerText = (totalRateSum / PRODUCTS.length * 100).toFixed(2) + '%';
+      document.getElementById('diagDiscountCount').innerText = `${discountCount}개 / 10개`;
+      document.getElementById('diagTierCapHit').innerText = `${capHitCount}개 품목`;
+    }
+
+    function renderV4Chart() {
+      const prodId = document.getElementById('v4ProductSelect').value || 'p3';
+      const prod = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[2];
+
+      const prices = [];
+      const basePrices = [];
+      const lowerCap = [];
+      const upperCap = [];
+
+      for (let d = 0; d < 14; d++) {
+        const res = calculateV4ProductDay(prod, d);
+        prices.push(res.finalPrice);
+        basePrices.push(prod.basePrice);
+        lowerCap.push(res.minPrice);
+        upperCap.push(res.maxPrice);
+      }
+
+      const ctx = document.getElementById('v4PriceChart').getContext('2d');
+      if (v4ChartInstance) v4ChartInstance.destroy();
+
+      v4ChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: DATES,
+          datasets: [
+            {
+              label: '오늘 최종 시세 (원)',
+              data: prices,
+              borderColor: '#059669',
+              backgroundColor: 'rgba(5, 150, 105, 0.1)',
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 5,
+              pointBackgroundColor: '#059669',
+              zIndex: 10
+            },
+            {
+              label: '기본가격 (정상가)',
+              data: basePrices,
+              borderColor: '#94a3b8',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0
+            },
+            {
+              label: `${prod.tier} 상한선 (+${(prod.cap * 100).toFixed(0)}%)`,
+              data: upperCap,
+              borderColor: 'rgba(239, 68, 68, 0.5)',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              pointRadius: 0
+            },
+            {
+              label: `${prod.tier} 하한선 (-${(prod.cap * 100).toFixed(0)}%)`,
+              data: lowerCap,
+              borderColor: 'rgba(37, 99, 235, 0.5)',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Pretendard' } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString() + '원'
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: { callback: val => val.toLocaleString() + '원' },
+              grid: { color: '#f1f5f9' }
+            },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderV4MatrixTable() {
+      const table = document.getElementById('v4MatrixTable');
+      table.innerHTML = '';
+
+      let theadHtml = '<thead><tr><th>제품명</th><th>기본가</th><th>구간 / 상하한</th>';
+      DATES.forEach(d => { theadHtml += `<th>${d}</th>`; });
+      theadHtml += '</tr></thead>';
+
+      let tbodyHtml = '<tbody>';
+      PRODUCTS.forEach(p => {
+        tbodyHtml += `<tr><td><b>${p.name}</b></td><td style="color:var(--text-muted);">${p.basePrice.toLocaleString()}원</td><td><span class="tier-badge ${p.tierClass}">${p.tier} (±${(p.cap*100).toFixed(0)}%)</span></td>`;
+        for (let d = 0; d < 14; d++) {
+          const res = calculateV4ProductDay(p, d);
+          let color = res.diffPrice < 0 ? '#2563eb' : (res.diffPrice > 0 ? '#ef4444' : 'inherit');
+          tbodyHtml += `
+            <td style="color:${color};">
+              <b>${res.finalPrice.toLocaleString()}원</b><br>
+              <span style="font-size:11px; opacity:0.8;">${(res.finalRate * 100).toFixed(1)}%</span>
+            </td>
+          `;
+        }
+        tbodyHtml += '</tr>';
+      });
+      tbodyHtml += '</tbody>';
+      table.innerHTML = theadHtml + tbodyHtml;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      if (tabId === 'tab-chart') renderV4Chart();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const select = document.getElementById('v4ProductSelect');
+      PRODUCTS.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.innerText = `${p.name} (${p.basePrice.toLocaleString()}원 | ${p.tier} ±${(p.cap*100).toFixed(0)}%)`;
+        select.appendChild(opt);
+      });
+      select.value = 'p3'; // 휘낭시에 기본
+      renderV4TodayTable();
+      renderV4Chart();
+      renderV4MatrixTable();
+    });
+  </script>
+</body>
+</html>

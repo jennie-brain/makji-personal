@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAKJI 오늘의 빵 시세 & 가격 변동 시뮬레이터</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #ff6b18;
+      --primary-dark: #e55609;
+      --primary-light: #fff4ed;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --up-red: #ef4444;
+      --up-bg: #fef2f2;
+      --down-blue: #3b82f6;
+      --down-bg: #eff6ff;
+      --cap-warn: #f59e0b;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-area h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-area h1 span.badge {
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 107, 24, 0.3);
+    }
+
+    .brand-area p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .header-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: #f1f5f9;
+      color: var(--text);
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .header-links a:hover {
+      background: #e2e8f0;
+    }
+
+    /* 상단 요약 진단 배너 */
+    .diagnostic-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .diag-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .diag-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .diag-card .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .diag-card .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* 메인 컨트롤러 패널 */
+    .control-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .control-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .preset-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .preset-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* 슬라이더 그리드 */
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .slider-box {
+      background: #f8fafc;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border: 1px solid #edf2f7;
+    }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .slider-top label {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slider-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 4px;
+      background: #cbd5e1;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(255, 107, 24, 0.4);
+      transition: transform 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .slider-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .ratio-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f1f5f9;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .ratio-sum {
+      font-weight: 800;
+    }
+
+    .ratio-sum.valid {
+      color: #10b981;
+    }
+
+    .ratio-sum.invalid {
+      color: #ef4444;
+    }
+
+    /* 카드 박스 공통 */
+    .content-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 테이블 스타일 */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2) {
+      text-align: left;
+    }
+
+    tr:hover td {
+      background: #fbfcfe;
+    }
+
+    .badge-cap {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .badge-max {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+    }
+
+    .badge-min {
+      background: #dbeafe;
+      color: #2563eb;
+      border: 1px solid #93c5fd;
+    }
+
+    .badge-normal {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .diff-up {
+      color: var(--up-red);
+      font-weight: 700;
+    }
+
+    .diff-down {
+      color: var(--down-blue);
+      font-weight: 700;
+    }
+
+    .diff-flat {
+      color: var(--text-muted);
+    }
+
+    /* 차트 셀렉터 */
+    .chart-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select.product-select {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    /* 분석 평가 리포트 섹션 */
+    .evaluation-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .eval-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eval-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 16px;
+    }
+
+    .eval-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      background: #f8fafc;
+    }
+
+    .eval-box.good {
+      border-left: 4px solid #10b981;
+    }
+
+    .eval-box.warn {
+      border-left: 4px solid #f59e0b;
+    }
+
+    .eval-box.danger {
+      border-left: 4px solid #ef4444;
+    }
+
+    .eval-box h4 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .eval-box p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .eval-box ul {
+      margin-left: 18px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .eval-box ul li {
+      margin-bottom: 4px;
+    }
+
+    /* 탭 컨트롤러 */
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    .market-inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 10px;
+    }
+
+    .market-stat {
+      font-size: 13px;
+    }
+
+    .market-stat .name {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .market-stat .val {
+      font-weight: 700;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header>
+    <div class="brand-area">
+      <h1>
+        🍞 MAKJI 오늘의 빵 시세 시뮬레이터
+        <span class="badge">동적 시세 검증 도구 v1.0</span>
+      </h1>
+      <p>네이버 트렌드 · KOSPI · 환율 데이터 가중치 및 배율에 따른 10종 제품 가격 흐름 & 적정도 정밀 진단기</p>
+    </div>
+    <div class="header-links">
+      <a href="https://makji.kr/" target="_blank">🔗 막지 공식몰 (makji.kr)</a>
+      <a href="./index.html">📈 MAK-DAQ 거래소 체험</a>
+    </div>
+  </header>
+
+  <!-- 실시간 진단 지표 배너 -->
+  <div class="diagnostic-bar">
+    <div class="diag-card">
+      <div class="label">상·하한선 도달률 (Clipping Rate)</div>
+      <div class="value" id="diagClippingRate">0.0%</div>
+      <div class="desc" id="diagClippingDesc">상한가/하한가에 걸린 상품 비율</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">일평균 가격 변동률 (Daily Volatility)</div>
+      <div class="value" id="diagAvgChange">0.0%</div>
+      <div class="desc" id="diagAvgChangeDesc">10종 전 상품 평균 변동폭</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">검색트렌드 실질 지배력</div>
+      <div class="value" id="diagTrendDominance">0.0%</div>
+      <div class="desc">가격 변동 기여도 중 트렌드의 실질 점유율</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">시세 적정도 종합 판정</div>
+      <div class="value" id="diagScore" style="color: var(--primary);">분석 중</div>
+      <div class="desc" id="diagScoreDesc">비즈니스 마진 & 소비자 체감 평가</div>
+    </div>
+  </div>
+
+  <!-- 메인 컨트롤 패널 -->
+  <section class="control-panel">
+    <div class="control-header">
+      <div class="control-title">🎛️ 지표 가중치 & 변동 공식 실시간 조정기</div>
+      <div class="preset-group">
+        <button class="preset-btn active" onclick="applyPreset('golden')" style="background: linear-gradient(135deg, #f59e0b, #ea580c); color: #fff; border-color: #d97706; font-weight: 800;">👑 골든 웨이브 (25 : 50 : 25 | x2.5) [강력 추천]</button>
+        <button class="preset-btn" onclick="applyPreset('dynamic')">🏄 다이내믹 리듬 (40 : 35 : 25 | x2.0)</button>
+        <button class="preset-btn" onclick="applyPreset('balanced')">✨ 추천 밸런스안 (35 : 40 : 25 | x3.5)</button>
+        <button class="preset-btn" onclick="applyPreset('default')">📌 기존 원안 (60 : 25 : 15 | x5.0)</button>
+        <button class="preset-btn" onclick="applyPreset('stable')">🛡️ 안정적 커머스형 (40 : 30 : 30 | x1.5)</button>
+      </div>
+    </div>
+
+    <!-- 할인 발생을 위한 트렌드 기준점 모드 선택 -->
+    <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <b style="color: #3730a3; font-size: 14px;">💡 빵 할인(마이너스 시세) 생성 알고리즘 모드:</b>
+        <span style="font-size: 12px; color: #4338ca; margin-left: 6px;">트렌드가 계속 오르거나 양수일 때 할인을 발생시키는 기준점 선택</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="modeBtnMA" class="preset-btn active" style="background: #4f46e5; color: #fff; border-color: #4f46e5;" onclick="setTrendMode('ma')">⭐ 7일 이동평균선 대비 (추천: 절반 할인 발생)</button>
+        <button id="modeBtnDaily" class="preset-btn" onclick="setTrendMode('daily')">전일 대비 단순 등락</button>
+        <button id="modeBtnDiscount" class="preset-btn" onclick="setTrendMode('discount')">🎁 할인 전용 밴드 (0% ~ -15% 세일)</button>
+      </div>
+    </div>
+
+    <div class="slider-grid">
+      <!-- 1. 네이버 검색트렌드 -->
+      <div class="slider-box">
+        <div class="slider-top">
+          <label>📊 NAVER 검색트렌드 비중</label>
+          <span class="slider-val" id="valTrend">60%</span>
+        </div>
+        <input type="range" id="weightTrend" min="0" max="100" value="60" oninput="updateWeights('trend')">
+        <div class="slider-hint">빵별 인기·화제성 변화 반영 (일일 변동성 보통 ±15~80%)</div>
+      </div>
+
+      <!-- 2. KOSPI -->
+      <div class="slider-box">
+        <div class="slider-top">
+          <label>📈 KOSPI 변동률 비중</label>
+          <span class="slider-val" id="valKospi">25%</span>
+        </div>
+        <input type="range" id="weightKospi" min="0" max="100" value="25" oninput="updateWeights('kospi')">
+        <div class="slider-hint">전체 시장 심리 반영 (일일 변동성 보통 ±0.5~2.0%)</div>
+      </div>
+
+      <!-- 3. 환율 -->
+      <div class="slider-box">
+        <div class="slider-top">
+          <label>💵 USD/KRW 환율 비중</label>
+          <span class="slider-val" id="valExchange">15%</span>
+        </div>
+        <input type="range" id="weightExchange" min="0" max="100" value="15" oninput="updateWeights('exchange')">
+        <div class="slider-hint">수입 원자재(밀가루/버터) 원가 심리 (일일 변동성 보통 ±0.2~0.8%)</div>
+      </div>
+
+      <!-- 4. 증폭 배수 -->
+      <div class="slider-box" style="border-color: #ffd8bf; background: #fffaf7;">
+        <div class="slider-top">
+          <label>⚡ 변동률 증폭 계수 (Multiplier)</label>
+          <span class="slider-val" id="valMultiplier" style="color: #ea580c;">×5.0</span>
+        </div>
+        <input type="range" id="paramMultiplier" min="1.0" max="10.0" step="0.5" value="5.0" oninput="updateSimulation()">
+        <div class="slider-hint">계산된 변동률에 곱해지는 배수 (현재 기획안 기본값: 5배)</div>
+      </div>
+
+      <!-- 5. 가격 절사 단위 -->
+      <div class="slider-box">
+        <div class="slider-top">
+          <label>🪙 가격 끝자리 절사 단위</label>
+          <span class="slider-val" id="valRounding">10원 단위</span>
+        </div>
+        <input type="range" id="paramRounding" min="0" max="2" step="1" value="0" oninput="updateSimulation()">
+        <div class="slider-hint">0: 10원 단위(기본) | 1: 50원 단위 | 2: 100원 단위</div>
+      </div>
+    </div>
+
+    <div class="ratio-status">
+      <div>가중치 총합: <span class="ratio-sum valid" id="ratioTotal">100%</span> (정규화 완료)</div>
+      <div style="color: var(--text-muted);">💡 공식: <b>오늘 변동률 = (트렌드% × W₁ + KOSPI% × W₂ + 환율% × W₃) × 증폭계수</b></div>
+    </div>
+  </section>
+
+  <!-- 탭 네비게이션 -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('tab-today')">📋 오늘(D-Day) 10종 빵 시세 상세표</button>
+    <button class="tab-btn" onclick="switchTab('tab-history')">📈 14일간 제품별 가격 변동 추이 차트</button>
+    <button class="tab-btn" onclick="switchTab('tab-matrix')">📅 14일 전체 시계열 가격 매트릭스</button>
+    <button class="tab-btn" onclick="switchTab('tab-review')">🧐 기획안 비율 타당성 정밀 심층 리포트</button>
+  </div>
+
+  <!-- 탭 1: 오늘 10종 빵 시세표 -->
+  <div id="tab-today" class="tab-pane active">
+    <!-- 오늘의 시장 지표 현황 -->
+    <div class="market-inputs-grid">
+      <div class="market-stat">
+        <div class="name">오늘 KOSPI 지수 변동률</div>
+        <div class="val diff-down" id="todayKospi">-1.20% (하락)</div>
+      </div>
+      <div class="market-stat">
+        <div class="name">오늘 USD/KRW 환율 변동률</div>
+        <div class="val diff-up" id="todayUsd">+0.65% (원화 약세)</div>
+      </div>
+      <div class="market-stat">
+        <div class="name">10종 평균 검색트렌드 변동률</div>
+        <div class="val diff-up" id="todayAvgTrend">+14.2% (상승)</div>
+      </div>
+      <div class="market-stat">
+        <div class="name">가격 캡(상·하한) 정책</div>
+        <div class="val" style="color: var(--primary);">1만 미만 ±10% | 1~2만 ±7% | 2만 이상 ±5%</div>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">🍞 MAKJI 10종 제품 실시간 시세 및 가격표 (정확한 원 단위 계산)</div>
+        <span style="font-size: 13px; color: var(--text-muted);">* 전날 가격이 아닌 <b>기본가격 기준</b> 재계산 원칙 적용</span>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>순번</th>
+              <th>제품명</th>
+              <th>기본가격</th>
+              <th>가격구간</th>
+              <th>상·하한폭</th>
+              <th>최대 허용 가격 범위</th>
+              <th>검색트렌드</th>
+              <th>공식 계산 변동률</th>
+              <th>최종 적용 변동률</th>
+              <th>오늘 최종 시세</th>
+              <th>기본가 대비 변동액</th>
+              <th>상태 판정</th>
+            </tr>
+          </thead>
+          <tbody id="todayTableBody">
+            <!-- JS 동적 렌더링 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 2: 14일간 제품별 가격 변동 추이 차트 -->
+  <div id="tab-history" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">
+          📊 14일간 일자별 가격 변동 흐름 (Price Trend)
+        </div>
+        <div class="chart-controls">
+          <label style="font-size: 13px; font-weight: 600;">제품 선택:</label>
+          <select id="chartProductSelect" class="product-select" onchange="renderChart()">
+            <!-- JS 동적 생성 -->
+          </select>
+        </div>
+      </div>
+
+      <div style="height: 420px; position: relative;">
+        <canvas id="priceTrendChart"></canvas>
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px; text-align: center;">
+        * 주황색 실선: 최종 적용 가격(원) | 회색 점선: 제품 기본가격 | 붉은/푸른 옅은 영역: 가격대별 상·하한선 밴드
+      </p>
+    </div>
+  </div>
+
+  <!-- 탭 3: 14일 전체 시계열 가격 매트릭스 -->
+  <div id="tab-matrix" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">📅 14일간 10종 전 제품 일자별 정확한 시세표 (원)</div>
+        <span style="font-size: 12px; color: var(--text-muted);">가중치 변경 시 전체 14일치 가격이 실시간으로 재계산됩니다.</span>
+      </div>
+      <div class="table-container">
+        <table id="matrixTable">
+          <!-- JS 동적 렌더링 -->
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 4: 기획안 비율 타당성 정밀 심층 리포트 -->
+  <div id="tab-review" class="tab-pane">
+    <div class="evaluation-section">
+      <div class="eval-title">🧐 "NAVER 60% + KOSPI 25% + 환율 15% (×5배)", 이대로 가도 될까?</div>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+        기획하신 공식과 가중치 구조를 <b>데이터 특성, 재무/마진 안전성, 소비자 UX, 알고리즘 왜곡</b> 관점에서 정밀 분석한 결과입니다.
+      </p>
+
+      <div class="eval-grid">
+        <!-- 1. 핵심 결함: 변동폭 스케일 불일치 -->
+        <div class="eval-box danger">
+          <h4>🚨 1. 데이터 스케일(단위 변동폭) 불일치 문제</h4>
+          <p>
+            <b>KOSPI와 환율은 변동폭이 너무 작고, 검색트렌드는 너무 큽니다.</b>
+          </p>
+          <ul>
+            <li><b>KOSPI 일일 변동:</b> 평상시 ±0.5% ~ ±1.5% 수준</li>
+            <li><b>환율 일일 변동:</b> 평상시 ±0.2% ~ ±0.6% 수준</li>
+            <li><b>네이버 트렌드 일일 변동:</b> 요일/방송/이슈에 따라 <b>±20% ~ ±80%</b> 폭증</li>
+          </ul>
+          <p style="margin-top: 8px;">
+            여기에 60% 가중치와 <b>×5배 증폭</b>을 곱하면, 검색트렌드가 20%만 올라도 <code>20% × 0.6 × 5 = +60%</code>가 되어 KOSPI나 환율이 아무리 움직여도 <b>항상 상한선(+10%, +7%, +5%)에 먼저 걸려버립니다 (클리핑 현상).</b> 사실상 KOSPI와 환율은 가격에 거의 아무런 영향을 못 미치게 됩니다.
+          </p>
+        </div>
+
+        <!-- 2. 주말 및 공휴일 데이터 부재 -->
+        <div class="eval-box warn">
+          <h4>⚠️ 2. 증시·환율의 주말/공휴일 휴장 문제</h4>
+          <p>
+            <b>주말에는 KOSPI와 환율 데이터가 움직이지 않습니다.</b>
+          </p>
+          <ul>
+            <li>토·일요일에는 주식장과 외환시장이 닫히므로 변동률이 0%가 됩니다.</li>
+            <li>반면 베이커리 쇼핑과 검색은 주말에 가장 활발합니다.</li>
+            <li>결과적으로 주말에는 네이버 검색트렌드가 가격을 100% 독점 결정하게 됩니다.</li>
+          </ul>
+        </div>
+
+        <!-- 3. 원가와 할인의 방향성 부호 모순 -->
+        <div class="eval-box warn">
+          <h4>🔄 3. 환율·KOSPI 상승/하락의 의미적 모순</h4>
+          <p>
+            <b>공식에서 (+)와 (-)가 소비자에게 주는 심리적 의미가 다릅니다.</b>
+          </p>
+          <ul>
+            <li><b>환율 상승(+):</b> 원재료(밀가루·버터) 원가 상승 요인 ➔ 빵 시세 상승? (소비자는 비싸져서 불만)</li>
+            <li><b>KOSPI 하락(-):</b> 주식 폭락으로 우울함 ➔ 빵 시세 하락? (소비자 위로 할인 효과로 긍정적)</li>
+            <li>단순 합산 <code>(Trend + KOSPI + 환율)</code> 시, 원자재 부담이 커졌는데 환율 상승으로 가격이 올라 소비자가 "환율 올랐다고 빵값을 올리네?"라고 반감을 가질 수 있습니다.</li>
+          </ul>
+        </div>
+
+        <!-- 4. 강력한 강점: 기본가 기준 재계산 & 상하한선 -->
+        <div class="eval-box good">
+          <h4>✅ 4. 매우 훌륭한 설계 장치 (칭찬 포인트!)</h4>
+          <p>
+            <b>기획안에 포함된 2가지 안전장치는 탁월한 선택입니다.</b>
+          </p>
+          <ul>
+            <li><b>기본가격 기준 리셋:</b> 전날 가격을 누적(복리)하지 않고 항상 기본가 기준으로 재계산하여, 가격이 0원으로 수렴하거나 몇 달 뒤 수십만 원으로 폭등하는 파산 위험을 원천 차단했습니다.</li>
+            <li><b>가격대별 차등 캡(±10%, ±7%, ±5%):</b> 고가 상품(마틸다 초코케이크 42,000원)은 ±5%로 방어하여 하루에 몇천 원씩 출렁이지 않게 잡은 점이 커머스 운영상 매우 안정적입니다.</li>
+          </ul>
+        </div>
+
+        <!-- 5. 최종 추천 솔루션 -->
+        <div class="eval-box good" style="grid-column: 1 / -1; background: #fffcf8; border-color: #f97316;">
+          <h4 style="color: #ea580c; font-size: 16px;">💡 최적의 적정 비율 & 공식 개선안 제안</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px;">
+            <div>
+              <b style="color: var(--text);">추천 1. [금융 체감형 밸런스안]</b>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                • 가중치: <b>트렌드 35% : KOSPI 40% : 환율 25%</b><br>
+                • 증폭 계수: <b>×3.0 ~ 3.5배</b><br>
+                • <b>효과:</b> 네이버 트렌드의 과도한 독점을 막고, "오늘 코스피가 떨어져서 빵값이 내렸다"는 직관적인 금융 스토리텔링이 실제 가격에 그대로 반영됩니다.
+              </p>
+            </div>
+            <div>
+              <b style="color: var(--text);">추천 2. [스마트 트렌드 정규화안]</b>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                • 검색트렌드 변동률을 <code>÷ 5</code>로 먼저 스케일 다운한 후 합산.<br>
+                • <code>오늘 변동률 = ( (트렌드변동률 ÷ 5) × 50% + KOSPI × 30% + 환율 × 20% ) × 5</code><br>
+                • <b>효과:</b> 트렌드가 50% 폭증해도 실제 10% 변동률로 정규화되어 상하한선에 매일 끼이는 현상(클리핑)을 완벽히 방지합니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 10개 제품 정의
+    const PRODUCTS = [
+      { id: 'p1', name: '비건 잉글리시 머핀', basePrice: 1500, cap: 0.10, capTier: '1만원 미만', trendVol: 1.2 },
+      { id: 'p2', name: '대만식 샌드위치', basePrice: 2400, cap: 0.10, capTier: '1만원 미만', trendVol: 1.0 },
+      { id: 'p3', name: '휘낭시에', basePrice: 3800, cap: 0.10, capTier: '1만원 미만', trendVol: 1.4 },
+      { id: 'p4', name: '글루텐프리 스콘', basePrice: 3800, cap: 0.10, capTier: '1만원 미만', trendVol: 1.1 },
+      { id: 'p5', name: '모닝롤', basePrice: 4500, cap: 0.10, capTier: '1만원 미만', trendVol: 0.8 },
+      { id: 'p6', name: '테트리스 브레드', basePrice: 11000, cap: 0.07, capTier: '1만~2만원', trendVol: 1.3 },
+      { id: 'p7', name: 'ZERO 카스테라', basePrice: 12000, cap: 0.07, capTier: '1만~2만원', trendVol: 1.5 },
+      { id: 'p8', name: '티라미수', basePrice: 15000, cap: 0.07, capTier: '1만~2만원', trendVol: 1.2 },
+      { id: 'p9', name: '냉동생지 3종', basePrice: 21000, cap: 0.05, capTier: '2만원 이상', trendVol: 0.9 },
+      { id: 'p10', name: '마틸다 초코케이크', basePrice: 42000, cap: 0.05, capTier: '2만원 이상', trendVol: 1.6 }
+    ];
+
+    // 14일간의 실제 시장 시나리오 시계열 데이터
+    // D-13부터 D-Day(오늘)까지의 KOSPI, USD/KRW, 및 각 제품별 네이버 트렌드 변동률
+    const DATES = [
+      '8/27(수)', '8/28(목)', '8/29(금)', '8/30(토)', '8/31(일)',
+      '9/01(월)', '9/02(화)', '9/03(수)', '9/04(목)', '9/05(금)',
+      '9/06(토)', '9/07(일)', '9/08(월)', '9/09(오늘)'
+    ];
+
+    // 코스피 일일 변동률 (주말은 0%)
+    const KOSPI_CHANGES = [
+      0.008, -0.004, 0.012, 0.0, 0.0,
+      -0.015, -0.008, 0.005, 0.011, -0.003,
+      0.0, 0.0, 0.007, -0.012
+    ];
+
+    // 환율 일일 변동률 (주말은 0%)
+    const USD_CHANGES = [
+      -0.002, 0.005, -0.004, 0.0, 0.0,
+      0.009, 0.004, -0.003, -0.006, 0.002,
+      0.0, 0.0, -0.004, 0.0065
+    ];
+
+    // 10종 제품별 14일 네이버 검색트렌드 변동률 매트릭스 (%)
+    const TREND_CHANGES = {
+      p1: [0.05, -0.02, 0.08, 0.15, 0.12, -0.08, 0.04, -0.03, 0.06, 0.09, 0.18, 0.14, -0.05, 0.07],
+      p2: [-0.03, 0.04, 0.02, 0.10, 0.08, -0.04, 0.02, -0.01, 0.03, 0.05, 0.12, 0.11, -0.02, 0.04],
+      p3: [0.12, -0.06, 0.18, 0.25, 0.20, -0.12, 0.08, 0.05, -0.04, 0.14, 0.28, 0.22, -0.08, 0.16],
+      p4: [0.08, -0.04, 0.06, 0.14, 0.18, -0.05, 0.03, 0.02, 0.05, 0.08, 0.20, 0.16, -0.03, 0.11],
+      p5: [-0.02, 0.01, -0.01, 0.06, 0.05, -0.02, 0.01, 0.00, 0.02, 0.03, 0.08, 0.07, -0.01, 0.03],
+      p6: [0.15, -0.08, 0.10, 0.22, 0.19, -0.10, 0.06, -0.02, 0.07, 0.12, 0.24, 0.21, -0.06, 0.14],
+      p7: [0.18, 0.10, -0.05, 0.30, 0.26, -0.15, 0.09, 0.08, 0.04, 0.16, 0.35, 0.29, -0.09, 0.21],
+      p8: [0.06, -0.03, 0.09, 0.16, 0.14, -0.07, 0.05, -0.02, 0.04, 0.10, 0.21, 0.18, -0.04, 0.09],
+      p9: [0.02, 0.01, 0.04, 0.08, 0.09, -0.03, 0.02, 0.01, 0.03, 0.04, 0.11, 0.10, -0.02, 0.05],
+      p10: [0.22, -0.12, 0.25, 0.38, 0.32, -0.18, 0.14, 0.06, -0.08, 0.20, 0.42, 0.36, -0.12, 0.28]
+    };
+
+    // 프리셋 정의
+    const PRESETS = {
+      golden: { trend: 25, kospi: 50, exchange: 25, multiplier: 2.5 },
+      dynamic: { trend: 40, kospi: 35, exchange: 25, multiplier: 2.0 },
+      balanced: { trend: 35, kospi: 40, exchange: 25, multiplier: 3.5 },
+      default: { trend: 60, kospi: 25, exchange: 15, multiplier: 5.0 },
+      stable: { trend: 40, kospi: 30, exchange: 30, multiplier: 1.5 }
+    };
+
+    // 현재 상태 (v1 원안: 60:25:15 | x5.0 | daily)
+    let state = {
+      wTrend: 0.60,
+      wKospi: 0.25,
+      wExchange: 0.15,
+      multiplier: 5.0,
+      rounding: 10, // 10원 단위 절사
+      selectedProductId: 'p1',
+      trendMode: 'daily' // 'ma', 'daily', 'discount'
+    };
+
+    let chartInstance = null;
+
+    // 가격 반올림 함수
+    function roundPrice(val, step) {
+      if (step === 0) return Math.round(val);
+      return Math.round(val / step) * step;
+    }
+
+    // 슬라이더 및 가중치 업데이트 (자동 100% 유지 로직)
+    function updateWeights(source) {
+      let t = parseFloat(document.getElementById('weightTrend').value);
+      let k = parseFloat(document.getElementById('weightKospi').value);
+      let e = parseFloat(document.getElementById('weightExchange').value);
+
+      if (source === 'trend') {
+        let remainder = 100 - t;
+        let otherSum = k + e;
+        if (otherSum === 0) {
+          k = remainder / 2;
+          e = remainder / 2;
+        } else {
+          let ratioK = k / otherSum;
+          k = remainder * ratioK;
+          e = remainder * (1 - ratioK);
+        }
+      } else if (source === 'kospi') {
+        let remainder = 100 - k;
+        let otherSum = t + e;
+        if (otherSum === 0) {
+          t = remainder / 2;
+          e = remainder / 2;
+        } else {
+          let ratioT = t / otherSum;
+          t = remainder * ratioT;
+          e = remainder * (1 - ratioT);
+        }
+      } else if (source === 'exchange') {
+        let remainder = 100 - e;
+        let otherSum = t + k;
+        if (otherSum === 0) {
+          t = remainder / 2;
+          k = remainder / 2;
+        } else {
+          let ratioT = t / otherSum;
+          t = remainder * ratioT;
+          k = remainder * (1 - ratioT);
+        }
+      }
+
+      // 값 반영
+      document.getElementById('weightTrend').value = t;
+      document.getElementById('weightKospi').value = k;
+      document.getElementById('weightExchange').value = e;
+
+      // 비율 텍스트 갱신
+      document.getElementById('valTrend').innerText = Math.round(t) + '%';
+      document.getElementById('valKospi').innerText = Math.round(k) + '%';
+      document.getElementById('valExchange').innerText = Math.round(e) + '%';
+
+      let totalEl = document.getElementById('ratioTotal');
+      totalEl.innerText = Math.round(t + k + e) + '%';
+      totalEl.className = 'ratio-sum valid';
+
+      state.wTrend = t / 100;
+      state.wKospi = k / 100;
+      state.wExchange = e / 100;
+
+      // 프리셋 활성 해제
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+
+      updateSimulation();
+    }
+
+    // 프리셋 적용
+    function applyPreset(name) {
+      const p = PRESETS[name];
+      if (!p) return;
+
+      document.getElementById('weightTrend').value = p.trend;
+      document.getElementById('weightKospi').value = p.kospi;
+      document.getElementById('weightExchange').value = p.exchange;
+      document.getElementById('paramMultiplier').value = p.multiplier;
+
+      document.getElementById('valTrend').innerText = p.trend + '%';
+      document.getElementById('valKospi').innerText = p.kospi + '%';
+      document.getElementById('valExchange').innerText = p.exchange + '%';
+      document.getElementById('valMultiplier').innerText = '×' + p.multiplier.toFixed(1);
+
+      document.getElementById('ratioTotal').innerText = (p.trend + p.kospi + p.exchange) + '%';
+      document.getElementById('ratioTotal').className = 'ratio-sum valid';
+
+      state.wTrend = p.trend / 100;
+      state.wKospi = p.kospi / 100;
+      state.wExchange = p.exchange / 100;
+      state.multiplier = p.multiplier;
+
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      updateSimulation();
+    }
+
+    // 모드 변경 함수
+    function setTrendMode(mode) {
+      state.trendMode = mode;
+      document.getElementById('modeBtnMA').style.background = mode === 'ma' ? '#4f46e5' : '#f8fafc';
+      document.getElementById('modeBtnMA').style.color = mode === 'ma' ? '#fff' : 'inherit';
+      document.getElementById('modeBtnMA').style.borderColor = mode === 'ma' ? '#4f46e5' : 'var(--border)';
+
+      document.getElementById('modeBtnDaily').style.background = mode === 'daily' ? '#4f46e5' : '#f8fafc';
+      document.getElementById('modeBtnDaily').style.color = mode === 'daily' ? '#fff' : 'inherit';
+      document.getElementById('modeBtnDaily').style.borderColor = mode === 'daily' ? '#4f46e5' : 'var(--border)';
+
+      document.getElementById('modeBtnDiscount').style.background = mode === 'discount' ? '#4f46e5' : '#f8fafc';
+      document.getElementById('modeBtnDiscount').style.color = mode === 'discount' ? '#fff' : 'inherit';
+      document.getElementById('modeBtnDiscount').style.borderColor = mode === 'discount' ? '#4f46e5' : 'var(--border)';
+
+      updateSimulation();
+    }
+
+    // 시뮬레이션 계산
+    function calculateProductDay(prod, dayIdx) {
+      let trendChange = TREND_CHANGES[prod.id][dayIdx];
+
+      // 1. 모드별 트렌드 지수 계산
+      if (state.trendMode === 'ma') {
+        // 최근 7일(또는 가능한 이전 일자) 평균 계산
+        const start = Math.max(0, dayIdx - 6);
+        let sum7 = 0;
+        let count7 = 0;
+        for (let i = start; i <= dayIdx; i++) {
+          sum7 += TREND_CHANGES[prod.id][i];
+          count7++;
+        }
+        const ma7 = sum7 / count7;
+        // 7일 이동평균선 대비 괴리율 (평균보다 낮으면 음수(-) 발생)
+        trendChange = (trendChange - ma7);
+      }
+
+      const kospiChange = KOSPI_CHANGES[dayIdx];
+      const exchangeChange = USD_CHANGES[dayIdx];
+
+      // 공식: (트렌드 × W1 + 코스피 × W2 + 환율 × W3) × multiplier
+      let rawRate = (trendChange * state.wTrend + kospiChange * state.wKospi + exchangeChange * state.wExchange) * state.multiplier;
+
+      // 2. 할인 전용 밴드 모드
+      if (state.trendMode === 'discount') {
+        // 원가 상승 없이 0% ~ -prod.cap(또는 최대 -15%) 사이에서만 할인
+        // rawRate가 음수면 더 큰 할인, 양수여도 기본가(0%) 초과 안 함
+        rawRate = -Math.abs(rawRate);
+      }
+
+      // 가격대별 상·하한 적용
+      let cappedRate = rawRate;
+      let isCapped = false;
+      let capType = 'normal';
+
+      if (rawRate > prod.cap) {
+        cappedRate = prod.cap;
+        isCapped = true;
+        capType = 'max';
+      } else if (rawRate < -prod.cap) {
+        cappedRate = -prod.cap;
+        isCapped = true;
+        capType = 'min';
+      }
+
+      // 최종 가격 계산 = 기본가격 × (1 + 적용변동률)
+      const exactPrice = prod.basePrice * (1 + cappedRate);
+      const finalPrice = roundPrice(exactPrice, state.rounding);
+      const diffPrice = finalPrice - prod.basePrice;
+
+      return {
+        trendChange,
+        kospiChange,
+        exchangeChange,
+        rawRate,
+        cappedRate,
+        isCapped,
+        capType,
+        exactPrice,
+        finalPrice,
+        diffPrice
+      };
+    }
+
+    // 전체 시뮬레이션 갱신
+    function updateSimulation() {
+      // 배수 및 절사 단위 읽기
+      state.multiplier = parseFloat(document.getElementById('paramMultiplier').value);
+      document.getElementById('valMultiplier').innerText = '×' + state.multiplier.toFixed(1);
+
+      const roundingIdx = parseInt(document.getElementById('paramRounding').value);
+      const roundingMap = [10, 50, 100];
+      state.rounding = roundingMap[roundingIdx];
+      document.getElementById('valRounding').innerText = state.rounding + '원 단위';
+
+      // 1. 오늘 시세 테이블 렌더링
+      renderTodayTable();
+
+      // 2. 진단 지표 산출
+      calcDiagnostics();
+
+      // 3. 차트 렌더링
+      renderChart();
+
+      // 4. 14일 매트릭스 렌더링
+      renderMatrixTable();
+    }
+
+    // 1. 오늘 시세 테이블 렌더링
+    function renderTodayTable() {
+      const tbody = document.getElementById('todayTableBody');
+      tbody.innerHTML = '';
+      const dayIdx = 13; // D-Day (오늘)
+
+      PRODUCTS.forEach((prod, idx) => {
+        const res = calculateProductDay(prod, dayIdx);
+
+        const tr = document.createElement('tr');
+
+        // 상태 뱃지
+        let badgeHtml = '<span class="badge-cap badge-normal">정상 변동</span>';
+        if (res.capType === 'max') {
+          badgeHtml = '<span class="badge-cap badge-max">▲ 상한선 도달</span>';
+        } else if (res.capType === 'min') {
+          badgeHtml = '<span class="badge-cap badge-min">▼ 하한선 도달</span>';
+        }
+
+        // 변동액 클래스
+        let diffClass = 'diff-flat';
+        let sign = '';
+        if (res.diffPrice > 0) {
+          diffClass = 'diff-up';
+          sign = '+';
+        } else if (res.diffPrice < 0) {
+          diffClass = 'diff-down';
+        }
+
+        const minPrice = roundPrice(prod.basePrice * (1 - prod.cap), state.rounding);
+        const maxPrice = roundPrice(prod.basePrice * (1 + prod.cap), state.rounding);
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><b>${prod.name}</b></td>
+          <td>${prod.basePrice.toLocaleString()}원</td>
+          <td><span style="font-size:11px; color:var(--text-muted);">${prod.capTier}</span></td>
+          <td>±${(prod.cap * 100).toFixed(0)}%</td>
+          <td style="font-size:12px; color:var(--text-muted);">${minPrice.toLocaleString()} ~ ${maxPrice.toLocaleString()}원</td>
+          <td>${res.trendChange > 0 ? '+' : ''}${(res.trendChange * 100).toFixed(1)}%</td>
+          <td style="color:${res.rawRate > 0 ? '#ef4444' : '#3b82f6'};">
+            ${res.rawRate > 0 ? '+' : ''}${(res.rawRate * 100).toFixed(2)}%
+          </td>
+          <td style="font-weight:700; color:${res.cappedRate > 0 ? '#ef4444' : '#3b82f6'};">
+            ${res.cappedRate > 0 ? '+' : ''}${(res.cappedRate * 100).toFixed(2)}%
+          </td>
+          <td style="font-size:15px; font-weight:800; color:var(--text);">
+            ${res.finalPrice.toLocaleString()}원
+          </td>
+          <td class="${diffClass}">
+            ${sign}${res.diffPrice.toLocaleString()}원 (${sign}${(res.cappedRate * 100).toFixed(1)}%)
+          </td>
+          <td>${badgeHtml}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 진단 지표 산출
+    function calcDiagnostics() {
+      let totalChecks = 0;
+      let cappedCount = 0;
+      let totalAbsChangeRate = 0;
+
+      // 14일 전체 기간 10개 제품 통계
+      for (let d = 0; d < 14; d++) {
+        PRODUCTS.forEach(p => {
+          totalChecks++;
+          const res = calculateProductDay(p, d);
+          if (res.isCapped) cappedCount++;
+          totalAbsChangeRate += Math.abs(res.cappedRate);
+        });
+      }
+
+      const clippingRate = (cappedCount / totalChecks) * 100;
+      const avgChange = (totalAbsChangeRate / totalChecks) * 100;
+
+      // 트렌드 실질 지배력 계산 (트렌드 변동폭 평균 * 가중치 / 전체)
+      const avgAbsTrend = 0.12; // 약 12%
+      const avgAbsKospi = 0.007; // 약 0.7%
+      const avgAbsUsd = 0.0035; // 약 0.35%
+      const trendEffort = avgAbsTrend * state.wTrend;
+      const kospiEffort = avgAbsKospi * state.wKospi;
+      const usdEffort = avgAbsUsd * state.wExchange;
+      const totalEffort = trendEffort + kospiEffort + usdEffort;
+      const trendDominance = (trendEffort / totalEffort) * 100;
+
+      document.getElementById('diagClippingRate').innerText = clippingRate.toFixed(1) + '%';
+      document.getElementById('diagAvgChange').innerText = '±' + avgChange.toFixed(2) + '%';
+      document.getElementById('diagTrendDominance').innerText = trendDominance.toFixed(1) + '%';
+
+      // 종합 진단 판정
+      let scoreText = '적정 밸런스';
+      let scoreColor = '#10b981';
+      let scoreDesc = '상하한선 클리핑이 적절하며 시세 체감도가 좋습니다.';
+
+      if (clippingRate > 45) {
+        scoreText = '과열 (클리핑 과다)';
+        scoreColor = '#ef4444';
+        scoreDesc = '매일 상한가/하한가에 걸려 금융 지표가 무의미해집니다. 배율을 낮추세요.';
+      } else if (clippingRate > 25) {
+        scoreText = '주의 (변동성 큼)';
+        scoreColor = '#f59e0b';
+        scoreDesc = '트렌드 비중이 높아 검색어에 따라 천장 도달 빈도가 높습니다.';
+      } else if (avgChange < 1.5) {
+        scoreText = '침체 (변동 미미)';
+        scoreColor = '#64748b';
+        scoreDesc = '가격 변화가 너무 적어 소비자가 시세 변동을 체감하기 어렵습니다.';
+      }
+
+      const scoreEl = document.getElementById('diagScore');
+      scoreEl.innerText = scoreText;
+      scoreEl.style.color = scoreColor;
+      document.getElementById('diagScoreDesc').innerText = scoreDesc;
+    }
+
+    // 2. 14일간 제품별 가격 변동 추이 차트
+    function renderChart() {
+      const prodId = document.getElementById('chartProductSelect').value || 'p1';
+      const prod = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[0];
+
+      const prices = [];
+      const basePrices = [];
+      const maxBand = [];
+      const minBand = [];
+
+      for (let d = 0; d < 14; d++) {
+        const res = calculateProductDay(prod, d);
+        prices.push(res.finalPrice);
+        basePrices.push(prod.basePrice);
+        maxBand.push(roundPrice(prod.basePrice * (1 + prod.cap), state.rounding));
+        minBand.push(roundPrice(prod.basePrice * (1 - prod.cap), state.rounding));
+      }
+
+      const ctx = document.getElementById('priceTrendChart').getContext('2d');
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: DATES,
+          datasets: [
+            {
+              label: '최종 적용 시세 (원)',
+              data: prices,
+              borderColor: '#ff6b18',
+              backgroundColor: 'rgba(255, 107, 24, 0.1)',
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 5,
+              pointHoverRadius: 8,
+              pointBackgroundColor: '#ff6b18',
+              zIndex: 10
+            },
+            {
+              label: '기본가격 (정상가)',
+              data: basePrices,
+              borderColor: '#94a3b8',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              fill: false
+            },
+            {
+              label: '상한가 밴드 (+' + (prod.cap * 100) + '%)',
+              data: maxBand,
+              borderColor: 'rgba(239, 68, 68, 0.4)',
+              borderWidth: 1,
+              borderDash: [3, 3],
+              pointRadius: 0,
+              fill: false
+            },
+            {
+              label: '하한가 밴드 (-' + (prod.cap * 100) + '%)',
+              data: minBand,
+              borderColor: 'rgba(59, 130, 246, 0.4)',
+              borderWidth: 1,
+              borderDash: [3, 3],
+              pointRadius: 0,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 14,
+                font: { size: 12, family: 'Pretendard' }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '원';
+                },
+                afterBody: function(contexts) {
+                  const dIdx = contexts[0].dataIndex;
+                  const res = calculateProductDay(prod, dIdx);
+                  return [
+                    '------------------',
+                    `• 검색트렌드: ${(res.trendChange * 100).toFixed(1)}%`,
+                    `• KOSPI 변동: ${(res.kospiChange * 100).toFixed(1)}%`,
+                    `• 환율 변동: ${(res.exchangeChange * 100).toFixed(1)}%`,
+                    `• 계산 변동률: ${(res.rawRate * 100).toFixed(2)}%`,
+                    `• 적용 변동률: ${(res.cappedRate * 100).toFixed(2)}% ${res.isCapped ? '(' + res.capType + '선 적용)' : ''}`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: function(val) {
+                  return val.toLocaleString() + '원';
+                },
+                font: { size: 11 }
+              },
+              grid: {
+                color: '#f1f5f9'
+              }
+            },
+            x: {
+              ticks: { font: { size: 11 } },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // 3. 14일 전체 시계열 매트릭스 렌더링
+    function renderMatrixTable() {
+      const table = document.getElementById('matrixTable');
+      table.innerHTML = '';
+
+      // thead
+      let theadHtml = '<thead><tr><th>제품명</th><th>기본가</th>';
+      DATES.forEach(d => {
+        theadHtml += `<th>${d}</th>`;
+      });
+      theadHtml += '</tr></thead>';
+
+      // tbody
+      let tbodyHtml = '<tbody>';
+      PRODUCTS.forEach(p => {
+        tbodyHtml += `<tr><td><b>${p.name}</b></td><td style="color:var(--text-muted);">${p.basePrice.toLocaleString()}원</td>`;
+        for (let d = 0; d < 14; d++) {
+          const res = calculateProductDay(p, d);
+          let color = res.diffPrice > 0 ? '#ef4444' : (res.diffPrice < 0 ? '#3b82f6' : 'inherit');
+          tbodyHtml += `
+            <td style="color:${color};">
+              <b>${res.finalPrice.toLocaleString()}원</b><br>
+              <span style="font-size:11px; opacity:0.8;">${res.cappedRate > 0 ? '+' : ''}${(res.cappedRate * 100).toFixed(1)}%</span>
+            </td>
+          `;
+        }
+        tbodyHtml += '</tr>';
+      });
+      tbodyHtml += '</tbody>';
+
+      table.innerHTML = theadHtml + tbodyHtml;
+    }
+
+    // 탭 전환
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+
+      if (tabId === 'tab-history') {
+        renderChart();
+      }
+    }
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      // 차트 셀렉트 옵션 채우기
+      const select = document.getElementById('chartProductSelect');
+      PRODUCTS.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.innerText = `${p.name} (${p.basePrice.toLocaleString()}원)`;
+        select.appendChild(opt);
+      });
+
+      updateSimulation();
+    });
+  </script>
+</body>
+</html>

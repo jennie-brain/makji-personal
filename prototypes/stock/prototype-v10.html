@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MAKJI STOCK v10 | Bread Market Full User Flow & RFP Expansion</title>
+  <!-- Pretendard Font & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bread-cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M7 11C7 7.5 9.5 5 13 5C14.5 5 15.5 5.7 16 6.5C16.5 5.7 17.5 5 19 5C22.5 5 25 7.5 25 11C26 12 26.5 13.5 26.5 15.5C26.5 21 24.5 26 23 27C21.5 27 9.5 27 8.5 26C7 24.5 5.5 20.5 5.5 15.5C5.5 13.5 6 12 7 11Z" fill="%23d97706" stroke="%2378350f" stroke-width="1.5"/><path d="M9 13C9 9 11 7.5 13.5 7.5C14.8 7.5 15.5 8.2 16 9C16.5 8.2 17.2 7.5 18.5 7.5C21 7.5 23 9 23 13C24 14.5 24.5 16.5 24.5 20C24.5 23.5 23 24.5 21.5 24.5H10.5C9 24.5 7.5 23.5 7.5 20C7.5 16.5 8 14.5 9 13Z" fill="%23fef3c7"/><circle cx="12.5" cy="15.5" r="1.2" fill="%2378350f"/><circle cx="19.5" cy="15.5" r="1.2" fill="%2378350f"/><path d="M14.5 18C15 19 17 19 17.5 18" stroke="%23b45309" stroke-width="1.2" stroke-linecap="round"/><ellipse cx="10" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/><ellipse cx="22" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/></svg>') 12 12, auto;
+      
+      --bg-cream: #fbf9f5;
+      --card-bg: #ffffff;
+      --primary: #ff6b18;
+      --primary-hover: #ea580c;
+      --primary-subtle: #fff7ed;
+      --game-purple: #8b5cf6;
+      --game-pink: #ec4899;
+      --butter-yellow: #fef3c7;
+      --toast-brown: #d97706;
+      --crust-dark: #78350f;
+      --text-main: #191f28;
+      --text-sub: #4e5968;
+      --text-muted: #8b95a1;
+      --toss-red: #f04452;
+      --toss-blue: #3182f6;
+      --card-shadow: 0 10px 25px -3px rgba(217, 119, 6, 0.07), 0 4px 6px -2px rgba(217, 119, 6, 0.03);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      cursor: var(--bread-cursor) !important;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: #ede7de;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* 모바일 반응형 프레임 */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-cream);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.14);
+    }
+
+    /* 상단 헤더 */
+    .app-header {
+      padding: 12px 18px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f2ede4;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--crust-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-logo span.badge {
+      font-size: 9.5px;
+      background: #fff7ed;
+      color: var(--primary);
+      padding: 2px 7px;
+      border-radius: 12px;
+      border: 1px solid #fed7aa;
+      font-weight: 800;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cart-header-btn {
+      position: relative;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--toss-red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(240, 68, 82, 0.4);
+    }
+
+    /* 롤링 티커 */
+    .market-ticker-bar {
+      background: #fffbeb;
+      border-bottom: 1px solid #fde68a;
+      padding: 6px 14px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-scroll {
+      display: inline-block;
+      animation: tickerLoop 25s linear infinite;
+    }
+
+    @keyframes tickerLoop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* 메인 스크롤 콘텐츠 */
+    .main-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px calc(76px + env(safe-area-inset-bottom));
+      scroll-behavior: smooth;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 하단 네비게이션 바 (5개 탭: 홈, 시세표, ETF·FX, 미니게임, 장바구니) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-top: 1px solid #f1ece4;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 8px 4px max(12px, env(safe-area-inset-bottom));
+      z-index: 50;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.04);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 10.5px;
+      font-weight: 700;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .nav-item .nav-icon {
+      font-size: 19px;
+      transition: transform 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active .nav-icon {
+      transform: scale(1.15);
+    }
+
+    /* 공통 카드 */
+    .cute-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #f5ede2;
+    }
+
+    .btn-cute {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 13.5px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(255, 107, 24, 0.22);
+      transition: all 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-cute:active {
+      transform: scale(0.97);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      box-shadow: none;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 1. 홈 & 지수 배너 */
+    /* ---------------------------------------------------- */
+    .market-status-box {
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+      border: 1.5px solid #fed7aa;
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+
+    .index-large {
+      font-size: 25px;
+      font-weight: 900;
+      margin: 4px 0 2px;
+      color: var(--crust-dark);
+    }
+
+    .market-pills {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .market-pill-item {
+      background: #ffffff;
+      border: 1px solid #fed7aa;
+      border-radius: var(--radius-sm);
+      padding: 7px 6px;
+      text-align: center;
+    }
+
+    .pill-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .pill-val {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 2. 시세표 & 토스 바텀시트 */
+    /* ---------------------------------------------------- */
+    .bread-stock-item {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+      margin-bottom: 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      border: 1px solid #f3ede4;
+      transition: transform 0.15s;
+    }
+
+    .bread-stock-item:active {
+      transform: scale(0.985);
+      background: #fdfbf7;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(2px);
+      z-index: 60;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .toss-bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, 100%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 14px 20px 24px;
+      z-index: 70;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .toss-bottom-sheet.open {
+      transform: translate(-50%, 0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      margin: 0 auto 10px;
+    }
+
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .sheet-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    .sheet-price {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin: 3px 0 2px;
+    }
+
+    .chart-view-switcher {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+      margin: 8px 0;
+    }
+
+    .chart-view-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 5px 0;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748b;
+      transition: all 0.15s;
+    }
+
+    .chart-view-btn.active {
+      background: #ffffff;
+      color: var(--text-main);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    }
+
+    .toss-period-tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .period-btn {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 3px 9px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .period-btn.active {
+      background: #1e293b;
+      color: #fff;
+      border-color: #1e293b;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 3. RFP 확장: Bakery ETF & FX 마켓 스타일 */
+    /* ---------------------------------------------------- */
+    .expansion-tabs {
+      display: flex;
+      background: #ede8df;
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .exp-tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 9px 0;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #78716c;
+      transition: all 0.15s;
+    }
+
+    .exp-tab-btn.active {
+      background: #ffffff;
+      color: var(--crust-dark);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .etf-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #f2ede4;
+      box-shadow: var(--card-shadow);
+    }
+
+    .etf-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .etf-composition {
+      background: #fbf9f5;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 11.5px;
+    }
+
+    .fx-banner {
+      background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+      border: 1.5px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 4. 미니게임천국 스타일 */
+    /* ---------------------------------------------------- */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .game-card-item {
+      background: #ffffff;
+      border: 1.5px solid #f3e8ff;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-card-item:hover {
+      border-color: var(--game-purple);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(139, 92, 246, 0.12);
+    }
+
+    .game-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 9px;
+      font-weight: 900;
+      background: #fdf4ff;
+      color: var(--game-purple);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .game-icon-large {
+      font-size: 32px;
+      margin-bottom: 5px;
+    }
+
+    .game-stage-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(3px);
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .game-stage-overlay.active {
+      display: flex;
+    }
+
+    .game-stage-card {
+      background: #ffffff;
+      border-radius: 22px;
+      width: 100%;
+      max-width: 380px;
+      padding: 18px 18px 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .game-play-area {
+      height: 170px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 2px dashed #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .rank-list {
+      max-height: 190px;
+      overflow-y: auto;
+      list-style: none;
+    }
+
+    .rank-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .rank-item.top-1 { background: #fffbeb; font-weight: 800; color: #b45309; }
+    .rank-item.top-2 { background: #f8fafc; font-weight: 800; }
+    .rank-item.top-3 { background: #fff7ed; font-weight: 800; color: #c2410c; }
+    .rank-item.my-rank { border: 2px solid var(--primary); background: #fff7ed; }
+
+    /* ---------------------------------------------------- */
+    /* 5. 장바구니 & 카페24 주문서 결제 화면 */
+    /* ---------------------------------------------------- */
+    .cart-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 2px 6px;
+    }
+
+    .qty-btn {
+      border: none;
+      background: none;
+      font-weight: 900;
+      font-size: 14px;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+    }
+
+    .coupon-box {
+      background: #fdf4ff;
+      border: 1.5px dashed #c084fc;
+      border-radius: 12px;
+      padding: 12px;
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .receipt-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .receipt-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1.5px dashed #cbd5e1;
+      margin-top: 8px;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    /* 결제 완료 모달 */
+    .checkout-modal {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, 100%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 20px;
+      z-index: 90;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .checkout-modal.open {
+      transform: translate(-50%, 0);
+    }
+
+    .pay-option-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff;
+      font-size: 13.5px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      transition: all 0.15s;
+    }
+
+    .pay-option-btn.selected {
+      border-color: var(--primary);
+      background: #fff7ed;
+    }
+
+    /* 토스트 팝업 */
+    .toast-popup {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(25, 31, 40, 0.92);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 30px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+
+    .toast-popup.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-viewport">
+    <!-- 헤더 -->
+    <header class="app-header">
+      <div class="brand-logo">
+        <span>🍞 MAKJI</span>
+        <span class="badge">STOCK v10</span>
+      </div>
+      <div class="header-actions">
+        <button class="cart-header-btn" onclick="switchTab('cart', document.getElementById('navCartBtn'))">
+          <span>🛒</span>
+          <span>장바구니</span>
+          <div class="cart-badge" id="headerCartCount">2</div>
+        </button>
+      </div>
+    </header>
+
+    <!-- 롤링 티커 -->
+    <div class="market-ticker-bar">
+      <span style="font-weight:900; margin-right:8px; display:flex; align-items:center; gap:3px;">
+        🔴 LIVE
+      </span>
+      <div style="overflow:hidden; width:100%;">
+        <div class="ticker-scroll">
+          💵 한국수출입은행 환율: USD 1,348.50원 (-0.2%) • JPY 912.40원 (-3.2% 말차세일) • EUR 1,465.10원 (+0.1%) &nbsp;&nbsp;|&nbsp;&nbsp;
+          🌤️ 기상청 단기예보: 맑음 24℃ (식빵 지수 최적) &nbsp;&nbsp;|&nbsp;&nbsp;
+          📊 MAKJI 브랜드 인덱스: 1,024.5p (▲1.8%) &nbsp;&nbsp;|&nbsp;&nbsp;
+          🎮 오늘의 미니게임: 첫 판 플레이 시 500원 할인 쿠폰 즉시 증정!
+        </div>
+      </div>
+    </div>
+
+    <!-- 메인 스크롤 영역 -->
+    <main class="main-scroll-area">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: 🏠 홈 (Market Dashboard) -->
+      <!-- ============================================== -->
+      <section id="tabHome" class="tab-content active">
+        <!-- 막지 브랜드 지수 배너 (RFP ④ Bread Index) -->
+        <div class="market-status-box">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:#b45309;">📊 MAKJI BREAD INDEX (브랜드 종합 지수)</span>
+              <div class="index-large">1,024.50 <span style="font-size:15px; color:var(--toss-red); font-weight:900;">▲ 18.2 (+1.8%)</span></div>
+            </div>
+            <span style="font-size:10px; background:#fff; padding:3px 7px; border-radius:10px; border:1px solid #fed7aa; color:#b45309; font-weight:800;">
+              09:00 개장
+            </span>
+          </div>
+          <p style="font-size:11px; color:var(--text-sub); margin-top:4px;">
+            판매량(40%) + 재구매율(25%) + 검색트렌드(20%) + 원료환율(15%) 가중치 산출
+          </p>
+
+          <div class="market-pills">
+            <div class="market-pill-item">
+              <div class="pill-label">💵 JPY 엔화</div>
+              <div class="pill-val" style="color:var(--toss-blue);">912.4원 (-3.2%)</div>
+            </div>
+            <div class="market-pill-item">
+              <div class="pill-label">🌤️ 기상청 날씨</div>
+              <div class="pill-val" style="color:#0284c7;">쾌청 24℃</div>
+            </div>
+            <div class="market-pill-item">
+              <div class="pill-label">🔥 검색 트렌드</div>
+              <div class="pill-val" style="color:var(--toss-red);">비건머핀 (+28%)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 데일리 미션 카드 (RFP 구매전환 게이미피케이션 연계) -->
+        <div class="cute-card" style="background: linear-gradient(135deg, #fdf4ff 0%, #fff 100%); border-color: #f3e8ff;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="font-size:14px; font-weight:900; color:var(--game-purple); display:flex; align-items:center; gap:5px;">
+              <span>🎮 오늘의 미니게임 미션</span>
+            </div>
+            <span style="font-size:10px; font-weight:800; background:#f3e8ff; color:var(--game-purple); padding:2px 7px; border-radius:10px;" id="homeMissionBadge">
+              1일 1회 한정
+            </span>
+          </div>
+          <div style="font-size:12.5px; font-weight:700; color:var(--text-main); margin-bottom:8px;">
+            미니게임 1판 클리어하고 <strong style="color:var(--primary);">500원 할인 쿠폰</strong>을 받으세요!
+          </div>
+          <button class="btn-cute" style="background:var(--game-purple); padding:10px;" onclick="switchTab('arcade', document.querySelectorAll('.nav-item')[3])">
+            🕹️ 지금 미니게임 도전하고 쿠폰 받기
+          </button>
+        </div>
+
+        <!-- 오늘의 추천 골든 빵 -->
+        <div class="cute-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:14px; font-weight:900; color:var(--text-main);">🔥 오늘의 추천 빵</span>
+            <span style="font-size:11px; color:var(--primary); font-weight:800; cursor:pointer;" onclick="switchTab('market', document.querySelectorAll('.nav-item')[1])">시세표 전체보기 &gt;</span>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center; background:#f8fafc; padding:12px; border-radius:12px;" onclick="openTossSheet('p10')">
+            <div style="font-size:36px;">🎂</div>
+            <div style="flex:1;">
+              <div style="font-size:14px; font-weight:900; color:var(--text-main);">마틸다 초코케이크</div>
+              <div style="font-size:11px; color:#64748b;">Tier 3 (±5%) • 오늘 확정가 44,000원</div>
+              <div style="font-size:12px; font-weight:800; color:var(--toss-red); margin-top:2px;">▲ +2,000원 (+4.75%)</div>
+            </div>
+            <button class="btn-cute" style="width:auto; padding:8px 12px; font-size:11.5px;">차트보기</button>
+          </div>
+        </div>
+
+        <!-- RFP 3대 확장 서비스 퀵 배너 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="cute-card" style="margin-bottom:0; cursor:pointer; background:#f0fdf4; border-color:#bbf7d0;" onclick="switchTab('expansion', document.querySelectorAll('.nav-item')[2])">
+            <div style="font-size:11px; font-weight:800; color:#166534;">💼 RFP ② 확장</div>
+            <div style="font-size:13.5px; font-weight:900; color:#14532d; margin:3px 0 2px;">Bakery ETF</div>
+            <div style="font-size:10.5px; color:#166534;">나만의 맞춤 번들 팩 &gt;</div>
+          </div>
+          <div class="cute-card" style="margin-bottom:0; cursor:pointer; background:#eff6ff; border-color:#bfdbfe;" onclick="switchTab('expansion', document.querySelectorAll('.nav-item')[2]); setExpSubTab('fx');">
+            <div style="font-size:11px; font-weight:800; color:#1e40af;">💱 RFP ③ 확장</div>
+            <div style="font-size:13.5px; font-weight:900; color:#1e3a8a; margin:3px 0 2px;">FX Bakery</div>
+            <div style="font-size:10.5px; color:#1e40af;">환율 연계 특별 할인 &gt;</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: 📈 시세표 (Market & Multi-View Chart) -->
+      <!-- ============================================== -->
+      <section id="tabMarket" class="tab-content">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;">
+          <div>
+            <h2 style="font-size:17px; font-weight:900;">오늘의 빵 주식 시세표</h2>
+            <p style="font-size:11px; color:#64748b; margin-top:2px;">
+              매일 09:00 데이터 알고리즘으로 시세가 확정됩니다.
+            </p>
+          </div>
+          <span style="font-size:11px; color:#64748b; font-weight:700;">10개 품목</span>
+        </div>
+
+        <div id="marketListContainer">
+          <!-- JS 렌더링 -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: 💼 RFP 확장 (Bakery ETF & FX Bakery) -->
+      <!-- ============================================== -->
+      <section id="tabExpansion" class="tab-content">
+        <!-- 서브 탭 스위처 -->
+        <div class="expansion-tabs">
+          <button class="exp-tab-btn active" id="btnSubEtf" onclick="setExpSubTab('etf')">💼 Bakery ETF (포트폴리오)</button>
+          <button class="exp-tab-btn" id="btnSubFx" onclick="setExpSubTab('fx')">💱 FX Bakery (환율마켓)</button>
+        </div>
+
+        <!-- 1) Bakery ETF 뷰 -->
+        <div id="viewEtfArea">
+          <div style="margin-bottom:12px;">
+            <h3 style="font-size:16px; font-weight:900; color:var(--text-main);">나만의 Bread Portfolio ETF</h3>
+            <p style="font-size:11px; color:#64748b; margin-top:2px;">
+              구매이력과 건강 목표에 맞춰 엄선된 테마별 빵 포트폴리오
+            </p>
+          </div>
+
+          <!-- ETF 1: 웰니스 블루칩 ETF -->
+          <div class="etf-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <span class="etf-badge">스테디셀러 1위</span>
+                <h4 style="font-size:15px; font-weight:900; margin-top:4px;">MAKJI 웰니스 블루칩 ETF</h4>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:15px; font-weight:900; color:var(--primary);">18,500원</div>
+                <div style="font-size:10.5px; color:var(--toss-blue); font-weight:800;">정가 대비 12% 할인</div>
+              </div>
+            </div>
+            <div class="etf-composition">
+              <div style="font-weight:800; color:#334155; margin-bottom:4px;">📦 포트폴리오 구성 (5종):</div>
+              <div style="color:#64748b;">• 비건 잉글리시 머핀 2개 (안정성 40%)</div>
+              <div style="color:#64748b;">• 글루텐프리 스콘 2개 (방어력 35%)</div>
+              <div style="color:#64748b;">• ZERO 카스테라 1개 (단백질 25%)</div>
+            </div>
+            <button class="btn-cute" onclick="addEtfToCart('웰니스 블루칩 ETF', 18500)">
+              🛒 포트폴리오 일괄 담기
+            </button>
+          </div>
+
+          <!-- ETF 2: 혈당 안심 다이어트 ETF -->
+          <div class="etf-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <span class="etf-badge" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">혈당 케어 특화</span>
+                <h4 style="font-size:15px; font-weight:900; margin-top:4px;">저혈당 안심 포뮬러 ETF</h4>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:15px; font-weight:900; color:var(--primary);">16,200원</div>
+                <div style="font-size:10.5px; color:var(--toss-blue); font-weight:800;">당류 0g 포트폴리오</div>
+              </div>
+            </div>
+            <div class="etf-composition">
+              <div style="font-weight:800; color:#334155; margin-bottom:4px;">📦 포트폴리오 구성 (3종):</div>
+              <div style="color:#64748b;">• ZERO 카스테라 1개 (대체당 알룰로스)</div>
+              <div style="color:#64748b;">• 비건 머핀 2개 (통밀 100%)</div>
+              <div style="color:#64748b;">• 모닝롤 2개 (천연 발효종)</div>
+            </div>
+            <button class="btn-cute" onclick="addEtfToCart('저혈당 안심 포뮬러 ETF', 16200)">
+              🛒 포트폴리오 일괄 담기
+            </button>
+          </div>
+        </div>
+
+        <!-- 2) FX Bakery 뷰 -->
+        <div id="viewFxArea" style="display:none;">
+          <div class="fx-banner">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; font-weight:800; color:#1e40af;">💱 실시간 원료 환율 연동</span>
+              <span style="font-size:10px; background:#bfdbfe; color:#1e3a8a; padding:2px 6px; border-radius:6px; font-weight:800;">한국수출입은행</span>
+            </div>
+            <div style="font-size:13px; font-weight:800; color:#1e3a8a; margin-top:4px;">
+              엔화(JPY) 3.2% 급락 ➔ <strong>제주 말차 & 일본 원료 라인업 8% 특별 세일!</strong>
+            </div>
+          </div>
+
+          <!-- FX 상품 1: 제주 말차 카스테라 (엔화 하락) -->
+          <div class="bread-stock-item" style="border-left: 4px solid #10b981;">
+            <div>
+              <span style="font-size:10px; font-weight:800; background:#d1fae5; color:#065f46; padding:2px 6px; border-radius:4px;">엔화(JPY) 연동</span>
+              <strong style="font-size:14px; color:var(--text-main); display:block; margin-top:2px;">제주 말차 샌드위치</strong>
+              <div style="font-size:11px; color:#64748b;">정가 4,000원 ➔ 환율 연동가</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:15px; font-weight:900; color:var(--primary);">3,400원</div>
+              <div style="font-size:12px; font-weight:800; color:var(--toss-blue);">▼ -600원 (-15%)</div>
+              <button class="btn-cute" style="width:auto; padding:4px 10px; font-size:11px; margin-top:4px;" onclick="addSingleBreadToCart('제주 말차 샌드위치', 3400)">담기</button>
+            </div>
+          </div>
+
+          <!-- FX 상품 2: 프랑스 AOP 버터 휘낭시에 (유로 연동) -->
+          <div class="bread-stock-item" style="border-left: 4px solid #3b82f6;">
+            <div>
+              <span style="font-size:10px; font-weight:800; background:#dbeafe; color:#1e40af; padding:2px 6px; border-radius:4px;">유로(EUR) 연동</span>
+              <strong style="font-size:14px; color:var(--text-main); display:block; margin-top:2px;">프랑스 AOP 버터 휘낭시에</strong>
+              <div style="font-size:11px; color:#64748b;">정가 3,800원 ➔ 환율 연동가</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:15px; font-weight:900; color:var(--primary);">3,500원</div>
+              <div style="font-size:12px; font-weight:800; color:var(--toss-blue);">▼ -300원 (-7.9%)</div>
+              <button class="btn-cute" style="width:auto; padding:4px 10px; font-size:11px; margin-top:4px;" onclick="addSingleBreadToCart('프랑스 버터 휘낭시에', 3500)">담기</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 4: 🎮 미니게임천국 (Arcade & 1-day Coupon Cap) -->
+      <!-- ============================================== -->
+      <section id="tabArcade" class="tab-content">
+        <div style="margin-bottom:12px;">
+          <h2 style="font-size:17px; font-weight:900; color:var(--text-main);">막지 미니게임천국 🎮</h2>
+          <p style="font-size:11px; color:#64748b; margin-top:2px;">
+            1일 1회 첫 판 500원 쿠폰 지급 &amp; 무제한 TOP 10 명예의 전당 도전!
+          </p>
+        </div>
+
+        <div class="game-grid">
+          <div class="game-card-item" onclick="openGameStage(1)">
+            <span class="game-badge">추천 1위</span>
+            <div class="game-icon-large">🍞</div>
+            <strong style="font-size:13px; color:var(--text-main); display:block;">골든 슬라이스</strong>
+            <span style="font-size:10.5px; color:#64748b;">정확한 반 자르기</span>
+          </div>
+
+          <div class="game-card-item" onclick="openGameStage(2)">
+            <span class="game-badge">인기</span>
+            <div class="game-icon-large">🥞</div>
+            <strong style="font-size:13px; color:var(--text-main); display:block;">식빵 탑 쌓기</strong>
+            <span style="font-size:10.5px; color:#64748b;">타이밍 드롭 액션</span>
+          </div>
+
+          <div class="game-card-item" onclick="openGameStage(3)">
+            <span class="game-badge">스릴</span>
+            <div class="game-icon-large">🏃</div>
+            <strong style="font-size:13px; color:var(--text-main); display:block;">달려라 식빵</strong>
+            <span style="font-size:10.5px; color:#64748b;">오븐 장애물 점프</span>
+          </div>
+
+          <div class="game-card-item" onclick="openGameStage(4)">
+            <span class="game-badge">퍼즐</span>
+            <div class="game-icon-large">🃏</div>
+            <strong style="font-size:13px; color:var(--text-main); display:block;">레시피 맞추기</strong>
+            <span style="font-size:10.5px; color:#64748b;">원료 카드 짝맞추기</span>
+          </div>
+
+          <div class="game-card-item" style="grid-column: span 2;" onclick="openGameStage(5)">
+            <span class="game-badge">행운</span>
+            <div class="game-icon-large">🥠</div>
+            <strong style="font-size:13px; color:var(--text-main); display:block;">황금 포춘쿠키</strong>
+            <span style="font-size:10.5px; color:#64748b;">오늘의 베이커리 행운 뽑기</span>
+          </div>
+        </div>
+
+        <!-- 실시간 명예의 전당 TOP 10 -->
+        <div class="cute-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:14px; font-weight:900; color:var(--text-main); display:flex; align-items:center; gap:5px;">
+              <span>🏆 명예의 전당 TOP 10</span>
+            </div>
+            <span style="font-size:11px; color:var(--game-purple); font-weight:800;">실시간 랭킹</span>
+          </div>
+          <div id="mainLeaderboard">
+            <!-- JS 렌더링 -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 5: 🛒 장바구니 & 카페24 주문서 (Cart & Checkout) -->
+      <!-- ============================================== -->
+      <section id="tabCart" class="tab-content">
+        <div style="margin-bottom:12px;">
+          <h2 style="font-size:17px; font-weight:900; color:var(--text-main);">장바구니 &amp; 주문서</h2>
+          <p style="font-size:11px; color:#64748b; margin-top:2px;">
+            오늘의 시장 할인 및 게임 혜택이 적용된 최종 견적입니다.
+          </p>
+        </div>
+
+        <!-- 장바구니 담긴 아이템 목록 -->
+        <div class="cute-card" style="padding:12px 16px;">
+          <div style="font-size:13.5px; font-weight:900; margin-bottom:8px; display:flex; justify-content:space-between;">
+            <span>담은 상품 (<span id="cartItemCountLabel">2</span>개)</span>
+            <button style="border:none; background:none; color:#94a3b8; font-size:11px; font-weight:700;" onclick="clearCart()">전체삭제</button>
+          </div>
+
+          <div id="cartItemsContainer">
+            <!-- JS 렌더링 -->
+          </div>
+        </div>
+
+        <!-- 🎟️ 쿠폰 적용 영역 (미니게임 연계) -->
+        <div class="coupon-box" id="couponBoxArea">
+          <div>
+            <div style="font-size:12px; font-weight:800; color:var(--game-purple);" id="couponTitle">
+              🎮 미니게임 1일 1회 데일리 쿠폰
+            </div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;" id="couponSub">
+              첫 판 클리어 시 500원 할인 적용
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="chkDailyCoupon" style="width:18px; height:18px; accent-color:var(--primary);" checked onchange="updateCartReceipt()">
+            <label for="chkDailyCoupon" style="font-size:12px; font-weight:800; color:var(--primary);">-500원 적용</label>
+          </div>
+        </div>
+
+        <!-- 🧾 실시간 투명 가격 영수증 -->
+        <div class="cute-card">
+          <div style="font-size:13.5px; font-weight:900; margin-bottom:10px;">결제 금액 상세</div>
+          
+          <div class="receipt-line">
+            <span>정상 소비자가격 합계</span>
+            <span id="rcptBaseTotal">45,800원</span>
+          </div>
+          <div class="receipt-line" style="color:var(--toss-blue);">
+            <span>오늘의 시장 시세 변동 할인</span>
+            <span id="rcptMarketDiscount">-1,800원</span>
+          </div>
+          <div class="receipt-line" style="color:var(--game-purple);" id="rcptCouponLine">
+            <span>미니게임 데일리 쿠폰 할인</span>
+            <span id="rcptCouponVal">-500원</span>
+          </div>
+          <div class="receipt-line">
+            <span>배송비 (3만원 이상 무료)</span>
+            <span id="rcptShipping">무료</span>
+          </div>
+
+          <div class="receipt-total">
+            <span>최종 결제 예정 금액</span>
+            <span style="color:var(--primary); font-size:20px;" id="rcptFinalTotal">43,500원</span>
+          </div>
+
+          <div style="background:#f8fafc; border-radius:10px; padding:8px 12px; margin-top:10px; font-size:11px; color:#64748b; text-align:center;">
+            🎉 오늘 총 <strong style="color:var(--primary);" id="rcptSaveTotal">2,300원</strong>을 절약하셨습니다!
+          </div>
+
+          <button class="btn-cute" style="margin-top:14px; padding:14px; font-size:15px;" onclick="openCafe24Checkout()">
+            🚀 카페24 간편결제로 주문하기
+          </button>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 6: 🎉 주문 완료 화면 (Order Complete) -->
+      <!-- ============================================== -->
+      <section id="viewOrderComplete" class="tab-content">
+        <div class="cute-card" style="text-align:center; padding:30px 20px;">
+          <div style="font-size:52px; margin-bottom:10px;">🎉</div>
+          <span style="font-size:12px; font-weight:800; background:#f0fdf4; color:#166534; padding:3px 10px; border-radius:12px;">
+            카페24 결제 승인 완료
+          </span>
+          <h2 style="font-size:22px; font-weight:900; color:var(--text-main); margin:10px 0 4px;">
+            주문이 정상 접수되었습니다!
+          </h2>
+          <p style="font-size:12px; color:#64748b;" id="orderIdText">
+            주문번호: MKJ-20260909-8421
+          </p>
+
+          <div style="background:#f8fafc; border-radius:14px; padding:14px; margin:18px 0; text-align:left; font-size:12.5px; border:1px solid #e2e8f0;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+              <span style="color:#64748b;">결제 수단</span>
+              <strong id="orderPayMethod">토스페이 (간편결제)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+              <span style="color:#64748b;">결제 금액</span>
+              <strong style="color:var(--primary);" id="orderPaidPrice">43,500원</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:#64748b;">배송 예정일</span>
+              <strong>내일(목) 오전 07시 전 도착 (새벽배송)</strong>
+            </div>
+          </div>
+
+          <!-- 재방문 유도 훅 (RFP 핵심) -->
+          <div style="background:#fffbeb; border:1px solid #fed7aa; border-radius:14px; padding:12px; text-align:left; margin-bottom:16px;">
+            <div style="font-weight:900; font-size:12.5px; color:#92400e; display:flex; align-items:center; gap:5px;">
+              <span>🔔 다음날 09:00 시세 변동 알림</span>
+            </div>
+            <div style="font-size:11px; color:#78350f; margin-top:3px;">
+              내일 아침 새로운 환율·트렌드 반영 시세표와 미니게임 기회가 다시 열립니다!
+            </div>
+          </div>
+
+          <button class="btn-cute" onclick="switchTab('home', document.querySelectorAll('.nav-item')[0])">
+            🏠 홈으로 돌아가기
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 하단 5대 네비게이션 바 -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('home', this)">
+        <span class="nav-icon">🏠</span>
+        <span>홈</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('market', this)">
+        <span class="nav-icon">📈</span>
+        <span>시세표</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('expansion', this)">
+        <span class="nav-icon">💼</span>
+        <span>ETF·FX</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('arcade', this)">
+        <span class="nav-icon">🎮</span>
+        <span>미니게임</span>
+      </button>
+      <button class="nav-item" id="navCartBtn" onclick="switchTab('cart', this)">
+        <span class="nav-icon">🛒</span>
+        <span>장바구니</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 📊 토스증권 스타일 바텀시트 (멀티뷰 차트) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="tossOverlay" onclick="closeTossSheet()"></div>
+  <div class="toss-bottom-sheet" id="tossSheet">
+    <div class="sheet-handle" onclick="closeTossSheet()"></div>
+    
+    <div class="sheet-header">
+      <div>
+        <span style="font-size:10.5px; font-weight:800; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px;" id="sheetTier">Tier 3 (±5%)</span>
+        <div class="sheet-title" id="sheetName">마틸다 초코케이크</div>
+      </div>
+      <button style="border:none; background:#f1f5f9; border-radius:50%; width:28px; height:28px; font-weight:800;" onclick="closeTossSheet()">✕</button>
+    </div>
+
+    <div class="sheet-price" id="sheetPrice">44,000원</div>
+    <div style="font-size: 13px; font-weight: 800; color:var(--toss-red);" id="sheetDiff">
+      ▲ +2,000원 (+4.75%) • 오늘 확정가
+    </div>
+
+    <!-- 📊 3대 차트 멀티뷰 토글 스위치 -->
+    <div class="chart-view-switcher">
+      <button class="chart-view-btn active" id="btnMode1" onclick="switchChartMode(1)">📈 간편 라인</button>
+      <button class="chart-view-btn" id="btnMode2" onclick="switchChartMode(2)">🕯️ 일봉 캔들</button>
+      <button class="chart-view-btn" id="btnMode3" onclick="switchChartMode(3)">🎁 혜택 밴드</button>
+    </div>
+
+    <!-- 일별 시세 변동 기간 탭 -->
+    <div class="toss-period-tabs">
+      <button class="period-btn active" onclick="changePeriod('1W')">최근 7일</button>
+      <button class="period-btn" onclick="changePeriod('1M')">최근 30일</button>
+    </div>
+
+    <!-- 캔버스 차트 -->
+    <div style="height: 155px; position: relative; margin: 2px 0 8px;">
+      <canvas id="tossChartCanvas"></canvas>
+    </div>
+
+    <!-- 오늘 시세 결정 영수증 -->
+    <div style="background:#f8fafc; border-radius:12px; padding:10px 12px; font-size:11.5px; margin-bottom:10px; border:1px solid #edf2f7;">
+      <div style="font-weight:800; color:#334155; margin-bottom:4px;">📊 오늘 시세 결정 요인:</div>
+      <div style="display:flex; justify-content:space-between; color:#64748b; margin-bottom:2px;">
+        <span id="sheetTrendLabel">• 🔥 검색 트렌드 (수요):</span>
+        <b style="color:#ef4444;" id="sheetTrend">+3.80%</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; color:#64748b;">
+        <span>• 💵 한국수출입은행 환율 (공급):</span>
+        <b style="color:#d97706;" id="sheetFx">+0.95%</b>
+      </div>
+    </div>
+
+    <!-- 장바구니 담기 CTA -->
+    <button class="btn-cute" id="sheetCtaBtn" onclick="buyBreadFromSheet()">
+      🛒 오늘 시세로 장바구니 담기
+    </button>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 🕹️ 미니게임 플레이 모달 레이어 -->
+  <!-- ============================================== -->
+  <div class="game-stage-overlay" id="gameStageModal">
+    <div class="game-stage-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #f1f5f9;">
+        <div style="font-size:15px; font-weight:900; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+          <span id="activeGameIcon">🎮</span>
+          <span id="activeGameTitle">미니게임</span>
+        </div>
+        <button style="background:#f1f5f9; border:none; border-radius:50%; width:28px; height:28px; font-weight:800;" onclick="closeGameStage()">✕</button>
+      </div>
+
+      <!-- 플레이 화면 -->
+      <div id="screenPlaying">
+        <div class="game-play-area" id="gamePlayContainer"></div>
+        <button class="btn-cute" id="gameActionBtn" onclick="handleGameAction()">시작하기!</button>
+      </div>
+
+      <!-- 결과 & 랭킹 등록 화면 -->
+      <div id="screenResult" style="display:none; text-align:center;">
+        <div style="font-size:12.5px; font-weight:800; color:var(--toast-brown);">🎉 GAME OVER!</div>
+        <div style="font-size:34px; font-weight:900; color:var(--primary); margin:4px 0;" id="resultFinalScore">0점</div>
+        
+        <!-- 마진 방어 1일 1회 쿠폰 알림 박스 -->
+        <div id="rewardNotificationBox" style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:12px; padding:9px 11px; font-size:11.5px; color:#166534; font-weight:800; margin-bottom:10px;">
+          🎟️ [오늘의 첫 판] 500원 할인 쿠폰 발급 완료! (오늘 자정까지 사용)
+        </div>
+
+        <div style="background:#f8fafc; border-radius:10px; padding:8px; font-size:11px; color:var(--text-sub); margin-bottom:10px;">
+          TOP 10 명예의 전당에 등재할 닉네임을 입력하세요!
+        </div>
+
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+          <input type="text" id="playerNickname" style="flex:1; padding:10px; border-radius:10px; border:2px solid #cbd5e1; font-weight:700; font-size:13px;" placeholder="닉네임 (최대 6자)" maxlength="6" value="빵순이">
+          <button class="btn-cute" style="width:auto; padding:10px 14px; white-space:nowrap;" onclick="submitRanking()">
+            🏆 랭킹 등록
+          </button>
+        </div>
+
+        <button style="border:none; background:#f1f5f9; color:#64748b; padding:8px 12px; border-radius:8px; font-weight:700; font-size:11.5px; width:100%;" onclick="closeGameStage()">
+          등록 없이 닫기
+        </button>
+      </div>
+
+      <!-- 명예의 전당 랭킹 화면 -->
+      <div id="screenLeaderboard" style="display:none;">
+        <div style="font-size:14px; font-weight:900; color:var(--text-main); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <span>🏆 명예의 전당 TOP 10</span>
+          <span style="font-size:10.5px; color:var(--game-purple);" id="lbGameName">게임 랭킹</span>
+        </div>
+        <ul class="rank-list" id="stageRankList"></ul>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          <button class="btn-cute" style="background:#64748b;" onclick="closeGameStage()">🎮 목록</button>
+          <button class="btn-cute" onclick="replayActiveGame()">🔄 다시하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 💳 카페24 간편결제 모달 (Checkout Modal) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="checkoutOverlay" onclick="closeCafe24Checkout()"></div>
+  <div class="checkout-modal" id="checkoutModal">
+    <div class="sheet-handle" onclick="closeCafe24Checkout()"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="font-size:17px; font-weight:900; color:var(--text-main);">카페24 주문 / 결제</h3>
+      <button style="border:none; background:#f1f5f9; border-radius:50%; width:28px; height:28px; font-weight:800;" onclick="closeCafe24Checkout()">✕</button>
+    </div>
+
+    <!-- 배송지 정보 -->
+    <div style="background:#f8fafc; border-radius:12px; padding:10px 12px; font-size:12px; margin-bottom:12px; border:1px solid #e2e8f0;">
+      <div style="display:flex; justify-content:space-between; font-weight:800; color:#334155; margin-bottom:4px;">
+        <span>📍 기본 배송지</span>
+        <span style="color:var(--primary); font-size:11px;">변경 &gt;</span>
+      </div>
+      <div style="color:var(--text-main); font-weight:700;">서울시 강남구 테헤란로 152, 10층 (스윗앤스위츠)</div>
+      <div style="color:#64748b; font-size:11px; margin-top:2px;">수령인: 홍길동 (010-1234-5678)</div>
+    </div>
+
+    <!-- 결제 수단 선택 -->
+    <div style="font-size:13px; font-weight:800; margin-bottom:8px;">간편 결제 수단 선택</div>
+    <div class="pay-option-btn selected" onclick="selectPayMethod(this, '토스페이')">
+      <span>🔵</span>
+      <div style="flex:1;">토스페이 (Toss Pay)</div>
+      <span style="font-size:11px; color:var(--primary); font-weight:800;">기본</span>
+    </div>
+    <div class="pay-option-btn" onclick="selectPayMethod(this, '카카오페이')">
+      <span>🟡</span>
+      <div style="flex:1;">카카오페이 (Kakao Pay)</div>
+    </div>
+    <div class="pay-option-btn" onclick="selectPayMethod(this, '네이버페이')">
+      <span>🟢</span>
+      <div style="flex:1;">네이버페이 (Naver Pay)</div>
+    </div>
+
+    <!-- 최종 결제 버튼 -->
+    <button class="btn-cute" style="margin-top:10px; padding:14px; font-size:15px;" id="btnSubmitPayment" onclick="processCafe24Payment()">
+      <span id="paySubmitPrice">43,500원</span> 결제 승인하기
+    </button>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div class="toast-popup" id="toastPopup">
+    <span id="toastMsg">토스트 메시지</span>
+  </div>
+
+  <script>
+    // 10종 상품 데이터 명세
+    const PRODUCTS = [
+      { id: 'p1',  name: '비건 잉글리시 머핀', base: 1500, price: 1550, diff: 50, rate: 0.0345, isUp: true, tier: 'Tier 1 (±10%)', trend: 0.025, history: [1470, 1490, 1520, 1500, 1530, 1540, 1550] },
+      { id: 'p2',  name: '대만식 샌드위치',   base: 2400, price: 2350, diff: -50, rate: -0.0225, isUp: false, tier: 'Tier 1 (±10%)', trend: -0.032, history: [2380, 2400, 2360, 2380, 2390, 2370, 2350] },
+      { id: 'p3',  name: '휘낭시에',          base: 3800, price: 4010, diff: 210, rate: 0.0545, isUp: true, tier: 'Tier 1 (±10%)', trend: 0.045, history: [3750, 3840, 3920, 3880, 3950, 3980, 4010] },
+      { id: 'p4',  name: '글루텐프리 스콘',   base: 3800, price: 3680, diff: -120, rate: -0.0325, isUp: false, tier: 'Tier 1 (±10%)', trend: -0.042, history: [3740, 3720, 3680, 3700, 3710, 3690, 3680] },
+      { id: 'p5',  name: '모닝롤',            base: 4500, price: 4330, diff: -170, rate: -0.0385, isUp: false, tier: 'Tier 1 (±10%)', trend: -0.048, history: [4450, 4420, 4380, 4390, 4400, 4360, 4330] },
+      { id: 'p6',  name: '테트리스 브레드',   base: 11000, price: 11460, diff: 460, rate: 0.0415, isUp: true, tier: 'Tier 2 (±7%)', trend: 0.032, history: [11100, 11250, 11150, 11300, 11380, 11420, 11460] },
+      { id: 'p7',  name: 'ZERO 카스테라',     base: 12000, price: 11510, diff: -490, rate: -0.0405, isUp: false, tier: 'Tier 2 (±7%)', trend: -0.050, history: [11750, 11680, 11600, 11580, 11620, 11550, 11510] },
+      { id: 'p8',  name: '티라미수',          base: 15000, price: 15320, diff: 320, rate: 0.0215, isUp: true, tier: 'Tier 2 (±7%)', trend: 0.012, history: [15100, 15150, 15200, 15180, 15250, 15280, 15320] },
+      { id: 'p9',  name: '냉동생지 3종',      base: 21000, price: 20360, diff: -640, rate: -0.0305, isUp: false, tier: 'Tier 3 (±5%)', trend: -0.040, history: [20700, 20650, 20500, 20550, 20480, 20420, 20360] },
+      { id: 'p10', name: '마틸다 초코케이크', base: 42000, price: 44000, diff: 2000, rate: 0.0475, isUp: true, tier: 'Tier 3 (±5%)', trend: 0.038, history: [42600, 43100, 42800, 43400, 43700, 43850, 44000] }
+    ];
+
+    let selectedProduct = PRODUCTS[9];
+    let tossChartInstance = null;
+    let currentChartMode = 1; // 1: 라인, 2: 캔들, 3: 혜택 밴드
+
+    // 1일 1회 데일리 쿠폰 캡 상태
+    let hasReceivedDailyCoupon = false;
+
+    // 장바구니 상태 모델
+    let cartItems = [
+      { name: '마틸다 초코케이크', basePrice: 42000, currentPrice: 44000, qty: 1, type: 'bread' },
+      { name: '비건 잉글리시 머핀', basePrice: 1500, currentPrice: 1550, qty: 1, type: 'bread' }
+    ];
+    let selectedPaymentMethod = '토스페이';
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastPopup');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2200);
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      if (tabId === 'home') document.getElementById('tabHome').classList.add('active');
+      else if (tabId === 'market') document.getElementById('tabMarket').classList.add('active');
+      else if (tabId === 'expansion') document.getElementById('tabExpansion').classList.add('active');
+      else if (tabId === 'arcade') document.getElementById('tabArcade').classList.add('active');
+      else if (tabId === 'cart') {
+        document.getElementById('tabCart').classList.add('active');
+        renderCartView();
+      }
+
+      if (btn) btn.classList.add('active');
+      else {
+        const map = { home:0, market:1, expansion:2, arcade:3, cart:4 };
+        if (document.querySelectorAll('.nav-item')[map[tabId]]) {
+          document.querySelectorAll('.nav-item')[map[tabId]].classList.add('active');
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setExpSubTab(sub) {
+      if (sub === 'etf') {
+        document.getElementById('btnSubEtf').classList.add('active');
+        document.getElementById('btnSubFx').classList.remove('active');
+        document.getElementById('viewEtfArea').style.display = 'block';
+        document.getElementById('viewFxArea').style.display = 'none';
+      } else {
+        document.getElementById('btnSubFx').classList.add('active');
+        document.getElementById('btnSubEtf').classList.remove('active');
+        document.getElementById('viewFxArea').style.display = 'block';
+        document.getElementById('viewEtfArea').style.display = 'none';
+      }
+    }
+
+    function renderMarketList() {
+      const container = document.getElementById('marketListContainer');
+      container.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'bread-stock-item';
+        item.onclick = () => openTossSheet(p.id);
+
+        const sign = p.isUp ? '+' : '';
+        const color = p.isUp ? 'var(--toss-red)' : 'var(--toss-blue)';
+        const arrow = p.isUp ? '▲' : '▼';
+        item.innerHTML = `
+          <div>
+            <strong style="font-size:14px; color:var(--text-main);">${p.name}</strong>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">${p.tier} • 기본가 ${p.base.toLocaleString()}원</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${p.price.toLocaleString()}원</div>
+            <div style="font-size:12px; font-weight:800; color:${color};">${arrow} ${sign}${(p.rate * 100).toFixed(2)}% (${sign}${p.diff.toLocaleString()}원)</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // ----------------------------------------------------
+    // 바텀시트 & 멀티뷰 차트 로직
+    // ----------------------------------------------------
+    function openTossSheet(prodId) {
+      selectedProduct = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[9];
+
+      document.getElementById('sheetName').innerText = selectedProduct.name;
+      document.getElementById('sheetTier').innerText = selectedProduct.tier;
+      document.getElementById('sheetPrice').innerText = `${selectedProduct.price.toLocaleString()}원`;
+      
+      const isUp = selectedProduct.isUp;
+      const diffEl = document.getElementById('sheetDiff');
+      diffEl.style.color = isUp ? 'var(--toss-red)' : 'var(--toss-blue)';
+      diffEl.innerText = `${isUp ? '▲ +' : '▼ '}${selectedProduct.diff.toLocaleString()}원 (${isUp ? '+' : ''}${(selectedProduct.rate * 100).toFixed(2)}%) • 오늘 확정가`;
+
+      document.getElementById('sheetTrend').innerText = `${selectedProduct.trend >= 0 ? '+' : ''}${(selectedProduct.trend * 100).toFixed(2)}%`;
+      document.getElementById('sheetFx').innerText = '+0.95%';
+
+      document.getElementById('tossOverlay').classList.add('open');
+      document.getElementById('tossSheet').classList.add('open');
+
+      renderMultiViewChart();
+    }
+
+    function closeTossSheet() {
+      document.getElementById('tossOverlay').classList.remove('open');
+      document.getElementById('tossSheet').classList.remove('open');
+    }
+
+    function switchChartMode(mode) {
+      currentChartMode = mode;
+      document.querySelectorAll('.chart-view-btn').forEach((b, idx) => {
+        b.classList.toggle('active', idx === (mode - 1));
+      });
+      renderMultiViewChart();
+    }
+
+    function renderMultiViewChart() {
+      const canvas = document.getElementById('tossChartCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (tossChartInstance) tossChartInstance.destroy();
+
+      const labels = ['9/3', '9/4', '9/5', '9/6', '9/7', '9/8', '오늘(9/9)'];
+      const data = selectedProduct.history;
+      const baseLine = Array(7).fill(selectedProduct.base);
+      const isRising = selectedProduct.isUp;
+      const mainColor = isRising ? '#f04452' : '#3182f6';
+
+      // 1. 간편 라인
+      if (currentChartMode === 1) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 160);
+        gradient.addColorStop(0, isRising ? 'rgba(240, 68, 82, 0.25)' : 'rgba(49, 130, 246, 0.25)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+        tossChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              borderColor: mainColor,
+              borderWidth: 2.5,
+              fill: true,
+              backgroundColor: gradient,
+              tension: 0.35,
+              pointRadius: 0,
+              pointHoverRadius: 6,
+              pointHoverBackgroundColor: mainColor,
+              pointHoverBorderColor: '#fff',
+              pointHoverBorderWidth: 2
+            }]
+          },
+          options: getChartOptions()
+        });
+      }
+      // 2. 일봉 캔들스틱
+      else if (currentChartMode === 2) {
+        const candleBars = [];
+        const candleColors = [];
+        const ma3 = [null, null];
+        for (let i = 0; i < 7; i++) {
+          const prev = i === 0 ? data[0] : data[i-1];
+          const curr = data[i];
+          candleBars.push([Math.min(prev, curr), Math.max(prev, curr)]);
+          candleColors.push(curr >= prev ? '#ef4444' : '#3182f6');
+          if (i >= 2) ma3.push(Math.round((data[i] + data[i-1] + data[i-2]) / 3));
+        }
+
+        tossChartInstance = new Chart(ctx, {
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                type: 'line',
+                label: '3일 MA',
+                data: ma3,
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.2
+              },
+              {
+                type: 'bar',
+                label: '일봉',
+                data: candleBars,
+                backgroundColor: candleColors,
+                barPercentage: 0.5
+              }
+            ]
+          },
+          options: getChartOptions()
+        });
+      }
+      // 3. 혜택 밴드
+      else if (currentChartMode === 3) {
+        tossChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: '기본정가',
+                data: baseLine,
+                borderColor: '#64748b',
+                borderWidth: 2,
+                borderDash: [4, 4],
+                pointRadius: 0,
+                fill: false
+              },
+              {
+                label: '구매시세',
+                data: data,
+                borderColor: '#ff6b18',
+                backgroundColor: 'rgba(255, 107, 24, 0.15)',
+                borderWidth: 2.5,
+                tension: 0.3,
+                fill: '-1',
+                pointRadius: 3,
+                pointBackgroundColor: '#ff6b18'
+              }
+            ]
+          },
+          options: getChartOptions()
+        });
+      }
+    }
+
+    function getChartOptions() {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1e293b',
+            titleFont: { size: 11, weight: '700' },
+            bodyFont: { size: 13, weight: '900' },
+            padding: 8,
+            callbacks: {
+              title: (items) => `${items[0].label} 시세`,
+              label: (item) => {
+                if (item.dataset.type === 'bar') {
+                  const val = item.raw[1];
+                  const diff = val - selectedProduct.base;
+                  const sign = diff >= 0 ? '+' : '';
+                  return `${val.toLocaleString()}원 (${sign}${diff.toLocaleString()}원)`;
+                }
+                const val = typeof item.raw === 'number' ? item.raw : (Array.isArray(item.raw) ? item.raw[1] : 0);
+                if (!val) return '';
+                const diff = val - selectedProduct.base;
+                const sign = diff >= 0 ? '+' : '';
+                return `${val.toLocaleString()}원 (${sign}${diff.toLocaleString()}원)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            grid: { color: '#f1f5f9' },
+            ticks: { callback: (v) => v.toLocaleString() + '원' }
+          }
+        }
+      };
+    }
+
+    function changePeriod(p) {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderMultiViewChart();
+    }
+
+    function buyBreadFromSheet() {
+      cartItems.push({
+        name: selectedProduct.name,
+        basePrice: selectedProduct.base,
+        currentPrice: selectedProduct.price,
+        qty: 1,
+        type: 'bread'
+      });
+      updateCartBadge();
+      showToast(`🛒 ${selectedProduct.name} 장바구니에 담겼습니다!`);
+      closeTossSheet();
+    }
+
+    function addSingleBreadToCart(name, price) {
+      cartItems.push({
+        name: name,
+        basePrice: price + 400,
+        currentPrice: price,
+        qty: 1,
+        type: 'bread'
+      });
+      updateCartBadge();
+      showToast(`🛒 ${name} 장바구니 추가 완료!`);
+    }
+
+    function addEtfToCart(name, price) {
+      cartItems.push({
+        name: name,
+        basePrice: Math.round(price * 1.14),
+        currentPrice: price,
+        qty: 1,
+        type: 'etf'
+      });
+      updateCartBadge();
+      showToast(`💼 ${name} 일괄 담기 완료!`);
+    }
+
+    // ----------------------------------------------------
+    // 장바구니 & 카페24 주문서 로직
+    // ----------------------------------------------------
+    function updateCartBadge() {
+      const totalQty = cartItems.reduce((acc, cur) => acc + cur.qty, 0);
+      document.getElementById('headerCartCount').innerText = totalQty;
+      const countLabel = document.getElementById('cartItemCountLabel');
+      if (countLabel) countLabel.innerText = totalQty;
+    }
+
+    function renderCartView() {
+      const container = document.getElementById('cartItemsContainer');
+      container.innerHTML = '';
+
+      if (cartItems.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:30px 10px; color:#94a3b8;">
+            <div style="font-size:36px; margin-bottom:6px;">🧺</div>
+            <div style="font-size:13px; font-weight:800;">장바구니가 비어있습니다.</div>
+            <button class="btn-cute btn-outline" style="width:auto; margin:10px auto 0; padding:6px 14px; font-size:11.5px;" onclick="switchTab('market', document.querySelectorAll('.nav-item')[1])">
+              오늘의 빵 보러가기
+            </button>
+          </div>
+        `;
+        updateCartReceipt();
+        return;
+      }
+
+      cartItems.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item-row';
+        const icon = item.type === 'etf' ? '💼' : '🍞';
+        row.innerHTML = `
+          <div>
+            <div style="font-size:13px; font-weight:900; color:var(--text-main); display:flex; align-items:center; gap:4px;">
+              <span>${icon}</span>
+              <span>${item.name}</span>
+            </div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">
+              기본가 ${item.basePrice.toLocaleString()}원 ➔ <strong>${item.currentPrice.toLocaleString()}원</strong>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeCartQty(${idx}, -1)">-</button>
+              <span style="font-size:12px; font-weight:900; min-width:14px; text-align:center;">${item.qty}</span>
+              <button class="qty-btn" onclick="changeCartQty(${idx}, 1)">+</button>
+            </div>
+            <span style="font-size:13.5px; font-weight:900; min-width:65px; text-align:right;">
+              ${(item.currentPrice * item.qty).toLocaleString()}원
+            </span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      updateCartReceipt();
+    }
+
+    function changeCartQty(index, delta) {
+      cartItems[index].qty += delta;
+      if (cartItems[index].qty <= 0) {
+        cartItems.splice(index, 1);
+      }
+      updateCartBadge();
+      renderCartView();
+    }
+
+    function clearCart() {
+      cartItems = [];
+      updateCartBadge();
+      renderCartView();
+    }
+
+    function updateCartReceipt() {
+      const baseSum = cartItems.reduce((acc, cur) => acc + (cur.basePrice * cur.qty), 0);
+      const currentSum = cartItems.reduce((acc, cur) => acc + (cur.currentPrice * cur.qty), 0);
+      const marketDiff = currentSum - baseSum;
+
+      // 쿠폰 적용 여부
+      const chkCoupon = document.getElementById('chkDailyCoupon');
+      const isCouponApplied = chkCoupon && chkCoupon.checked;
+      const couponDiscount = (isCouponApplied && cartItems.length > 0) ? 500 : 0;
+
+      const finalPrice = Math.max(0, currentSum - couponDiscount);
+      const totalSaved = (baseSum - currentSum) + couponDiscount;
+
+      document.getElementById('rcptBaseTotal').innerText = `${baseSum.toLocaleString()}원`;
+      const diffEl = document.getElementById('rcptMarketDiscount');
+      if (marketDiff < 0) {
+        diffEl.innerText = `${marketDiff.toLocaleString()}원`;
+        diffEl.style.color = 'var(--toss-blue)';
+      } else {
+        diffEl.innerText = `+${marketDiff.toLocaleString()}원`;
+        diffEl.style.color = 'var(--toss-red)';
+      }
+
+      document.getElementById('rcptCouponVal').innerText = isCouponApplied ? '-500원' : '0원';
+      document.getElementById('rcptFinalTotal').innerText = `${finalPrice.toLocaleString()}원`;
+      document.getElementById('rcptSaveTotal').innerText = `${totalSaved > 0 ? totalSaved.toLocaleString() + '원' : '0원'}`;
+      document.getElementById('paySubmitPrice').innerText = `${finalPrice.toLocaleString()}원`;
+    }
+
+    function openCafe24Checkout() {
+      if (cartItems.length === 0) {
+        showToast('⚠️ 장바구니에 상품을 먼저 담아주세요!');
+        return;
+      }
+      document.getElementById('checkoutOverlay').classList.add('open');
+      document.getElementById('checkoutModal').classList.add('open');
+    }
+
+    function closeCafe24Checkout() {
+      document.getElementById('checkoutOverlay').classList.remove('open');
+      document.getElementById('checkoutModal').classList.remove('open');
+    }
+
+    function selectPayMethod(el, method) {
+      document.querySelectorAll('.pay-option-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedPaymentMethod = method;
+    }
+
+    function processCafe24Payment() {
+      const btn = document.getElementById('btnSubmitPayment');
+      btn.innerText = '⏳ 카페24 보안 결제 처리 중...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        closeCafe24Checkout();
+        btn.innerText = '결제 승인하기';
+        btn.disabled = false;
+
+        // 주문 완료 화면으로 전환
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('viewOrderComplete').classList.add('active');
+        
+        const finalPrice = document.getElementById('rcptFinalTotal').innerText;
+        document.getElementById('orderPaidPrice').innerText = finalPrice;
+        document.getElementById('orderPayMethod').innerText = `${selectedPaymentMethod} (간편결제)`;
+        document.getElementById('orderIdText').innerText = `주문번호: MKJ-20260909-${Math.floor(1000 + Math.random() * 9000)}`;
+
+        // 장바구니 비우기
+        cartItems = [];
+        updateCartBadge();
+        showToast('🎉 결제가 성공적으로 완료되었습니다!');
+      }, 1000);
+    }
+
+    // ----------------------------------------------------
+    // 미니게임천국 랭킹 & 1일 1회 데일리 쿠폰 엔진
+    // ----------------------------------------------------
+    const DEFAULT_LEADERBOARD = [
+      { name: '바게트장인', score: 1420, date: '09.09' },
+      { name: '성심당키즈', score: 1350, date: '09.09' },
+      { name: '초코러버',   score: 1280, date: '09.09' },
+      { name: '소금빵조아', score: 1190, date: '09.09' },
+      { name: '빵순이대장', score: 1050, date: '09.09' },
+      { name: '다이어터',   score: 980,  date: '09.09' },
+      { name: '밀가루요정', score: 920,  date: '09.09' },
+      { name: '모닝버터',   score: 870,  date: '09.09' },
+      { name: '크림치즈',   score: 810,  date: '09.09' },
+      { name: '식빵러버',   score: 750,  date: '09.09' }
+    ];
+
+    function getLeaderboard() {
+      const data = localStorage.getItem('makji_ranks_v10');
+      if (!data) {
+        localStorage.setItem('makji_ranks_v10', JSON.stringify(DEFAULT_LEADERBOARD));
+        return DEFAULT_LEADERBOARD;
+      }
+      return JSON.parse(data);
+    }
+
+    function saveScore(name, score) {
+      let list = getLeaderboard();
+      list.push({ name: name || '익명빵', score: score, date: '09.09' });
+      list.sort((a, b) => b.score - a.score);
+      list = list.slice(0, 10);
+      localStorage.setItem('makji_ranks_v10', JSON.stringify(list));
+      renderMainLeaderboard();
+      return list;
+    }
+
+    function renderMainLeaderboard() {
+      const container = document.getElementById('mainLeaderboard');
+      const list = getLeaderboard();
+      container.innerHTML = '';
+
+      list.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = `rank-item ${idx === 0 ? 'top-1' : (idx === 1 ? 'top-2' : (idx === 2 ? 'top-3' : ''))}`;
+        const medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : `${idx + 1}. `));
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:900; width:22px;">${medal}</span>
+            <strong style="color:var(--text-main);">${item.name}</strong>
+          </div>
+          <div style="font-weight:900; color:var(--primary);">${item.score.toLocaleString()}점</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    let activeGameId = 1;
+    let gameScore = 0;
+    let gameLoop = null;
+
+    const GAME_NAMES = {
+      1: '골든 슬라이스 (반 자르기)',
+      2: '식빵 탑 쌓기 (타이밍 드롭)',
+      3: '달려라 식빵 (장애물 점프)',
+      4: '레시피 카드 짝맞추기',
+      5: '황금 포춘쿠키 (행운 뽑기)'
+    };
+
+    function openGameStage(id) {
+      activeGameId = id;
+      document.getElementById('activeGameTitle').innerText = GAME_NAMES[id];
+      document.getElementById('screenPlaying').style.display = 'block';
+      document.getElementById('screenResult').style.display = 'none';
+      document.getElementById('screenLeaderboard').style.display = 'none';
+
+      initGame(id);
+      document.getElementById('gameStageModal').classList.add('active');
+    }
+
+    function closeGameStage() {
+      clearInterval(gameLoop);
+      document.getElementById('gameStageModal').classList.remove('active');
+    }
+
+    function initGame(id) {
+      clearInterval(gameLoop);
+      const area = document.getElementById('gamePlayContainer');
+      const btn = document.getElementById('gameActionBtn');
+
+      if (id === 1) {
+        area.innerHTML = `
+          <div style="position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%); width:24px; background:rgba(16,185,129,0.2); border-left:2px dashed #10b981; border-right:2px dashed #10b981;"></div>
+          <div style="font-size:64px; user-select:none;">🍞</div>
+          <div id="g1Knife" style="position:absolute; top:0; bottom:0; width:4px; background:#ef4444; box-shadow:0 0 8px #ef4444; left:10%;"></div>
+        `;
+        btn.innerText = '🔪 자르기 (STOP!)';
+        let pos = 10;
+        let dir = 3.0;
+        gameLoop = setInterval(() => {
+          pos += dir;
+          if (pos >= 90) dir = -3.0;
+          if (pos <= 10) dir = 3.0;
+          const k = document.getElementById('g1Knife');
+          if (k) k.style.left = pos + '%';
+        }, 25);
+      } else if (id === 2) {
+        area.innerHTML = `
+          <div style="position:absolute; bottom:0; width:100px; height:18px; background:#d97706; border-radius:4px; left:50%; transform:translateX(-50%); color:#fff; font-size:10px; font-weight:800; display:flex; justify-content:center; align-items:center;">접시</div>
+          <div id="g2Bread" style="position:absolute; top:30px; width:70px; height:18px; background:#fef3c7; border:2px solid #b45309; border-radius:4px; left:20%;"></div>
+        `;
+        btn.innerText = '🥞 식빵 놓기 (DROP!)';
+        let bx = 20;
+        let bdir = 3.5;
+        gameLoop = setInterval(() => {
+          bx += bdir;
+          if (bx >= 80) bdir = -3.5;
+          if (bx <= 10) bdir = 3.5;
+          const b = document.getElementById('g2Bread');
+          if (b) b.style.left = bx + '%';
+        }, 25);
+      } else if (id === 3) {
+        area.innerHTML = `
+          <div id="g3Bread" style="position:absolute; bottom:15px; left:40px; font-size:36px; transition:bottom 0.25s;">🍞</div>
+          <div id="g3Obs" style="position:absolute; bottom:15px; left:100%; font-size:28px;">🔥</div>
+          <div style="position:absolute; bottom:0; left:0; right:0; height:15px; background:#cbd5e1;"></div>
+        `;
+        btn.innerText = '🦘 점프하기 (JUMP!)';
+        let ox = 100;
+        gameLoop = setInterval(() => {
+          ox -= 4.0;
+          if (ox <= -10) ox = 100;
+          const o = document.getElementById('g3Obs');
+          if (o) o.style.left = ox + '%';
+        }, 30);
+      } else if (id === 4) {
+        area.innerHTML = `
+          <div style="font-size:44px; cursor:pointer;" onclick="handleGameAction()">🥐 🥯 🥪 🍰</div>
+          <div style="font-size:11.5px; font-weight:800; color:#64748b; margin-top:8px;">원료 카드를 매칭하세요!</div>
+        `;
+        btn.innerText = '✨ 짝맞추기 완료!';
+      } else if (id === 5) {
+        area.innerHTML = `
+          <div id="g5Cookie" style="font-size:70px; cursor:pointer;" onclick="handleGameAction()">🥠</div>
+          <div style="font-size:11.5px; font-weight:800; color:#b45309; margin-top:8px;">쿠키를 쪼개어 행운을 확인하세요!</div>
+        `;
+        btn.innerText = '🥠 지금 쪼개기!';
+      }
+    }
+
+    function handleGameAction() {
+      clearInterval(gameLoop);
+      gameScore = Math.floor(Math.random() * 400) + 900;
+      finishGame(gameScore);
+    }
+
+    function finishGame(score) {
+      document.getElementById('screenPlaying').style.display = 'none';
+      document.getElementById('screenResult').style.display = 'block';
+      document.getElementById('resultFinalScore').innerText = `${score.toLocaleString()}점`;
+
+      const box = document.getElementById('rewardNotificationBox');
+      if (!hasReceivedDailyCoupon) {
+        hasReceivedDailyCoupon = true;
+        box.innerHTML = '🎟️ <strong>[오늘의 첫 판 혜택]</strong> 500원 할인 쿠폰 발급 완료! (장바구니에 자동 적용되었습니다)';
+        box.style.background = '#f0fdf4';
+        box.style.borderColor = '#bbf7d0';
+        box.style.color = '#166534';
+        showToast('🎉 첫 판 성공! 500원 쿠폰이 장바구니에 적용되었습니다.');
+        updateCartReceipt();
+      } else {
+        box.innerHTML = '🛡️ <strong>[마진 방어 랭킹 모드]</strong> 오늘은 이미 쿠폰을 받으셨습니다! TOP 10 명예의 전당 랭킹에 도전하세요!';
+        box.style.background = '#f8fafc';
+        box.style.borderColor = '#e2e8f0';
+        box.style.color = '#475569';
+        showToast('랭킹 기록 갱신 완료!');
+      }
+    }
+
+    function submitRanking() {
+      const name = document.getElementById('playerNickname').value.trim() || '익명빵';
+      const updatedList = saveScore(name, gameScore);
+
+      document.getElementById('screenResult').style.display = 'none';
+      document.getElementById('screenLeaderboard').style.display = 'block';
+      document.getElementById('lbGameName').innerText = GAME_NAMES[activeGameId];
+
+      const ul = document.getElementById('stageRankList');
+      ul.innerHTML = '';
+      updatedList.forEach((item, idx) => {
+        const li = document.createElement('li');
+        const isMy = item.name === name && item.score === gameScore;
+        li.className = `rank-item ${idx === 0 ? 'top-1' : (idx === 1 ? 'top-2' : (idx === 2 ? 'top-3' : ''))} ${isMy ? 'my-rank' : ''}`;
+        const medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : `${idx + 1}. `));
+        li.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:900; width:22px;">${medal}</span>
+            <strong>${item.name} ${isMy ? '<span style="color:#ef4444; font-size:10px;">[ME]</span>' : ''}</strong>
+          </div>
+          <div style="font-weight:900; color:var(--primary);">${item.score.toLocaleString()}점</div>
+        `;
+        ul.appendChild(li);
+      });
+      showToast(`🏆 ${name}님, TOP 10 랭킹 등록 완료!`);
+    }
+
+    function replayActiveGame() {
+      openGameStage(activeGameId);
+    }
+
+    window.onload = () => {
+      renderMarketList();
+      renderMainLeaderboard();
+      updateCartBadge();
+    };
+  </script>
+</body>
+</html>

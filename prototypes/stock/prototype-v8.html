@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MAKJI STOCK v8 | 🎮 미니게임천국 & BREAD-DAQ 전광판</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    /* 식빵 마우스 커서 */
+    :root {
+      --bread-cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M7 11C7 7.5 9.5 5 13 5C14.5 5 15.5 5.7 16 6.5C16.5 5.7 17.5 5 19 5C22.5 5 25 7.5 25 11C26 12 26.5 13.5 26.5 15.5C26.5 21 24.5 26 23 27C21.5 27 9.5 27 8.5 26C7 24.5 5.5 20.5 5.5 15.5C5.5 13.5 6 12 7 11Z" fill="%23d97706" stroke="%2378350f" stroke-width="1.5"/><path d="M9 13C9 9 11 7.5 13.5 7.5C14.8 7.5 15.5 8.2 16 9C16.5 8.2 17.2 7.5 18.5 7.5C21 7.5 23 9 23 13C24 14.5 24.5 16.5 24.5 20C24.5 23.5 23 24.5 21.5 24.5H10.5C9 24.5 7.5 23.5 7.5 20C7.5 16.5 8 14.5 9 13Z" fill="%23fef3c7"/><circle cx="12.5" cy="15.5" r="1.2" fill="%2378350f"/><circle cx="19.5" cy="15.5" r="1.2" fill="%2378350f"/><path d="M14.5 18C15 19 17 19 17.5 18" stroke="%23b45309" stroke-width="1.2" stroke-linecap="round"/><ellipse cx="10" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/><ellipse cx="22" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/></svg>') 12 12, auto;
+      
+      --bg-cream: #fbf9f5;
+      --card-bg: #ffffff;
+      --primary: #ff6b18;
+      --primary-hover: #ea580c;
+      --game-purple: #8b5cf6;
+      --game-purple-dark: #6d28d9;
+      --game-pink: #ec4899;
+      --game-yellow: #f59e0b;
+      --butter-yellow: #fef3c7;
+      --toast-brown: #d97706;
+      --crust-dark: #78350f;
+      --text-main: #191f28;
+      --text-sub: #4e5968;
+      --text-muted: #8b95a1;
+      --toss-red: #f04452;
+      --toss-blue: #3182f6;
+      --card-shadow: 0 10px 25px -3px rgba(217, 119, 6, 0.07), 0 4px 6px -2px rgba(217, 119, 6, 0.03);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      cursor: var(--bread-cursor) !important;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: #f1ece4;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* 모바일 반응형 뷰포트 */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-cream);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    /* 상단 헤더 */
+    .app-header {
+      padding: 14px 20px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f2ede4;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--crust-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-logo span.badge {
+      font-size: 10px;
+      background: #fdf4ff;
+      color: var(--game-purple);
+      padding: 2px 7px;
+      border-radius: 12px;
+      border: 1px solid #e9d5ff;
+      font-weight: 800;
+    }
+
+    .user-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      background: #f8fafc;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* 상단 롤링 티커 */
+    .market-ticker-bar {
+      background: #fffbeb;
+      border-bottom: 1px solid #fde68a;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-scroll {
+      display: inline-block;
+      animation: tickerLoop 25s linear infinite;
+    }
+
+    @keyframes tickerLoop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* 메인 스크롤 영역 */
+    .main-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(76px + env(safe-area-inset-bottom));
+      scroll-behavior: smooth;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 하단 네비게이션 바 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-top: 1px solid #f1ece4;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 10px 12px max(14px, env(safe-area-inset-bottom));
+      z-index: 50;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+
+    .nav-item .nav-icon {
+      font-size: 20px;
+      transition: transform 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active .nav-icon {
+      transform: scale(1.15);
+    }
+
+    /* 공통 카드 */
+    .cute-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #f5ede2;
+    }
+
+    .btn-cute {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 14px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(255, 107, 24, 0.25);
+      transition: all 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-cute:active {
+      transform: scale(0.97);
+    }
+
+    /* ---------------------------------------------------- */
+    /* 🎮 미니게임천국 스타일 UI */
+    /* ---------------------------------------------------- */
+    .arcade-banner {
+      background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+    }
+
+    .arcade-banner::after {
+      content: '🎮';
+      position: absolute;
+      right: 14px;
+      bottom: 10px;
+      font-size: 64px;
+      opacity: 0.25;
+      transform: rotate(-15deg);
+    }
+
+    .arcade-title {
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .arcade-sub {
+      font-size: 12px;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    /* 미니게임 선택 그리드 (5개 게임) */
+    .game-selection-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .game-card-item {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px 14px;
+      border: 1.5px solid #f3e8ff;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.06);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .game-card-item:hover {
+      transform: translateY(-2px);
+      border-color: #c084fc;
+    }
+
+    .game-card-item:active {
+      transform: scale(0.96);
+    }
+
+    .game-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .g-icon-1 { background: #fef3c7; }
+    .g-icon-2 { background: #fee2e2; }
+    .g-icon-3 { background: #e0e7ff; }
+    .g-icon-4 { background: #dcfce7; }
+    .g-icon-5 { background: #fdf4ff; }
+
+    .game-card-name {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .game-card-desc {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .game-card-score {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--game-purple);
+      background: #f5f3ff;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    /* 게임 플레이 스테이지 (모달 형태) */
+    .game-stage-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 200;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .game-stage-overlay.active {
+      display: flex;
+    }
+
+    .game-stage-card {
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      animation: popIn 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .stage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .stage-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stage-close-btn {
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* 게임 캔버스 / 플레이 영역 공통 */
+    .game-play-area {
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 2px dashed #cbd5e1;
+      height: 220px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    /* 결과 & 랭킹 등록 화면 */
+    .game-result-box {
+      text-align: center;
+      display: none;
+    }
+
+    .result-score-large {
+      font-size: 38px;
+      font-weight: 900;
+      color: var(--primary);
+      margin: 6px 0;
+    }
+
+    .ranking-input-group {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .rank-input {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 2px solid #cbd5e1;
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .rank-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* 랭킹 모달 / 화면 (TOP 10) */
+    .ranking-modal-card {
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 22px 20px;
+      position: relative;
+    }
+
+    .rank-list {
+      list-style: none;
+      max-height: 280px;
+      overflow-y: auto;
+      margin: 12px 0;
+      padding-right: 4px;
+    }
+
+    .rank-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      background: #f8fafc;
+      font-size: 13px;
+    }
+
+    .rank-item.top-1 { background: #fef3c7; border: 1px solid #fde68a; font-weight: 900; }
+    .rank-item.top-2 { background: #f1f5f9; border: 1px solid #e2e8f0; font-weight: 800; }
+    .rank-item.top-3 { background: #ffedd5; border: 1px solid #fed7aa; font-weight: 800; }
+    .rank-item.my-rank { border: 2px solid var(--primary); background: #fff7ed; }
+
+    .rank-num {
+      width: 24px;
+      font-weight: 900;
+      color: #64748b;
+    }
+    .rank-item.top-1 .rank-num { color: #b45309; }
+
+    /* 토스트 팝업 */
+    .toast-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 300;
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toast-popup.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast-popup" id="toastPopup">
+    <span>🍞</span> <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <div class="app-viewport">
+    
+    <!-- 상단 헤더 -->
+    <header class="app-header">
+      <div class="brand-logo">
+        <span>🥐 MAKJI STOCK</span>
+        <span class="badge">v8 미니게임천국</span>
+      </div>
+      <div class="user-pill">
+        <span>🪙 빵머니:</span>
+        <b style="color:var(--primary);" id="userPointsDisplay">1,500P</b>
+      </div>
+    </header>
+
+    <!-- 실시간 티커 -->
+    <div class="market-ticker-bar">
+      <div class="ticker-scroll">
+        🎮 [MAKJI 미니게임천국 오픈!] 5종 미니게임 플레이하고 10위 랭킹에 도전하세요! • 1판당 500원 할인 쿠폰 즉시 지급 • [BREAD-DAQ] 마틸다 케이크 +4.75% ▲ • 글루텐프리 스콘 -3.25% ▼
+      </div>
+    </div>
+
+    <!-- 메인 스크롤 콘텐츠 -->
+    <main class="main-scroll-area">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: 홈 (Home) -->
+      <!-- ============================================== -->
+      <section class="tab-content active" id="tabHome">
+        
+        <!-- BREAD-DAQ 종합 시황 카드 -->
+        <div class="cute-card" style="background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-color: #fed7aa;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--toast-brown);">
+            <span>🏛️ 오늘 아침 9시 BREAD-DAQ 종합지수</span>
+            <span style="color:#059669;">🟢 정상 개장</span>
+          </div>
+          <div style="font-size:26px; font-weight:900; margin:6px 0 2px; color:var(--crust-dark); display:flex; align-items:baseline; gap:8px;">
+            <span>2,485.40</span>
+            <span style="font-size:14px; font-weight:800; color:var(--toss-red);">▲ +0.21% (수급 균형)</span>
+          </div>
+          <p style="font-size:12px; color:var(--text-sub);">
+            [수요] 네이버 검색 트렌드 ±5% + [공급] 환율 ±3% 2대 지표 연동
+          </p>
+        </div>
+
+        <!-- 미니게임천국 배너 (클릭 시 아케이드 탭 이동) -->
+        <div class="arcade-banner" onclick="switchTab('arcade')">
+          <div class="arcade-title">🎮 MAKJI 미니게임천국</div>
+          <div class="arcade-sub">
+            출근길 30초 한판! 5종 미니게임 플레이하고<br>
+            500원 할인 쿠폰과 TOP 10 랭커의 영예를 차지하세요!
+          </div>
+          <div style="margin-top:12px;">
+            <span style="background:#fff; color:var(--game-purple); font-size:12px; font-weight:800; padding:4px 12px; border-radius:20px;">
+              지금 바로 게임하기 ➔
+            </span>
+          </div>
+        </div>
+
+        <!-- 오늘의 빵 핫 대장주 -->
+        <div class="cute-card" style="cursor:pointer;" onclick="switchTab('market')">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:#e11d48;">🔥 실시간 검색 1위 대장주</span>
+              <div style="font-size:17px; font-weight:900; color:var(--text-main); margin-top:2px;">마틸다 초코케이크</div>
+              <div style="font-size:13px; font-weight:800; color:var(--toss-red);">44,000원 (▲ +4.75%)</div>
+            </div>
+            <button class="btn-cute" style="width:auto; padding:8px 14px; font-size:12px;">
+              시세 전광판 ➔
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: 마켓 (Market) -->
+      <!-- ============================================== -->
+      <section class="tab-content" id="tabMarket">
+        <div style="font-size:16px; font-weight:900; color:var(--text-main); margin-bottom:12px;">
+          📊 오늘의 빵 10종 실시간 시세표
+        </div>
+        <div id="marketListContainer">
+          <!-- JS 렌더링 -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: 🎮 미니게임천국 아케이드 (Arcade) -->
+      <!-- ============================================== -->
+      <section class="tab-content" id="tabArcade">
+        
+        <div class="arcade-banner" style="margin-bottom:14px;">
+          <div class="arcade-title">🕹️ MAKJI 미니게임천국</div>
+          <div class="arcade-sub">
+            원버튼으로 즐기는 초간단 베이커리 게임 5선!<br>
+            게임 완료 후 닉네임을 입력하고 명예의 전당 TOP 10에 도전하세요!
+          </div>
+        </div>
+
+        <!-- 5종 미니게임 선택 그리드 -->
+        <div class="game-selection-grid">
+          
+          <!-- 게임 1: 골든 슬라이스 -->
+          <div class="game-card-item" onclick="openGameStage(1)">
+            <div class="game-icon-circle g-icon-1">🔪</div>
+            <div class="game-card-name">골든 슬라이스</div>
+            <div class="game-card-desc">식빵 50% 반 자르기!</div>
+            <div class="game-card-score" id="highScore1">최고: 980점</div>
+          </div>
+
+          <!-- 게임 2: 식빵 탑 쌓기 -->
+          <div class="game-card-item" onclick="openGameStage(2)">
+            <div class="game-icon-circle g-icon-2">🥞</div>
+            <div class="game-card-name">식빵 탑 쌓기</div>
+            <div class="game-card-desc">흔들리는 빵 착착 쌓기!</div>
+            <div class="game-card-score" id="highScore2">최고: 1,200점</div>
+          </div>
+
+          <!-- 게임 3: 달려라 식빵 -->
+          <div class="game-card-item" onclick="openGameStage(3)">
+            <div class="game-icon-circle g-icon-3">🏃</div>
+            <div class="game-card-name">달려라 식빵</div>
+            <div class="game-card-desc">토스터기 피하기 러닝!</div>
+            <div class="game-card-score" id="highScore3">최고: 850점</div>
+          </div>
+
+          <!-- 게임 4: 크루아상 짝맞추기 -->
+          <div class="game-card-item" onclick="openGameStage(4)">
+            <div class="game-icon-circle g-icon-4">🥐</div>
+            <div class="game-card-name">빵 카드 짝맞추기</div>
+            <div class="game-card-desc">8장 카드 기억력 매칭!</div>
+            <div class="game-card-score" id="highScore4">최고: 1,450점</div>
+          </div>
+
+          <!-- 게임 5: 포춘쿠키 & 운세 -->
+          <div class="game-card-item" style="grid-column: span 2;" onclick="openGameStage(5)">
+            <div class="game-icon-circle g-icon-5">🥠</div>
+            <div class="game-card-name">황금 포춘쿠키 대폭발</div>
+            <div class="game-card-desc">타이밍 맞춰 쿠키를 쪼개어 오늘의 황금 빵머니를 뽑으세요!</div>
+            <div class="game-card-score" id="highScore5">최고: 1,000점</div>
+          </div>
+
+        </div>
+
+        <!-- 🏆 명예의 전당 (종합 랭킹 10위) 카드 -->
+        <div class="cute-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:15px; font-weight:900; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+              <span>🏆 전당 TOP 10 랭킹</span>
+            </div>
+            <button style="border:none; background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:700; color:#475569;" onclick="resetLeaderboard()">
+              초기화
+            </button>
+          </div>
+          <div id="mainLeaderboard">
+            <!-- JS 렌더링 -->
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 하단 고정 네비게이션 바 -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('home', this)">
+        <span class="nav-icon">🏠</span>
+        <span>홈</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('market', this)">
+        <span class="nav-icon">📈</span>
+        <span>시세표</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('arcade', this)">
+        <span class="nav-icon">🎮</span>
+        <span>미니게임</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 🕹️ 미니게임 플레이 모달 레이어 -->
+  <!-- ============================================== -->
+  <div class="game-stage-overlay" id="gameStageModal">
+    <div class="game-stage-card">
+      
+      <!-- 스테이지 헤더 -->
+      <div class="stage-header">
+        <div class="stage-title">
+          <span id="activeGameIcon">🎮</span>
+          <span id="activeGameTitle">미니게임</span>
+        </div>
+        <button class="stage-close-btn" onclick="closeGameStage()">✕</button>
+      </div>
+
+      <!-- [화면 1] 실제 게임 플레이 화면 -->
+      <div id="screenPlaying">
+        <div class="game-play-area" id="gamePlayContainer">
+          <!-- 동적 게임 캔버스/DOM 삽입 -->
+        </div>
+        
+        <!-- 컨트롤 액션 버튼 -->
+        <button class="btn-cute" id="gameActionBtn" onclick="handleGameAction()">
+          시작하기!
+        </button>
+      </div>
+
+      <!-- [화면 2] 게임 오버 & 랭킹 등록 화면 -->
+      <div id="screenResult" class="game-result-box">
+        <div style="font-size:13px; font-weight:800; color:var(--toast-brown);">🎉 GAME OVER!</div>
+        <div class="result-score-large" id="resultFinalScore">0점</div>
+        <p style="font-size:12px; color:#059669; font-weight:800; margin-bottom:12px;" id="resultCouponText">
+          🎟️ 퀴즈 500원 할인 쿠폰 발급 완료!
+        </p>
+
+        <div style="background:#f8fafc; border-radius:12px; padding:12px; font-size:12px; color:var(--text-sub); margin-bottom:10px;">
+          명예의 전당 TOP 10에 등록할 닉네임을 입력하세요!
+        </div>
+
+        <div class="ranking-input-group">
+          <input type="text" id="playerNickname" class="rank-input" placeholder="닉네임 (최대 6자)" maxlength="6" value="빵순이">
+          <button class="btn-cute" style="width:auto; padding:12px 16px; white-space:nowrap;" onclick="submitRanking()">
+            🏆 랭킹 등록
+          </button>
+        </div>
+
+        <button style="border:none; background:#f1f5f9; color:#64748b; padding:10px 16px; border-radius:10px; font-weight:700; font-size:12px; width:100%;" onclick="closeGameStage()">
+          등록 없이 닫기
+        </button>
+      </div>
+
+      <!-- [화면 3] 게임별 랭킹 화면 -->
+      <div id="screenLeaderboard" style="display:none;">
+        <div style="font-size:16px; font-weight:900; color:var(--text-main); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <span>🏆 이 게임의 TOP 10 랭킹</span>
+          <span style="font-size:11px; color:var(--game-purple);" id="lbGameName">골든 슬라이스</span>
+        </div>
+        <ul class="rank-list" id="stageRankList">
+          <!-- JS 주입 -->
+        </ul>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn-cute" style="background:#64748b;" onclick="closeGameStage()">
+            🎮 게임 목록
+          </button>
+          <button class="btn-cute" onclick="replayActiveGame()">
+            🔄 다시 도전
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------------------------------
+    // 1. 10종 상품 데이터 및 시세표
+    // ----------------------------------------------------
+    const PRODUCTS = [
+      { id: 'p1',  name: '비건 잉글리시 머핀', base: 1500, price: 1550, diff: 50, rate: 0.0345, isUp: true },
+      { id: 'p2',  name: '대만식 샌드위치',   base: 2400, price: 2350, diff: -50, rate: -0.0225, isUp: false },
+      { id: 'p3',  name: '휘낭시에',          base: 3800, price: 4010, diff: 210, rate: 0.0545, isUp: true },
+      { id: 'p4',  name: '글루텐프리 스콘',   base: 3800, price: 3680, diff: -120, rate: -0.0325, isUp: false },
+      { id: 'p5',  name: '모닝롤',            base: 4500, price: 4330, diff: -170, rate: -0.0385, isUp: false },
+      { id: 'p6',  name: '테트리스 브레드',   base: 11000, price: 11460, diff: 460, rate: 0.0415, isUp: true },
+      { id: 'p7',  name: 'ZERO 카스테라',     base: 12000, price: 11510, diff: -490, rate: -0.0405, isUp: false },
+      { id: 'p8',  name: '티라미수',          base: 15000, price: 15320, diff: 320, rate: 0.0215, isUp: true },
+      { id: 'p9',  name: '냉동생지 3종',      base: 21000, price: 20360, diff: -640, rate: -0.0305, isUp: false },
+      { id: 'p10', name: '마틸다 초코케이크', base: 42000, price: 44000, diff: 2000, rate: 0.0475, isUp: true }
+    ];
+
+    function renderMarketList() {
+      const container = document.getElementById('marketListContainer');
+      container.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const item = document.createElement('div');
+        item.style.cssText = 'background:#fff; border-radius:14px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #f1ece4;';
+        const sign = p.isUp ? '+' : '';
+        const color = p.isUp ? 'var(--toss-red)' : 'var(--toss-blue)';
+        const arrow = p.isUp ? '▲' : '▼';
+        item.innerHTML = `
+          <div>
+            <strong style="font-size:14px; color:var(--text-main);">${p.name}</strong>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">기본가 ${p.base.toLocaleString()}원</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">${p.price.toLocaleString()}원</div>
+            <div style="font-size:12px; font-weight:800; color:${color};">${arrow} ${sign}${(p.rate * 100).toFixed(2)}% (${sign}${p.diff.toLocaleString()}원)</div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // ----------------------------------------------------
+    // 2. 미니게임천국 랭킹 관리 (localStorage & TOP 10)
+    // ----------------------------------------------------
+    const DEFAULT_LEADERBOARD = [
+      { name: '바게트장인', score: 1420, gameId: 4, date: '09.09' },
+      { name: '성심당키즈', score: 1350, gameId: 2, date: '09.09' },
+      { name: '초코러버',   score: 1280, gameId: 1, date: '09.09' },
+      { name: '소금빵조아', score: 1190, gameId: 3, date: '09.09' },
+      { name: '빵순이대장', score: 1050, gameId: 2, date: '09.09' },
+      { name: '다이어터',   score: 980,  gameId: 5, date: '09.09' },
+      { name: '밀가루요정', score: 920,  gameId: 1, date: '09.09' },
+      { name: '모닝버터',   score: 870,  gameId: 3, date: '09.09' },
+      { name: '크림치즈',   score: 810,  gameId: 4, date: '09.09' },
+      { name: '식빵러버',   score: 750,  gameId: 2, date: '09.09' }
+    ];
+
+    function getLeaderboard() {
+      const data = localStorage.getItem('makji_minigame_ranks');
+      if (!data) {
+        localStorage.setItem('makji_minigame_ranks', JSON.stringify(DEFAULT_LEADERBOARD));
+        return DEFAULT_LEADERBOARD;
+      }
+      return JSON.parse(data);
+    }
+
+    function saveScoreToLeaderboard(name, score, gameId) {
+      let list = getLeaderboard();
+      const today = '09.09';
+      list.push({ name: name || '익명빵', score: score, gameId: gameId, date: today });
+      // 점수 내림차순 정렬 후 10위까지만 유지
+      list.sort((a, b) => b.score - a.score);
+      list = list.slice(0, 10);
+      localStorage.setItem('makji_minigame_ranks', JSON.stringify(list));
+      renderMainLeaderboard();
+      return list;
+    }
+
+    function resetLeaderboard() {
+      if (confirm('랭킹을 초기화하시겠습니까?')) {
+        localStorage.setItem('makji_minigame_ranks', JSON.stringify(DEFAULT_LEADERBOARD));
+        renderMainLeaderboard();
+        showToast('랭킹이 기본값으로 초기화되었습니다.');
+      }
+    }
+
+    function renderMainLeaderboard() {
+      const container = document.getElementById('mainLeaderboard');
+      const list = getLeaderboard();
+      container.innerHTML = '';
+
+      list.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = `rank-item ${idx === 0 ? 'top-1' : (idx === 1 ? 'top-2' : (idx === 2 ? 'top-3' : ''))}`;
+        const medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : `${idx + 1}. `));
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="rank-num">${medal}</span>
+            <strong style="color:var(--text-main);">${item.name}</strong>
+          </div>
+          <div style="font-weight:900; color:var(--primary);">${item.score.toLocaleString()}점</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // ----------------------------------------------------
+    // 3. 5종 미니게임 엔진 & 플레이어 인터랙션
+    // ----------------------------------------------------
+    let activeGameId = 1;
+    let gameState = 'READY'; // READY, PLAYING, FINISHED
+    let gameScore = 0;
+    let gameLoopInterval = null;
+
+    const GAME_META = {
+      1: { name: '골든 슬라이스', icon: '🔪', btnStart: '🔪 자르기 (STOP!)' },
+      2: { name: '식빵 탑 쌓기', icon: '🥞', btnStart: '🥞 식빵 놓기 (DROP!)' },
+      3: { name: '달려라 식빵', icon: '🏃', btnStart: '🦘 점프 (JUMP!)' },
+      4: { name: '빵 카드 짝맞추기', icon: '🥐', btnStart: '👀 기억하기 시작!' },
+      5: { name: '황금 포춘쿠키', icon: '🥠', btnStart: '🥠 쿠키 쪼개기 (CRACK!)' }
+    };
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastPopup');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2200);
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      if (tabId === 'home') document.getElementById('tabHome').classList.add('active');
+      else if (tabId === 'market') document.getElementById('tabMarket').classList.add('active');
+      else if (tabId === 'arcade') document.getElementById('tabArcade').classList.add('active');
+
+      if (btn) btn.classList.add('active');
+      else {
+        const idx = tabId === 'home' ? 0 : (tabId === 'market' ? 1 : 2);
+        document.querySelectorAll('.nav-item')[idx].classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openGameStage(gameId) {
+      activeGameId = gameId;
+      const meta = GAME_META[gameId];
+      document.getElementById('activeGameIcon').innerText = meta.icon;
+      document.getElementById('activeGameTitle').innerText = meta.name;
+
+      document.getElementById('screenPlaying').style.display = 'block';
+      document.getElementById('screenResult').style.display = 'none';
+      document.getElementById('screenLeaderboard').style.display = 'none';
+
+      initGameStage(gameId);
+      document.getElementById('gameStageModal').classList.add('active');
+    }
+
+    function closeGameStage() {
+      clearInterval(gameLoopInterval);
+      document.getElementById('gameStageModal').classList.remove('active');
+    }
+
+    function handleGameAction() {
+      if (activeGameId === 1) handleGame1Action();
+      else if (activeGameId === 2) handleGame2Action();
+      else if (activeGameId === 3) handleGame3Action();
+      else if (activeGameId === 4) handleGame4Action();
+      else if (activeGameId === 5) handleGame5Action();
+    }
+
+    // --- GAME 1: 골든 슬라이스 (식빵 반 자르기) ---
+    let g1Pos = 10;
+    let g1Dir = 1;
+    function initGameStage(id) {
+      clearInterval(gameLoopInterval);
+      const area = document.getElementById('gamePlayContainer');
+      const btn = document.getElementById('gameActionBtn');
+      gameState = 'READY';
+
+      if (id === 1) {
+        area.innerHTML = `
+          <div style="position:absolute; top:0; bottom:0; left:50%; transform:translateX(-50%); width:24px; background:rgba(16,185,129,0.2); border-left:2px dashed #10b981; border-right:2px dashed #10b981;"></div>
+          <div style="font-size:64px; user-select:none;">🍞</div>
+          <div id="g1Knife" style="position:absolute; top:0; bottom:0; width:4px; background:#ef4444; box-shadow:0 0 8px #ef4444; border-radius:2px; left:10%;"></div>
+          <div style="position:absolute; bottom:12px; font-size:12px; font-weight:800; color:#64748b;">게이지가 정중앙(50%)에 올 때 멈추세요!</div>
+        `;
+        btn.innerText = '🔪 자르기 (STOP!)';
+        g1Pos = 10;
+        g1Dir = 2.8;
+        gameLoopInterval = setInterval(() => {
+          g1Pos += g1Dir;
+          if (g1Pos >= 90) g1Dir = -2.8;
+          if (g1Pos <= 10) g1Dir = 2.8;
+          const k = document.getElementById('g1Knife');
+          if (k) k.style.left = g1Pos + '%';
+        }, 25);
+      }
+      else if (id === 2) {
+        initGame2(area, btn);
+      }
+      else if (id === 3) {
+        initGame3(area, btn);
+      }
+      else if (id === 4) {
+        initGame4(area, btn);
+      }
+      else if (id === 5) {
+        initGame5(area, btn);
+      }
+    }
+
+    function handleGame1Action() {
+      clearInterval(gameLoopInterval);
+      const diff = Math.abs(50 - g1Pos); // 오차
+      gameScore = Math.max(100, Math.round(1000 - diff * 25));
+      finishGame(gameScore);
+    }
+
+    // --- GAME 2: 식빵 탑 쌓기 (타이밍 드롭) ---
+    let g2Floors = 0;
+    let g2BreadX = 20;
+    let g2Dir = 2.5;
+    function initGame2(area, btn) {
+      g2Floors = 0;
+      g2BreadX = 20;
+      g2Dir = 3.2;
+      area.innerHTML = `
+        <div id="g2TowerBase" style="position:absolute; bottom:0; width:100px; height:20px; background:#d97706; border-radius:6px; left:50%; transform:translateX(-50%); display:flex; justify-content:center; align-items:center; color:#fff; font-size:11px; font-weight:900;">접시</div>
+        <div id="g2FallingBread" style="position:absolute; top:30px; width:70px; height:18px; background:#fef3c7; border:2px solid #b45309; border-radius:4px; left:20%;"></div>
+        <div id="g2FloorText" style="position:absolute; top:10px; left:14px; font-size:14px; font-weight:900; color:var(--primary);">0층 쌓음</div>
+      `;
+      btn.innerText = '🥞 식빵 놓기 (DROP!)';
+      gameLoopInterval = setInterval(() => {
+        g2BreadX += g2Dir;
+        if (g2BreadX >= 80) g2Dir = -3.2;
+        if (g2BreadX <= 10) g2Dir = 3.2;
+        const b = document.getElementById('g2FallingBread');
+        if (b) b.style.left = g2BreadX + '%';
+      }, 25);
+    }
+
+    function handleGame2Action() {
+      // 35% ~ 65% 사이면 착지 성공
+      if (g2BreadX >= 35 && g2BreadX <= 65) {
+        g2Floors++;
+        document.getElementById('g2FloorText').innerText = `${g2Floors}층 쌓음!`;
+        showToast(`🎉 ${g2Floors}층 성공!`);
+        if (g2Floors >= 10) {
+          clearInterval(gameLoopInterval);
+          gameScore = 1500;
+          finishGame(gameScore);
+        }
+      } else {
+        clearInterval(gameLoopInterval);
+        gameScore = g2Floors * 120 + 200;
+        finishGame(gameScore);
+      }
+    }
+
+    // --- GAME 3: 달려라 식빵 (장애물 점프) ---
+    let g3Jumping = false;
+    let g3ObsX = 100;
+    let g3Distance = 0;
+    function initGame3(area, btn) {
+      g3Jumping = false;
+      g3ObsX = 100;
+      g3Distance = 0;
+      area.innerHTML = `
+        <div id="g3BreadChar" style="position:absolute; bottom:15px; left:40px; font-size:36px; transition:bottom 0.25s ease;">🍞</div>
+        <div id="g3Obstacle" style="position:absolute; bottom:15px; left:100%; font-size:30px;">🔥</div>
+        <div style="position:absolute; bottom:0; left:0; right:0; height:15px; background:#cbd5e1;"></div>
+        <div id="g3DistText" style="position:absolute; top:10px; right:14px; font-size:13px; font-weight:900; color:#0f172a;">0m</div>
+      `;
+      btn.innerText = '🦘 점프하기 (JUMP!)';
+      gameLoopInterval = setInterval(() => {
+        g3ObsX -= 3.5;
+        g3Distance += 5;
+        document.getElementById('g3DistText').innerText = `${g3Distance}m`;
+        const obs = document.getElementById('g3Obstacle');
+        if (obs) obs.style.left = g3ObsX + '%';
+
+        // 충돌 체크
+        if (g3ObsX >= 8 && g3ObsX <= 18 && !g3Jumping) {
+          clearInterval(gameLoopInterval);
+          gameScore = g3Distance * 10 + 100;
+          finishGame(gameScore);
+        }
+
+        if (g3ObsX <= -10) {
+          g3ObsX = 100;
+        }
+      }, 30);
+    }
+
+    function handleGame3Action() {
+      if (g3Jumping) return;
+      g3Jumping = true;
+      const char = document.getElementById('g3BreadChar');
+      if (char) char.style.bottom = '85px';
+      setTimeout(() => {
+        if (char) char.style.bottom = '15px';
+        g3Jumping = false;
+      }, 350);
+    }
+
+    // --- GAME 4: 빵 카드 짝맞추기 ---
+    let g4Cards = ['🥐', '🥐', '🥯', '🥯', '🥪', '🥪', '🍰', '🍰'];
+    let g4Flipped = [];
+    let g4Matched = 0;
+    let g4TimeStart = 0;
+    function initGame4(area, btn) {
+      g4Cards.sort(() => Math.random() - 0.5);
+      g4Flipped = [];
+      g4Matched = 0;
+      g4TimeStart = Date.now();
+
+      area.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; width:90%; height:90%; padding:8px;" id="g4CardGrid">
+          ${g4Cards.map((icon, idx) => `
+            <div class="g4-card" onclick="flipCard(${idx}, '${icon}', this)" style="background:#fff; border-radius:10px; border:2px solid #cbd5e1; display:flex; justify-content:center; align-items:center; font-size:24px; cursor:pointer; user-select:none;">
+              ❓
+            </div>
+          `).join('')}
+        </div>
+      `;
+      btn.innerText = '카드 2장을 골라 짝을 맞추세요!';
+      btn.disabled = true;
+    }
+
+    function flipCard(idx, icon, el) {
+      if (g4Flipped.length >= 2 || el.innerText !== '❓') return;
+      el.innerText = icon;
+      el.style.borderColor = 'var(--primary)';
+      g4Flipped.push({ idx, icon, el });
+
+      if (g4Flipped.length === 2) {
+        if (g4Flipped[0].icon === g4Flipped[1].icon) {
+          g4Matched++;
+          g4Flipped = [];
+          if (g4Matched === 4) {
+            const elapsed = (Date.now() - g4TimeStart) / 1000;
+            gameScore = Math.max(300, Math.round(1800 - elapsed * 80));
+            setTimeout(() => finishGame(gameScore), 400);
+          }
+        } else {
+          setTimeout(() => {
+            g4Flipped.forEach(c => {
+              c.el.innerText = '❓';
+              c.el.style.borderColor = '#cbd5e1';
+            });
+            g4Flipped = [];
+          }, 600);
+        }
+      }
+    }
+
+    function handleGame4Action() {}
+
+    // --- GAME 5: 황금 포춘쿠키 쪼개기 ---
+    function initGame5(area, btn) {
+      area.innerHTML = `
+        <div id="g5Cookie" style="font-size:74px; cursor:pointer; user-select:none; transition:transform 0.2s;" onclick="handleGame5Action()">🥠</div>
+        <div style="font-size:12px; font-weight:800; color:#b45309; margin-top:8px;">쿠키를 눌러 황금 티켓을 뽑으세요!</div>
+      `;
+      btn.innerText = '🥠 지금 쿠키 쪼개기!';
+    }
+
+    function handleGame5Action() {
+      const el = document.getElementById('g5Cookie');
+      if (el) el.innerText = '💥';
+      setTimeout(() => {
+        gameScore = Math.floor(Math.random() * 500) + 800;
+        finishGame(gameScore);
+      }, 300);
+    }
+
+    // ----------------------------------------------------
+    // 4. 게임 종료 및 랭킹 등록 / 결과 화면
+    // ----------------------------------------------------
+    function finishGame(score) {
+      document.getElementById('screenPlaying').style.display = 'none';
+      document.getElementById('screenResult').style.display = 'block';
+      document.getElementById('resultFinalScore').innerText = `${score.toLocaleString()}점`;
+      
+      // 최고 점수 갱신 표시
+      const scoreTag = document.getElementById(`highScore${activeGameId}`);
+      if (scoreTag) scoreTag.innerText = `최고: ${score.toLocaleString()}점`;
+
+      showToast(`🎉 게임 종료! ${score.toLocaleString()}점을 기록했습니다!`);
+    }
+
+    function submitRanking() {
+      const nameInput = document.getElementById('playerNickname');
+      const nickname = nameInput.value.trim() || '익명빵';
+      const updatedList = saveScoreToLeaderboard(nickname, gameScore, activeGameId);
+
+      showStageLeaderboard(updatedList, nickname);
+    }
+
+    function showStageLeaderboard(list, myName) {
+      document.getElementById('screenResult').style.display = 'none';
+      document.getElementById('screenLeaderboard').style.display = 'block';
+      document.getElementById('lbGameName').innerText = GAME_META[activeGameId].name;
+
+      const ul = document.getElementById('stageRankList');
+      ul.innerHTML = '';
+
+      list.forEach((item, idx) => {
+        const li = document.createElement('li');
+        const isMy = item.name === myName && item.score === gameScore;
+        li.className = `rank-item ${idx === 0 ? 'top-1' : (idx === 1 ? 'top-2' : (idx === 2 ? 'top-3' : ''))} ${isMy ? 'my-rank' : ''}`;
+        const medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : `${idx + 1}. `));
+
+        li.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="rank-num">${medal}</span>
+            <strong>${item.name} ${isMy ? '<span style="color:#ef4444; font-size:10px;">[ME]</span>' : ''}</strong>
+          </div>
+          <div style="font-weight:900; color:var(--primary);">${item.score.toLocaleString()}점</div>
+        `;
+        ul.appendChild(li);
+      });
+
+      showToast(`🏆 ${myName}님, 명예의 전당 TOP 10 등록 완료!`);
+    }
+
+    function replayActiveGame() {
+      openGameStage(activeGameId);
+    }
+
+    window.onload = () => {
+      renderMarketList();
+      renderMainLeaderboard();
+    };
+  </script>
+</body>
+</html>

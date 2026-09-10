@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAKJI 빵 시세 시뮬레이터 v8 | 수요·공급 2대 실물 지표 슬림화 완성형</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #ff6b18;
+      --primary-dark: #e55609;
+      --primary-light: #fff4ed;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --up-red: #ef4444;
+      --up-bg: #fef2f2;
+      --down-blue: #2563eb;
+      --down-bg: #eff6ff;
+      --tier-low: #10b981;
+      --tier-mid: #3b82f6;
+      --tier-high: #8b5cf6;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* 버전 스위처 */
+    .version-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .version-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .version-link {
+      padding: 4px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .version-link.v1 { background: #334155; color: #cbd5e1; }
+    .version-link.v2 { background: #334155; color: #cbd5e1; }
+    .version-link.v3 { background: #334155; color: #cbd5e1; }
+    .version-link.v4 { background: #334155; color: #cbd5e1; }
+    .version-link.v5 { background: #334155; color: #cbd5e1; }
+    .version-link.v6 { background: #334155; color: #cbd5e1; }
+    .version-link.v7 { background: #334155; color: #cbd5e1; }
+    .version-link.v8 { background: var(--primary); color: #fff; font-weight: 800; }
+    .version-link:hover { opacity: 0.85; }
+
+    header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-area h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-area h1 span.badge {
+      font-size: 12px;
+      font-weight: 700;
+      background: #ecfdf5;
+      color: #059669;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(5, 150, 105, 0.3);
+    }
+
+    .brand-area p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* 실시간 지표 진단 배너 */
+    .diagnostic-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .diag-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .diag-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .diag-card .value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .diag-card .desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* 컨트롤 패널 */
+    .control-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .control-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preset-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover { background: #e2e8f0; }
+    .preset-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      margin: 16px 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .slider-box {
+      background: #f8fafc;
+      padding: 16px 20px;
+      border-radius: 10px;
+      border: 1px solid #edf2f7;
+    }
+
+    .slider-box.tier1-box { border-left: 4px solid var(--tier-low); }
+    .slider-box.tier2-box { border-left: 4px solid var(--tier-mid); }
+    .slider-box.tier3-box { border-left: 4px solid var(--tier-high); }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .slider-top label {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slider-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 4px;
+      background: #cbd5e1;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(255, 107, 24, 0.4);
+      transition: transform 0.1s;
+    }
+
+    .slider-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* 탭 네비게이션 */
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* 카드 */
+    .content-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 테이블 */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2) {
+      text-align: left;
+    }
+
+    tr:hover td { background: #fbfcfe; }
+
+    .tier-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .tier-badge.t1 { background: #ecfdf5; color: #059669; }
+    .tier-badge.t2 { background: #eff6ff; color: #2563eb; }
+    .tier-badge.t3 { background: #f5f3ff; color: #7c3aed; }
+
+    .pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    .pill-green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .pill-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .pill-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .pill-purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+    .val-down { color: var(--down-blue); font-weight: 700; }
+    .val-up { color: var(--up-red); font-weight: 700; }
+    .val-flat { color: var(--text-muted); }
+
+    /* 스토리텔링 전용 스타일 */
+    .story-hero {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 32px 40px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    }
+
+    .story-hero h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .story-hero p {
+      font-size: 15px;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    .trinity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .trinity-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .trinity-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+    }
+
+    .card-trend::before { background: #059669; }
+    .card-kospi::before { background: #2563eb; }
+    .card-fx::before { background: #d97706; }
+
+    .trinity-badge {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      width: fit-content;
+    }
+
+    .badge-trend { background: #ecfdf5; color: #059669; }
+    .badge-kospi { background: #eff6ff; color: #2563eb; }
+    .badge-fx { background: #fffbeb; color: #d97706; }
+
+    .trinity-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .trinity-meta {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .trinity-body {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.7;
+    }
+
+    .trinity-body b {
+      color: var(--text);
+    }
+
+    .quote-box {
+      background: #f8fafc;
+      border-left: 3px solid var(--primary);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #334155;
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    .user-journey-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .journey-step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .journey-step {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      position: relative;
+    }
+
+    .step-num {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 버전 스위처 -->
+  <div class="version-bar">
+    <div>🚀 MAKJI 가격 모델 버전 아카이브</div>
+    <div class="version-links">
+      <a href="./price-simulator-v1.html" class="version-link v1">v1 (원안 60:25:15)</a>
+      <a href="./price-simulator-v2.html" class="version-link v2">v2 (골든 웨이브 25:50:25)</a>
+      <a href="./price-simulator-v3.html" class="version-link v3">v3 (성분별 독립 한도)</a>
+      <a href="./price-simulator-v4.html" class="version-link v4">v4 (3단계 차등 캡 고정형)</a>
+      <a href="./price-simulator-v5.html" class="version-link v5">v5 (풀 컨트롤러)</a>
+      <a href="./price-simulator-v6.html" class="version-link v6">v6 (스토리텔링 완비)</a>
+      <a href="./price-simulator-v7.html" class="version-link v7">v7 (용어 표준화)</a>
+      <a href="./price-simulator-v8.html" class="version-link v8">v8 (수요·공급 2대 실물 지표 슬림화 완성형) ★</a>
+    </div>
+  </div>
+
+  <!-- 헤더 -->
+  <header>
+    <div class="brand-area">
+      <h1>
+        🍞 MAKJI 빵 시세 시뮬레이터
+        <span class="badge">v8.0 수요·공급 2대 실물 지표</span>
+      </h1>
+      <p>불필요한 코스피 제거! [수요] 네이버 검색 트렌드(0~-7%) + [공급] USD/KRW 환율(±3%) 2대 실물 지표 풀 시뮬레이터</p>
+    </div>
+    <div>
+      <a href="https://makji.kr/" target="_blank" style="padding: 8px 16px; background: #f1f5f9; color: var(--text); border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;">🔗 막지 공식몰 (makji.kr)</a>
+    </div>
+  </header>
+
+  <!-- 실시간 진단 지표 배너 -->
+  <div class="diagnostic-bar">
+    <div class="diag-card">
+      <div class="label">오늘 10종 평균 변동률</div>
+      <div class="value" id="diagAvgRate" style="color: #059669;">-0.0%</div>
+      <div class="desc">차등 캡 적용 후 실질 변동률</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">오늘 할인 적용 품목 수</div>
+      <div class="value" id="diagDiscountItems">0개 / 10개</div>
+      <div class="desc">정가보다 저렴해진 상품 수</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">차등 상하한 보호 발동</div>
+      <div class="value" id="diagCapHits" style="color: #7c3aed;">0개</div>
+      <div class="desc">구간별 한도에 걸려 보호된 품목 수</div>
+    </div>
+    <div class="diag-card">
+      <div class="label">전체 14일 할인 비율</div>
+      <div class="value" id="diag14dDiscountRatio">0.0%</div>
+      <div class="desc">14일 전체 중 할인일 빈도</div>
+    </div>
+  </div>
+
+  <!-- 메인 컨트롤러 패널 -->
+  <section class="control-panel">
+    <div class="control-header">
+      <div class="control-title">🎛️ 지표 성분 영향도 & 가격대별 차등 상하한선 실시간 조절기</div>
+      <div class="preset-group">
+        <button class="preset-btn active" onclick="applyV8Preset('standard')">👑 스탠다드 차등안 (트렌드할인-7% | 환율±3% | 캡 10/7/5%)</button>
+        <button class="preset-btn" onclick="applyV8Preset('dividend')">🎁 파격 트렌드형 (트렌드할인-9% | 환율±2% | 캡 12/8/5%)</button>
+        <button class="preset-btn" onclick="applyV8Preset('margin')">🛡️ 마진 철통보호형 (트렌드할인-4% | 환율±2% | 캡 8/5/3%)</button>
+        <button class="preset-btn" onclick="applyV8Preset('dynamic')">🏄 고변동 다이내믹형 (트렌드할인-7% | 환율±4% | 캡 12/10/7%)</button>
+      </div>
+    </div>
+
+    <!-- 섹션 1: 3대 지표 성분별 최대 영향폭 -->
+    <div class="section-title">📊 1. 수요·공급 2대 실물 지표 성분별 영향폭 조절</div>
+    <div class="slider-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+      <div class="slider-box">
+        <div class="slider-top">
+          <label>📉 [수요] NAVER 검색 트렌드 할인 한도 (Search Trend Discount)</label>
+          <span class="slider-val" id="valTrendCap" style="color: #059669;">-7.0%</span>
+        </div>
+        <input type="range" id="inputTrendCap" min="0" max="12" step="0.5" value="7" oninput="updateV8Simulation()">
+        <div class="slider-hint">검색량이 터질수록 고객에게 환원되는 팬덤 감사 할인폭 (0 ~ -X%)</div>
+      </div>
+      <div class="slider-box">
+        <div class="slider-top">
+          <label>💵 [공급] USD/KRW 환율 비용 압력 한도 (한국은행 ECOS API)</label>
+          <span class="slider-val" id="valFxCap" style="color: #d97706;">±3.0%</span>
+        </div>
+        <input type="range" id="inputFxCap" min="1.0" max="6.0" step="0.5" value="3.0" oninput="updateV8Simulation()">
+        <div class="slider-hint">수입 원자재(프랑스산 버터, 밀가루)의 실질 원가 변동 반영폭 (±X%)</div>
+      </div>
+    </div>
+    <!-- 섹션 2: 가격대별 3단계 차등 상하한선 -->
+    <div class="section-title">🛡️ 2. 가격대별 3단계 차등 상하한선 (Tiered Caps)</div>
+    <div class="slider-grid">
+      <div class="slider-box tier1-box">
+        <div class="slider-top">
+          <label>🟢 Tier 1: 1만원 미만 상품군 상하한선</label>
+          <span class="slider-val" id="valTier1Cap" style="color: #059669;">±10%</span>
+        </div>
+        <input type="range" id="inputTier1Cap" min="5" max="15" step="1" value="10" oninput="updateV8Simulation()">
+        <div class="slider-hint">대상: 머핀, 샌드위치, 휘낭시에, 스콘, 모닝롤 (체감 재미 극대화)</div>
+      </div>
+
+      <div class="slider-box tier2-box">
+        <div class="slider-top">
+          <label>🔵 Tier 2: 1만~2만원 미만 상품군 상하한선</label>
+          <span class="slider-val" id="valTier2Cap" style="color: #2563eb;">±7%</span>
+        </div>
+        <input type="range" id="inputTier2Cap" min="3" max="12" step="1" value="7" oninput="updateV8Simulation()">
+        <div class="slider-hint">대상: 테트리스 브레드, ZERO 카스테라, 티라미수 (적정 변동)</div>
+      </div>
+
+      <div class="slider-box tier3-box">
+        <div class="slider-top">
+          <label>🟣 Tier 3: 2만원 이상 상품군 상하한선</label>
+          <span class="slider-val" id="valTier3Cap" style="color: #7c3aed;">±5%</span>
+        </div>
+        <input type="range" id="inputTier3Cap" min="2" max="10" step="1" value="5" oninput="updateV8Simulation()">
+        <div class="slider-hint">대상: 냉동생지 3종, 마틸다 초코케이크 (마진 철통 방어)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 탭 네비게이션 -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('tab-story')">💡 3대 지표 도입 이유 & 스토리텔링</button>
+    <button class="tab-btn" onclick="switchTab('tab-today')">📋 오늘(D-Day) 10종 빵 성분 분해 & 차등 캡 시세표</button>
+    <button class="tab-btn" onclick="switchTab('tab-chart')">📈 14일간 제품별 가격 변동 추이 차트</button>
+    <button class="tab-btn" onclick="switchTab('tab-matrix')">📅 14일 전체 시계열 가격 매트릭스</button>
+  </div>
+
+  <!-- 탭 1: 3대 지표 도입 이유 & 스토리텔링 -->
+  <div id="tab-story" class="tab-pane active">
+    <!-- 히어로 배너 -->
+    <div class="story-hero">
+      <h2>🥐 왜 '검색량(수요)'과 '환율(공급)'인가? (빵 경제학 2대 기둥)</h2>
+      <p>
+        MAKJI 빵 시세는 인위적인 금융 증시(코스피) 연동을 과감히 걷어내고,<br>
+        <b>대중의 관심과 사랑(수요)</b>과 <b>베이커리 수입 원자재(공급)</b> 2대 실물 지표로만 정직하게 작동하는 <b>'수요·공급 빵 경제학'</b>입니다.
+      </p>
+    </div>
+    <div class="trinity-grid" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));">
+      <div class="trinity-card card-trend">
+        <span class="trinity-badge badge-trend">수요 (Demand) • 대중의 관심과 팬덤</span>
+        <div class="trinity-title">1. NAVER 검색트렌드 할인</div>
+        <div class="trinity-meta">"인기 폭발에 보답하는 '검색 트렌드 할인' (0% ~ -7%)"</div>
+        <div class="trinity-body">
+          • <b>왜 들어가는가?</b><br>
+          빵은 단순한 탄수화물이 아니라, 인스타그램과 유튜브에서 유행하는 <b>트렌드 소비재</b>입니다. 10종 제품마다 화제성이 제각각 다르기 때문에, 매일 '오늘의 핫 종목'을 만드는 핵심 엔진이 됩니다.<br><br>
+          • <b>역발상 고객 감사 스토리텔링:</b><br>
+          일반 커머스는 인기가 많아지면 가격을 올리지만, MAKJI는 <b>"우리 빵을 많이 찾아주신 고객들께 감사의 의미로 가격을 깎아드리는 '검색 트렌드 할인(트렌드 보너스)'을 제공한다"</b>는 감동적인 철학을 담았습니다.
+        </div>
+        <div class="quote-box">
+          🗣️ <i>"오늘 마틸다 초코케이크 검색량 1위 등극! 고객 감사 -5.88% 특별 검색 트렌드 할인 발동!"</i>
+        </div>
+      </div>
+      <div class="trinity-card card-fx">
+        <span class="trinity-badge badge-fx">공급 (Supply) • 리얼 원자재 원가 팩트</span>
+        <div class="trinity-title">2. USD/KRW 수입 환율</div>
+        <div class="trinity-meta">"수입 밀가루와 버터 원가와 직결된 '진짜 시장 팩트' (-3% ~ +3%)"</div>
+        <div class="trinity-body">
+          • <b>왜 들어가는가?</b><br>
+          베이커리의 핵심 원료(프랑스산 고메버터, 소맥, 초콜릿, 치즈)는 90% 이상 해외 수입에 의존합니다. 환율은 빵의 실제 제조 원가와 가장 밀접하게 맞닿은 <b>'진짜 원가 팩트'</b>입니다.<br><br>
+          • <b>정직한 원가 반영 스토리텔링:</b><br>
+          가짜 마케팅이 아니라, <b>"한국은행 공인 환율 데이터를 바탕으로 수입 원자재 비용 절감분을 오늘의 빵 시세에 정직하게 즉각 반영한다"</b>는 거래소의 정당성과 신뢰성을 부여합니다.
+        </div>
+        <div class="quote-box">
+          🗣️ <i>"원/달러 환율 1,338원 안정세! 수입 버터 원가 절감분을 오늘의 빵 시세에 정직하게 반영합니다."</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- 고객 경험 흐름 (User Journey) -->
+    <div class="user-journey-card">
+      <div class="card-title">🚀 고객이 매일 아침 앱을 켜며 겪는 감정 여정 (User Journey)</div>
+      <div class="journey-step-grid">
+        <div class="journey-step">
+          <div class="step-num">STEP 1 • 아침 9시</div>
+          <div class="step-title">증시 개장 & 계좌 확인</div>
+          <div class="step-desc">"오늘 출근길에 당 떨어지는데 마틸다 케이크 검색량 1위 떴네! 트렌드 할인 확인해볼까?"</div>
+        </div>
+        <div class="journey-step">
+          <div class="step-num">STEP 2 • 막지스닥 접속</div>
+          <div class="step-title">오늘의 빵 시세 확인</div>
+          <div class="step-desc">"환율 안정세에 검색 1위 트렌드 할인까지 더블로 붙어서 오늘 빵값이 엄청 싸졌네!"</div>
+        </div>
+        <div class="journey-step">
+          <div class="step-num">STEP 3 • 줍줍 구매 전환</div>
+          <div class="step-title">할인가 즉시 결제</div>
+          <div class="step-desc">42,000원짜리 케이크를 39,900원에 득템! "어차피 살 빵인데 오늘 완전 이득 봤다!"</div>
+        </div>
+        <div class="journey-step">
+          <div class="step-num">STEP 4 • 내일의 기대</div>
+          <div class="step-title">익일 시세 예측 참여</div>
+          <div class="step-desc">"내일은 환율 오를 것 같으니까 생지 미리 사둘까? 내일 시세 또 보러 와야지!"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 2: 오늘 시세표 -->
+  <div id="tab-today" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">🧾 성분별 기여도 분해 및 가격대별 차등 상하한선 적용 결과</div>
+        <span style="font-size: 13px; color: var(--text-muted);">
+        <span style="font-size: 13px; color: var(--text-muted);">
+          오늘 실물 지표: USD/KRW 환율 +0.65% (한국은행 ECOS 공공누리 제1유형 합법 연동)
+        </span>
+        </span>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>순번</th>
+              <th>제품명</th>
+              <th>기본가격</th>
+              <th>가격 구간</th>
+              <th>📉 검색 트렌드 할인</th>
+              <th>💵 환율 비용</th>
+              <th>성분 합산 변동률</th>
+              <th>해당 구간 상하한선</th>
+              <th>최종 적용 변동률</th>
+              <th>오늘 최종 시세</th>
+              <th>기본가 대비 변동액</th>
+              <th>상태 판정</th>
+            </tr>
+          </thead>
+          <tbody id="v8TodayTable">
+            <!-- JS 동적 렌더링 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 탭 3: 14일 추이 차트 -->
+  <div id="tab-chart" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">📊 14일간 일자별 가격 변동 흐름 (제품별 맞춤형 상하한 밴드)</div>
+        <div>
+          <label style="font-size: 13px; font-weight: 600; margin-right: 8px;">제품 선택:</label>
+          <select id="v6ProductSelect" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);" onchange="renderV8Chart()"></select>
+        </div>
+      </div>
+      <div style="height: 420px; position: relative;">
+        <canvas id="v6PriceChart"></canvas>
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px; text-align: center;">
+        * 초록색 실선: 최종 시세 | 회색 점선: 기본가격 | 붉은/푸른 점선: 슬라이더로 설정된 해당 제품 티어의 상·하한선 밴드
+      </p>
+    </div>
+  </div>
+
+  <!-- 탭 4: 14일 전체 매트릭스 -->
+  <div id="tab-matrix" class="tab-pane">
+    <div class="content-card">
+      <div class="card-header">
+        <div class="card-title">📅 14일간 10종 전 제품 일자별 정확한 시세표 (원)</div>
+        <span style="font-size: 12px; color: var(--text-muted);">슬라이더 조절 시 전체 14일치 가격이 실시간으로 재계산됩니다.</span>
+      </div>
+      <div class="table-container">
+        <table id="v6MatrixTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PRODUCTS = [
+      { id: 'p1', name: '비건 잉글리시 머핀', basePrice: 1500, tier: '1만원 미만', tierKey: 't1', tierClass: 't1' },
+      { id: 'p2', name: '대만식 샌드위치', basePrice: 2400, tier: '1만원 미만', tierKey: 't1', tierClass: 't1' },
+      { id: 'p3', name: '휘낭시에', basePrice: 3800, tier: '1만원 미만', tierKey: 't1', tierClass: 't1' },
+      { id: 'p4', name: '글루텐프리 스콘', basePrice: 3800, tier: '1만원 미만', tierKey: 't1', tierClass: 't1' },
+      { id: 'p5', name: '모닝롤', basePrice: 4500, tier: '1만원 미만', tierKey: 't1', tierClass: 't1' },
+      { id: 'p6', name: '테트리스 브레드', basePrice: 11000, tier: '1만~2만원', tierKey: 't2', tierClass: 't2' },
+      { id: 'p7', name: 'ZERO 카스테라', basePrice: 12000, tier: '1만~2만원', tierKey: 't2', tierClass: 't2' },
+      { id: 'p8', name: '티라미수', basePrice: 15000, tier: '1만~2만원', tierKey: 't2', tierClass: 't2' },
+      { id: 'p9', name: '냉동생지 3종', basePrice: 21000, tier: '2만원 이상', tierKey: 't3', tierClass: 't3' },
+      { id: 'p10', name: '마틸다 초코케이크', basePrice: 42000, tier: '2만원 이상', tierKey: 't3', tierClass: 't3' }
+    ];
+
+    const DATES = [
+      '8/27(수)', '8/28(목)', '8/29(금)', '8/30(토)', '8/31(일)',
+      '9/01(월)', '9/02(화)', '9/03(수)', '9/04(목)', '9/05(금)',
+      '9/06(토)', '9/07(일)', '9/08(월)', '9/09(오늘)'
+    ];
+
+    /* KOSPI removed in v8 */
+
+    const USD_CHANGES = [
+      -0.002, 0.005, -0.004, 0.0, 0.0,
+      0.009, 0.004, -0.003, -0.006, 0.002,
+      0.0, 0.0, -0.004, 0.0065
+    ];
+
+    const TREND_SCORES = {
+      p1: [0.4, 0.3, 0.6, 0.8, 0.7, 0.2, 0.5, 0.3, 0.6, 0.7, 0.8, 0.7, 0.4, 0.6],
+      p2: [0.3, 0.4, 0.3, 0.5, 0.5, 0.2, 0.3, 0.3, 0.4, 0.4, 0.6, 0.5, 0.3, 0.4],
+      p3: [0.6, 0.4, 0.8, 0.9, 0.8, 0.3, 0.7, 0.6, 0.5, 0.8, 0.9, 0.8, 0.5, 0.85],
+      p4: [0.5, 0.4, 0.5, 0.7, 0.7, 0.3, 0.4, 0.4, 0.5, 0.6, 0.8, 0.7, 0.4, 0.7],
+      p5: [0.3, 0.3, 0.2, 0.4, 0.4, 0.2, 0.3, 0.3, 0.3, 0.4, 0.5, 0.4, 0.3, 0.35],
+      p6: [0.6, 0.4, 0.6, 0.8, 0.8, 0.3, 0.5, 0.4, 0.6, 0.7, 0.9, 0.8, 0.5, 0.75],
+      p7: [0.7, 0.6, 0.5, 0.9, 0.9, 0.4, 0.7, 0.6, 0.6, 0.8, 0.95, 0.9, 0.6, 0.9],
+      p8: [0.5, 0.4, 0.6, 0.7, 0.7, 0.3, 0.5, 0.4, 0.5, 0.6, 0.8, 0.7, 0.4, 0.65],
+      p9: [0.4, 0.3, 0.4, 0.6, 0.6, 0.2, 0.4, 0.3, 0.4, 0.5, 0.7, 0.6, 0.4, 0.55],
+      p10: [0.8, 0.5, 0.9, 1.0, 0.95, 0.4, 0.8, 0.7, 0.6, 0.85, 1.0, 0.95, 0.6, 0.98]
+    };
+
+    const V8_PRESETS = {
+      standard: { trend: 7.0, fx: 3.0, tier1: 10, tier2: 7, tier3: 5 },
+      dividend: { trend: 9.0, fx: 2.0, tier1: 12, tier2: 8, tier3: 5 },
+      margin: { trend: 4.0, fx: 2.0, tier1: 8, tier2: 5, tier3: 3 },
+      dynamic: { trend: 7.0, fx: 4.0, tier1: 12, tier2: 10, tier3: 7 }
+    };
+    let v8State = {
+      maxTrendDividend: 0.07,
+      maxFxImpact: 0.03,
+      tier1Cap: 0.10,
+      tier2Cap: 0.07,
+      tier3Cap: 0.05,
+      rounding: 10,
+      selectedProductId: 'p3'
+    };
+    let v8ChartInstance = null;
+
+    function roundPrice(val, step) {
+      if (step === 0) return Math.round(val);
+      return Math.round(val / step) * step;
+    }
+
+    function getProductCap(prod) {
+      if (prod.tierKey === 't1') return v8State.tier1Cap;
+      if (prod.tierKey === 't2') return v8State.tier2Cap;
+      return v8State.tier3Cap;
+    }
+
+    function calculateV8ProductDay(prod, dayIdx) {
+      const trendScore = TREND_SCORES[prod.id][dayIdx];
+      const fxChange = USD_CHANGES[dayIdx];
+
+      const trendImpact = -1 * (trendScore * v8State.maxTrendDividend);
+
+      let fxImpact = fxChange * 3.0;
+      if (fxImpact > v8State.maxFxImpact) fxImpact = v8State.maxFxImpact;
+      if (fxImpact < -v8State.maxFxImpact) fxImpact = -v8State.maxFxImpact;
+
+      const rawTotalRate = trendImpact + fxImpact;
+
+      const cap = getProductCap(prod);
+      let finalRate = rawTotalRate;
+      let isCapped = false;
+      let capType = 'normal';
+
+      if (rawTotalRate > cap) {
+        finalRate = cap;
+        isCapped = true;
+        capType = 'upper';
+      } else if (rawTotalRate < -cap) {
+        finalRate = -cap;
+        isCapped = true;
+        capType = 'lower';
+      }
+
+      const finalPrice = roundPrice(prod.basePrice * (1 + finalRate), v8State.rounding);
+      const diffPrice = finalPrice - prod.basePrice;
+      const minPrice = roundPrice(prod.basePrice * (1 - cap), v8State.rounding);
+      const maxPrice = roundPrice(prod.basePrice * (1 + cap), v8State.rounding);
+
+      return {
+        trendScore,
+        trendImpact,
+        fxImpact,
+        rawTotalRate,
+        finalRate,
+        finalPrice,
+        diffPrice,
+        cap,
+        isCapped,
+        capType,
+        minPrice,
+        maxPrice
+      };
+    }
+    function updateV8Simulation() {
+      v8State.maxTrendDividend = parseFloat(document.getElementById('inputTrendCap').value) / 100;
+      v8State.maxFxImpact = parseFloat(document.getElementById('inputFxCap').value) / 100;
+      v8State.tier1Cap = parseFloat(document.getElementById('inputTier1Cap').value) / 100;
+      v8State.tier2Cap = parseFloat(document.getElementById('inputTier2Cap').value) / 100;
+      v8State.tier3Cap = parseFloat(document.getElementById('inputTier3Cap').value) / 100;
+
+      document.getElementById('valTrendCap').innerText = '-' + (v8State.maxTrendDividend * 100).toFixed(1) + '%';
+      document.getElementById('valFxCap').innerText = '±' + (v8State.maxFxImpact * 100).toFixed(1) + '%';
+      document.getElementById('valTier1Cap').innerText = '±' + (v8State.tier1Cap * 100).toFixed(0) + '%';
+      document.getElementById('valTier2Cap').innerText = '±' + (v8State.tier2Cap * 100).toFixed(0) + '%';
+      document.getElementById('valTier3Cap').innerText = '±' + (v8State.tier3Cap * 100).toFixed(0) + '%';
+
+      renderV8TodayTable();
+      calcV8Diagnostics();
+      renderV8Chart();
+      renderV8MatrixTable();
+    }
+
+    function applyV8Preset(name) {
+      const p = V8_PRESETS[name];
+      if (!p) return;
+
+      document.getElementById('inputTrendCap').value = p.trend;
+      document.getElementById('inputFxCap').value = p.fx;
+      document.getElementById('inputTier1Cap').value = p.tier1;
+      document.getElementById('inputTier2Cap').value = p.tier2;
+      document.getElementById('inputTier3Cap').value = p.tier3;
+
+      document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      updateV8Simulation();
+    }
+    function renderV8TodayTable() {
+      const tbody = document.getElementById('v8TodayTable');
+      tbody.innerHTML = '';
+      const dayIdx = 13;
+
+      PRODUCTS.forEach((p, idx) => {
+        const res = calculateV8ProductDay(p, dayIdx);
+        const tr = document.createElement('tr');
+
+        let capBadge = '<span class="pill pill-blue">정상 범위</span>';
+        if (res.isCapped) {
+          if (res.capType === 'lower') {
+            capBadge = `<span class="pill pill-purple">🛡️ -${(res.cap*100).toFixed(0)}% 하한 보호</span>`;
+          } else {
+            capBadge = `<span class="pill pill-red">🛡️ +${(res.cap*100).toFixed(0)}% 상한 제한</span>`;
+          }
+        }
+
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><b>${p.name}</b></td>
+          <td>${p.basePrice.toLocaleString()}원</td>
+          <td><span class="tier-badge ${p.tierClass}">${p.tier}</span></td>
+          <td style="color:#059669; font-weight:700;">${(res.trendImpact * 100).toFixed(2)}%</td>
+          <td style="color:${res.fxImpact > 0 ? '#ef4444' : '#2563eb'};">${res.fxImpact > 0 ? '+' : ''}${(res.fxImpact * 100).toFixed(2)}%</td>
+          <td style="color:#64748b;">${res.rawTotalRate > 0 ? '+' : ''}${(res.rawTotalRate * 100).toFixed(2)}%</td>
+          <td style="font-weight:700;">±${(res.cap * 100).toFixed(0)}%</td>
+          <td style="font-weight:800; color:${res.finalRate < 0 ? '#2563eb' : '#ef4444'};">
+            ${res.finalRate > 0 ? '+' : ''}${(res.finalRate * 100).toFixed(2)}%
+          </td>
+          <td style="font-size:15px; font-weight:800;">${res.finalPrice.toLocaleString()}원</td>
+          <td class="${res.diffPrice < 0 ? 'val-down' : (res.diffPrice > 0 ? 'val-up' : 'val-flat')}">
+            ${res.diffPrice > 0 ? '+' : ''}${res.diffPrice.toLocaleString()}원
+          </td>
+          <td>${capBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function calcV8Diagnostics() {
+      let todayDiscountCount = 0;
+      let todayCapHitCount = 0;
+      let todayRateSum = 0;
+
+      let total14dChecks = 0;
+      let total14dDiscounts = 0;
+
+      PRODUCTS.forEach(p => {
+        const resToday = calculateV8ProductDay(p, 13);
+        todayRateSum += resToday.finalRate;
+        if (resToday.finalRate < 0) todayDiscountCount++;
+        if (resToday.isCapped) todayCapHitCount++;
+
+        for (let d = 0; d < 14; d++) {
+          total14dChecks++;
+          const res = calculateV8ProductDay(p, d);
+          if (res.finalRate < 0) total14dDiscounts++;
+        }
+      });
+
+      document.getElementById('diagAvgRate').innerText = (todayRateSum / PRODUCTS.length * 100).toFixed(2) + '%';
+      document.getElementById('diagDiscountItems').innerText = `${todayDiscountCount}개 / 10개`;
+      document.getElementById('diagCapHits').innerText = `${todayCapHitCount}개 품목`;
+      document.getElementById('diag14dDiscountRatio').innerText = ((total14dDiscounts / total14dChecks) * 100).toFixed(1) + '%';
+    }
+
+    function renderV8Chart() {
+      const prodId = document.getElementById('v6ProductSelect').value || 'p3';
+      const prod = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[2];
+
+      const prices = [];
+      const basePrices = [];
+      const lowerCap = [];
+      const upperCap = [];
+
+      for (let d = 0; d < 14; d++) {
+        const res = calculateV8ProductDay(prod, d);
+        prices.push(res.finalPrice);
+        basePrices.push(prod.basePrice);
+        lowerCap.push(res.minPrice);
+        upperCap.push(res.maxPrice);
+      }
+
+      const ctx = document.getElementById('v6PriceChart').getContext('2d');
+      if (v8ChartInstance) v8ChartInstance.destroy();
+
+      const cap = getProductCap(prod);
+
+      v8ChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: DATES,
+          datasets: [
+            {
+              label: '오늘 최종 시세 (원)',
+              data: prices,
+              borderColor: '#059669',
+              backgroundColor: 'rgba(5, 150, 105, 0.1)',
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 5,
+              pointBackgroundColor: '#059669',
+              zIndex: 10
+            },
+            {
+              label: '기본가격 (정상가)',
+              data: basePrices,
+              borderColor: '#94a3b8',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0
+            },
+            {
+              label: `${prod.tier} 상한선 (+${(cap * 100).toFixed(0)}%)`,
+              data: upperCap,
+              borderColor: 'rgba(239, 68, 68, 0.5)',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              pointRadius: 0
+            },
+            {
+              label: `${prod.tier} 하한선 (-${(cap * 100).toFixed(0)}%)`,
+              data: lowerCap,
+              borderColor: 'rgba(37, 99, 235, 0.5)',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Pretendard' } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString() + '원',
+                afterBody: contexts => {
+                  const dIdx = contexts[0].dataIndex;
+                  const res = calculateV8ProductDay(prod, dIdx);
+                  return [
+                    '------------------',
+                    `• 📉 검색 트렌드 할인: ${(res.trendImpact * 100).toFixed(2)}%`,
+                    `• 💵 환율 비용: ${(res.fxImpact * 100).toFixed(2)}%`,
+                    `• 합산 변동률: ${(res.rawTotalRate * 100).toFixed(2)}%`,
+                    `• 최종 적용: ${(res.finalRate * 100).toFixed(2)}% ${res.isCapped ? '(' + res.capType + '선 캡)' : ''}`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: { callback: val => val.toLocaleString() + '원' },
+              grid: { color: '#f1f5f9' }
+            },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderV8MatrixTable() {
+      const table = document.getElementById('v6MatrixTable');
+      table.innerHTML = '';
+
+      let theadHtml = '<thead><tr><th>제품명</th><th>기본가</th><th>구간 / 상하한</th>';
+      DATES.forEach(d => { theadHtml += `<th>${d}</th>`; });
+      theadHtml += '</tr></thead>';
+
+      let tbodyHtml = '<tbody>';
+      PRODUCTS.forEach(p => {
+        const cap = getProductCap(p);
+        tbodyHtml += `<tr><td><b>${p.name}</b></td><td style="color:var(--text-muted);">${p.basePrice.toLocaleString()}원</td><td><span class="tier-badge ${p.tierClass}">${p.tier} (±${(cap*100).toFixed(0)}%)</span></td>`;
+        for (let d = 0; d < 14; d++) {
+          const res = calculateV8ProductDay(p, d);
+          let color = res.diffPrice < 0 ? '#2563eb' : (res.diffPrice > 0 ? '#ef4444' : 'inherit');
+          tbodyHtml += `
+            <td style="color:${color};">
+              <b>${res.finalPrice.toLocaleString()}원</b><br>
+              <span style="font-size:11px; opacity:0.8;">${(res.finalRate * 100).toFixed(1)}%</span>
+            </td>
+          `;
+        }
+        tbodyHtml += '</tr>';
+      });
+      tbodyHtml += '</tbody>';
+      table.innerHTML = theadHtml + tbodyHtml;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      if (tabId === 'tab-chart') renderV8Chart();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const select = document.getElementById('v6ProductSelect');
+      PRODUCTS.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.innerText = `${p.name} (${p.basePrice.toLocaleString()}원 | ${p.tier})`;
+        select.appendChild(opt);
+      });
+      select.value = 'p3';
+      updateV8Simulation();
+    });
+  </script>
+</body>
+</html>

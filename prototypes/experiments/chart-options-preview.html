@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BREAD-DAQ 3대 차트 옵션 시각화 비교 뷰어</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #ff6b18;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --border: #e2e8f0;
+      --toss-red: #ef4444;
+      --toss-blue: #3182f6;
+      --green-benefit: #10b981;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+      background: var(--surface);
+      padding: 24px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-top: 6px;
+    }
+
+    /* 상단 옵션 전환 탭 3선 */
+    .option-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .opt-tab-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .opt-tab-btn:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+    }
+
+    .opt-tab-btn.active {
+      border-color: var(--primary);
+      background: #fff7ed;
+      box-shadow: 0 4px 15px rgba(255, 107, 24, 0.15);
+    }
+
+    .opt-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .badge-opt1 { background: #fee2e2; color: #b91c1c; }
+    .badge-opt2 { background: #eff6ff; color: #1e40af; }
+    .badge-opt3 { background: #ecfdf5; color: #047857; }
+
+    .opt-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .opt-desc {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.4;
+    }
+
+    /* 메인 시각화 카드 */
+    .chart-display-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+      margin-bottom: 24px;
+    }
+
+    .chart-info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .prod-meta h2 {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .prod-price-box {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .current-price {
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .price-diff {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .chart-container-box {
+      height: 380px;
+      position: relative;
+      margin: 16px 0;
+    }
+
+    /* 하단 평가 및 특징 요약 박스 */
+    .evaluation-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .eval-box {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+
+    .eval-box h4 {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .eval-box ul {
+      padding-left: 18px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📈 BREAD-DAQ 3대 차트 옵션 시각화 비교</h1>
+    <p class="subtitle">
+      "하루 1회(09:00) 시세 확정" 특성에 가장 어울리는 인터랙티브 차트 형태를 직접 비교해보세요.
+    </p>
+  </header>
+
+  <!-- 3대 옵션 탭 버튼 -->
+  <div class="option-tabs">
+    <!-- 옵션 1 -->
+    <div class="opt-tab-btn active" onclick="switchChartOption(1, this)">
+      <span class="opt-badge badge-opt1">옵션 1 • 추천 ★★★★★</span>
+      <div class="opt-title">토스 간편 라인 차트</div>
+      <div class="opt-desc">
+        부드러운 스플라인 라인 + 양봉(빨강)/음봉(파랑) 테마 그라데이션. 모바일 가독성 극대화.
+      </div>
+    </div>
+
+    <!-- 옵션 2 -->
+    <div class="opt-tab-btn" onclick="switchChartOption(2, this)">
+      <span class="opt-badge badge-opt2">옵션 2 • 전문 증권형</span>
+      <div class="opt-title">정통 일봉 캔들스틱 + MA5</div>
+      <div class="opt-desc">
+        HTS/MTS 주식 스타일. 14일간의 양봉/음봉 캔들 막대와 5일 이동평균선(MA5) 오버레이.
+      </div>
+    </div>
+
+    <!-- 옵션 3 -->
+    <div class="opt-tab-btn" onclick="switchChartOption(3, this)">
+      <span class="opt-badge badge-opt3">옵션 3 • 커머스 혜택형</span>
+      <div class="opt-title">정가 대비 혜택 밴드 차트</div>
+      <div class="opt-desc">
+        고정 정가 기준선(점선)과 일별 시세 사이의 '할인 혜택 영역'을 시각화하여 구매 자극.
+      </div>
+    </div>
+  </div>
+
+  <!-- 차트 렌더링 카드 -->
+  <div class="chart-display-card">
+    <div class="chart-info-header">
+      <div class="prod-meta">
+        <span style="font-size:11px; font-weight:800; color:#e11d48; background:#fff1f2; padding:3px 8px; border-radius:6px;">
+          🔥 오늘의 인기 대장주 (Tier 3)
+        </span>
+        <h2>마틸다 초코케이크 (42,000원 정가)</h2>
+        <div class="prod-price-box">
+          <span class="current-price" id="displayPrice" style="color:var(--toss-red);">44,000원</span>
+          <span class="price-diff" id="displayDiff" style="color:var(--toss-red);">▲ +2,000원 (+4.75%)</span>
+          <span style="font-size:12px; color:var(--text-sub); margin-left:6px;">오늘 아침 9시 확정 시세</span>
+        </div>
+      </div>
+
+      <div style="text-align:right;">
+        <span style="font-size:12px; font-weight:700; color:var(--text-sub);">차트 모드:</span>
+        <strong id="activeModeLabel" style="font-size:13px; color:var(--primary); display:block;">
+          토스 간편 라인 차트 (상승 테마)
+        </strong>
+      </div>
+    </div>
+
+    <!-- 캔버스 영역 -->
+    <div class="chart-container-box">
+      <canvas id="comparisonChartCanvas"></canvas>
+    </div>
+
+    <!-- 특징 및 평가 요약 그리드 -->
+    <div class="evaluation-grid">
+      <div class="eval-box">
+        <h4 id="evalStrongTitle">✨ 이 차트의 핵심 강점</h4>
+        <ul id="evalStrongList">
+          <li>복잡한 지표 없이 스마트폰 화면에서 1초 만에 가격 흐름 파악 가능</li>
+          <li>토스증권 고유의 힙하고 젊은 감성으로 2030 디저트 고객에게 가장 친숙함</li>
+          <li>오늘 상승(빨간색) vs 하락(파란색) 테마가 전광판과 완벽히 연동됨</li>
+        </ul>
+      </div>
+      <div class="eval-box">
+        <h4 id="evalWeakTitle">⚠️ 실무적 고려사항 & 적합성</h4>
+        <ul id="evalWeakList">
+          <li>하루 1회 갱신되는 빵 시세 특성에 완벽히 부합 (불필요한 노이즈 제거)</li>
+          <li>모바일 터치 인터랙션(툴팁, 날짜별 가격 확인)이 가장 부드럽고 쾌적함</li>
+          <li><b>추천도:</b> 상용 커머스 및 일반 고객 대상 1순위 추천</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 14일 시계열 데이터 (마틸다 초코케이크: 기본가 42,000원)
+    const DATES = ['D-13', 'D-12', 'D-11', 'D-10', 'D-9', 'D-8', 'D-7', 'D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', '오늘'];
+    const CLOSES = [42840, 43260, 41580, 41160, 42420, 43680, 43050, 42210, 41370, 42630, 43470, 42420, 41790, 44000];
+    const BASE_PRICE = 42000;
+    const BASE_LINE = Array(14).fill(BASE_PRICE);
+
+    // 캔들스틱 가상 데이터 (시가, 고가, 저가, 종가)
+    const OPENS =  [42500, 42900, 42400, 41800, 41200, 42500, 43700, 42800, 42000, 41500, 42700, 43200, 42300, 42000];
+    const HIGHS =  [43000, 43500, 42600, 42000, 42600, 43900, 43800, 43100, 42300, 42800, 43700, 43500, 42600, 44100];
+    const LOWS =   [42300, 42700, 41400, 41000, 41000, 42300, 42900, 42000, 41200, 41300, 42500, 42200, 41600, 41800];
+
+    // 5일 이동평균선(MA5) 계산
+    const MA5 = [];
+    for (let i = 0; i < CLOSES.length; i++) {
+      if (i < 4) {
+        MA5.push(null);
+      } else {
+        const sum = CLOSES[i] + CLOSES[i-1] + CLOSES[i-2] + CLOSES[i-3] + CLOSES[i-4];
+        MA5.push(Math.round(sum / 5));
+      }
+    }
+
+    let chartInstance = null;
+    let currentOption = 1;
+
+    function renderChart(option) {
+      const ctx = document.getElementById('comparisonChartCanvas').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      if (option === 1) {
+        // [옵션 1] 토스 간편 라인 차트 (Spline Line + Fill)
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: DATES,
+            datasets: [
+              {
+                label: '마틸다 케이크 시세 (원)',
+                data: CLOSES,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                borderWidth: 3,
+                tension: 0.35,
+                fill: true,
+                pointRadius: (c) => c.dataIndex === 13 ? 7 : 3,
+                pointBackgroundColor: (c) => c.dataIndex === 13 ? '#ef4444' : '#f87171',
+                pointHoverRadius: 8
+              },
+              {
+                label: '기본정가 (42,000원)',
+                data: BASE_LINE,
+                borderColor: '#94a3b8',
+                borderWidth: 1.5,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { position: 'top', labels: { boxWidth: 12, font: { weight: '700' } } },
+              tooltip: {
+                callbacks: {
+                  label: (c) => ` ${c.dataset.label}: ${c.raw.toLocaleString()}원`
+                }
+              }
+            },
+            scales: {
+              x: { grid: { display: false } },
+              y: {
+                ticks: { callback: (v) => v.toLocaleString() + '원' },
+                grid: { color: '#f1f5f9' }
+              }
+            }
+          }
+        });
+      }
+      else if (option === 2) {
+        // [옵션 2] 정통 일봉 캔들스틱 (Chart.js Bar를 활용한 양봉/음봉 시뮬레이션 + MA5 선)
+        // Bar dataset: [open, close] 플로팅 막대 + MA5 Line
+        const candleColors = [];
+        const candleBorders = [];
+        const barData = [];
+
+        for (let i = 0; i < 14; i++) {
+          const isUp = CLOSES[i] >= OPENS[i];
+          candleColors.push(isUp ? 'rgba(239, 68, 68, 0.85)' : 'rgba(49, 130, 246, 0.85)');
+          candleBorders.push(isUp ? '#dc2626' : '#2563eb');
+          // floating bar [min, max]
+          const bottom = Math.min(OPENS[i], CLOSES[i]);
+          const top = Math.max(OPENS[i], CLOSES[i]);
+          barData.push([bottom, top]);
+        }
+
+        chartInstance = new Chart(ctx, {
+          data: {
+            labels: DATES,
+            datasets: [
+              {
+                type: 'line',
+                label: '5일 이동평균선 (MA5)',
+                data: MA5,
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.2
+              },
+              {
+                type: 'bar',
+                label: '일봉 캔들 (시가 ➔ 종가)',
+                data: barData,
+                backgroundColor: candleColors,
+                borderColor: candleBorders,
+                borderWidth: 1.5,
+                barPercentage: 0.45
+              },
+              {
+                type: 'line',
+                label: '기본정가 (42,000원)',
+                data: BASE_LINE,
+                borderColor: '#94a3b8',
+                borderWidth: 1.5,
+                borderDash: [5, 5],
+                pointRadius: 0
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { position: 'top', labels: { boxWidth: 12, font: { weight: '700' } } },
+              tooltip: {
+                callbacks: {
+                  label: (c) => {
+                    const idx = c.dataIndex;
+                    if (c.dataset.type === 'bar') {
+                      return ` 시가: ${OPENS[idx].toLocaleString()}원 | 종가: ${CLOSES[idx].toLocaleString()}원 (고가: ${HIGHS[idx].toLocaleString()}원 / 저가: ${LOWS[idx].toLocaleString()}원)`;
+                    }
+                    if (c.raw) return ` ${c.dataset.label}: ${c.raw.toLocaleString()}원`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { grid: { display: false } },
+              y: {
+                ticks: { callback: (v) => v.toLocaleString() + '원' },
+                grid: { color: '#f1f5f9' }
+              }
+            }
+          }
+        });
+      }
+      else if (option === 3) {
+        // [옵션 3] 정가 대비 혜택 밴드 차트 (Discount Benefit Band)
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: DATES,
+            datasets: [
+              {
+                label: '고정 기본정가 (기준선)',
+                data: BASE_LINE,
+                borderColor: '#64748b',
+                borderWidth: 2,
+                borderDash: [4, 4],
+                pointRadius: 0,
+                fill: false
+              },
+              {
+                label: '일별 실제 구매 시세 (원)',
+                data: CLOSES,
+                borderColor: '#ff6b18',
+                backgroundColor: 'rgba(255, 107, 24, 0.15)',
+                borderWidth: 3,
+                tension: 0.3,
+                fill: '-1', // 기준선과의 사이 영역을 혜택 밴드로 채움!
+                pointRadius: 4,
+                pointBackgroundColor: '#ff6b18'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { position: 'top', labels: { boxWidth: 12, font: { weight: '700' } } },
+              tooltip: {
+                callbacks: {
+                  afterLabel: (c) => {
+                    if (c.datasetIndex === 1) {
+                      const diff = c.raw - BASE_PRICE;
+                      return diff <= 0 
+                        ? ` 🎁 정가 대비 할인 혜택: ${Math.abs(diff).toLocaleString()}원 절약!`
+                        : ` 🔥 수급 프리미엄: +${diff.toLocaleString()}원 (쿠폰으로 상쇄 가능)`;
+                    }
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { grid: { display: false } },
+              y: {
+                ticks: { callback: (v) => v.toLocaleString() + '원' },
+                grid: { color: '#f1f5f9' }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    function switchChartOption(opt, btn) {
+      currentOption = opt;
+      document.querySelectorAll('.opt-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const modeLabel = document.getElementById('activeModeLabel');
+      const strongTitle = document.getElementById('evalStrongTitle');
+      const strongList = document.getElementById('evalStrongList');
+      const weakTitle = document.getElementById('evalWeakTitle');
+      const weakList = document.getElementById('evalWeakList');
+
+      if (opt === 1) {
+        modeLabel.innerText = '옵션 1: 토스 간편 라인 차트 (직관형)';
+        strongTitle.innerText = '✨ 옵션 1 핵심 강점';
+        strongList.innerHTML = `
+          <li>복잡한 지표 없이 스마트폰 화면에서 1초 만에 가격 흐름 파악 가능</li>
+          <li>토스증권 고유의 힙하고 젊은 감성으로 2030 디저트 고객에게 가장 친숙함</li>
+          <li>오늘 상승(빨간색) vs 하락(파란색) 테마가 전광판과 완벽히 연동됨</li>
+        `;
+        weakTitle.innerText = '🎯 추천도 및 적합성';
+        weakList.innerHTML = `
+          <li>하루 1회 갱신되는 빵 시세 특성에 완벽히 부합 (불필요한 노이즈 제거)</li>
+          <li>모바일 터치 인터랙션(툴팁, 날짜별 가격 확인)이 가장 부드럽고 쾌적함</li>
+          <li><b>최종 평가:</b> 상용 서비스 및 대중 고객 타깃으로 압도적 1순위 추천</li>
+        `;
+      } else if (opt === 2) {
+        modeLabel.innerText = '옵션 2: 정통 일봉 캔들스틱 차트 (전문 증권형)';
+        strongTitle.innerText = '✨ 옵션 2 핵심 강점';
+        strongList.innerHTML = `
+          <li>빨간색/파란색 캔들 막대와 이동평균선(MA5)으로 "진짜 주식 거래소" 느낌 극대화</li>
+          <li>금융 투자나 코인에 익숙한 고객에게 시각적 만족도와 도파민 제공</li>
+          <li>BREAD-DAQ 거래소 콘셉트의 시각적 진정성(Verisimilitude) 최고 수준</li>
+        `;
+        weakTitle.innerText = '⚠️ 실무적 고려사항';
+        weakList.innerHTML = `
+          <li>하루 1회만 가격이 바뀌므로 장중 고가/저가의 개념이 다소 인위적일 수 있음</li>
+          <li>모바일 좁은 화면에서 캔들 막대가 다소 빽빽하게 느껴질 수 있음</li>
+          <li><b>최종 평가:</b> 주식 콘셉트의 시각적 쇼맨십을 최우선시할 때 추천</li>
+        `;
+      } else if (opt === 3) {
+        modeLabel.innerText = '옵션 3: 정가 대비 혜택 밴드 차트 (커머스 혜택형)';
+        strongTitle.innerText = '✨ 옵션 3 핵심 강점';
+        strongList.innerHTML = `
+          <li>고정된 정가(42,000원) 대비 오늘 내가 얼마를 아꼈는지(초록빛 밴드) 직관적 시각화</li>
+          <li>금융의 복잡함보다는 "오늘 안 사면 손해"라는 커머스 할인 혜택을 직접적으로 강조</li>
+          <li>주식 초보자도 1초 만에 "아, 지금 사면 이만큼 이득이구나!" 이해 완료</li>
+        `;
+        weakTitle.innerText = '⚠️ 실무적 고려사항';
+        weakList.innerHTML = `
+          <li>주식/증권 특유의 캔들/라인 차트 감성은 상대적으로 다소 약해짐</li>
+          <li>인기 폭발로 정가보다 올랐을 때는 밴드 영역의 설명이 복잡해질 수 있음</li>
+          <li><b>최종 평가:</b> 구매 전환율(Conversion Rate)과 실속 혜택을 최우선할 때 추천</li>
+        `;
+      }
+
+      renderChart(opt);
+    }
+
+    window.onload = () => {
+      renderChart(1);
+    };
+  </script>
+</body>
+</html>

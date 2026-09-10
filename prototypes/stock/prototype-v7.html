@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MAKJI STOCK (막지스톡) v7 | 양방향 트렌드(±5%) & 5상승 5하락 진짜 주식 거래소</title>
+  <!-- 폰트 & Chart.js CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    /* 식빵 마우스 커서 */
+    :root {
+      --bread-cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M7 11C7 7.5 9.5 5 13 5C14.5 5 15.5 5.7 16 6.5C16.5 5.7 17.5 5 19 5C22.5 5 25 7.5 25 11C26 12 26.5 13.5 26.5 15.5C26.5 21 24.5 26 23 27C21.5 27 9.5 27 8.5 26C7 24.5 5.5 20.5 5.5 15.5C5.5 13.5 6 12 7 11Z" fill="%23d97706" stroke="%2378350f" stroke-width="1.5"/><path d="M9 13C9 9 11 7.5 13.5 7.5C14.8 7.5 15.5 8.2 16 9C16.5 8.2 17.2 7.5 18.5 7.5C21 7.5 23 9 23 13C24 14.5 24.5 16.5 24.5 20C24.5 23.5 23 24.5 21.5 24.5H10.5C9 24.5 7.5 23.5 7.5 20C7.5 16.5 8 14.5 9 13Z" fill="%23fef3c7"/><circle cx="12.5" cy="15.5" r="1.2" fill="%2378350f"/><circle cx="19.5" cy="15.5" r="1.2" fill="%2378350f"/><path d="M14.5 18C15 19 17 19 17.5 18" stroke="%23b45309" stroke-width="1.2" stroke-linecap="round"/><ellipse cx="10" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/><ellipse cx="22" cy="17" rx="1.5" ry="0.8" fill="%23fca5a5" opacity="0.8"/></svg>') 12 12, auto;
+      
+      --bg-cream: #fbf9f5;
+      --card-bg: #ffffff;
+      --primary: #ff6b18;
+      --primary-hover: #ea580c;
+      --butter-yellow: #fef3c7;
+      --butter-border: #fde68a;
+      --toast-brown: #d97706;
+      --crust-dark: #78350f;
+      --text-main: #191f28;
+      --text-sub: #4e5968;
+      --text-muted: #8b95a1;
+      --toss-red: #f04452;
+      --toss-blue: #3182f6;
+      --toss-bg-red: #fdedef;
+      --toss-bg-blue: #e8f3ff;
+      --card-shadow: 0 10px 25px -3px rgba(217, 119, 6, 0.07), 0 4px 6px -2px rgba(217, 119, 6, 0.03);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      cursor: var(--bread-cursor) !important;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: #f1ece4;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* 모바일 반응형 뷰포트 (PC 중앙 폰 목업, 모바일 100% 핏) */
+    .app-viewport {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-cream);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    /* 상단 헤더 */
+    .app-header {
+      padding: 14px 20px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f2ede4;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--crust-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-logo span.badge {
+      font-size: 10px;
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 2px 7px;
+      border-radius: 12px;
+      border: 1px solid #fca5a5;
+      font-weight: 800;
+    }
+
+    .user-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      background: #f8fafc;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* 종합 전광판 티커 */
+    .market-ticker-bar {
+      background: #fffbeb;
+      border-bottom: 1px solid #fde68a;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-scroll {
+      display: inline-block;
+      animation: tickerLoop 24s linear infinite;
+    }
+
+    @keyframes tickerLoop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* 탭 네비게이션 컨테이너 */
+    .main-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px calc(76px + env(safe-area-inset-bottom));
+      scroll-behavior: smooth;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 하단 네비게이션 바 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-top: 1px solid #f1ece4;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 10px 12px max(14px, env(safe-area-inset-bottom));
+      z-index: 50;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.03);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 11px;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+
+    .nav-item .nav-icon {
+      font-size: 21px;
+      transition: transform 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active .nav-icon {
+      transform: scale(1.15);
+    }
+
+    /* 공통 카드 */
+    .cute-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #f5ede2;
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 버튼 공통 */
+    .btn-cute {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      font-size: 14px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(255, 107, 24, 0.25);
+      transition: all 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-cute:active {
+      transform: scale(0.97);
+    }
+
+    /* ---------------------------------------------------- */
+    /* 1. 홈 화면 (Home) */
+    /* ---------------------------------------------------- */
+    .market-status-box {
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+      border: 1.5px solid #fed7aa;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+
+    .market-status-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--toast-brown);
+    }
+
+    .index-large {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 6px 0 2px;
+      color: var(--crust-dark);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .index-diff {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--toss-red);
+    }
+
+    /* 전광판 요약 스트립 */
+    .board-summary-strip {
+      display: flex;
+      justify-content: space-between;
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* 내일의 빵 예측 퀴즈 */
+    .predict-box {
+      background: #ffffff;
+      border: 2px dashed #fed7aa;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .predict-tag {
+      display: inline-block;
+      background: #ffedd5;
+      color: #ea580c;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .predict-target-bread {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .predict-hint {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+    }
+
+    .predict-choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .predict-btn {
+      padding: 14px 10px;
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .predict-btn.up {
+      background: var(--toss-bg-red);
+      color: var(--toss-red);
+      border-color: #fecaca;
+    }
+
+    .predict-btn.down {
+      background: var(--toss-bg-blue);
+      color: var(--toss-blue);
+      border-color: #bfdbfe;
+    }
+
+    .predict-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* 뉴스레터 카드 */
+    .newsletter-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid #f5ede2;
+    }
+
+    .newsletter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3ece4;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .newsletter-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .newsletter-tag {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #475569;
+      white-space: nowrap;
+      margin-top: 1px;
+    }
+
+    .newsletter-title {
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 2. 마켓 화면 (Bread Market & Toss Style 차트) */
+    /* ---------------------------------------------------- */
+    .market-control-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      background: #ffffff;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid #f0e6da;
+    }
+
+    .market-tab-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .market-filter-btn {
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .market-filter-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* TOP 1 대형 히어로 카드 */
+    .top1-hero-card {
+      background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+      border: 2px solid #fecdd3;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .top1-badge {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: #e11d48;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+
+    .top1-name {
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--crust-dark);
+      margin-bottom: 2px;
+    }
+
+    .top1-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .top1-price {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    .top1-diff {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--toss-red);
+    }
+
+    /* 10종 리스트 아이템 */
+    .bread-stock-item {
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #f3ece4;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .bread-stock-item:active {
+      transform: scale(0.98);
+      background: #fffcf8;
+    }
+
+    .item-tier-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-top: 3px;
+    }
+
+    .tier-t1 { background: #ecfdf5; color: #059669; }
+    .tier-t2 { background: #eff6ff; color: #2563eb; }
+    .tier-t3 { background: #f5f3ff; color: #7c3aed; }
+
+    .item-rate-badge {
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-block;
+    }
+
+    .rate-up { color: var(--toss-red); }
+    .rate-down { color: var(--toss-blue); }
+
+    /* 토스증권 스타일 바텀시트 모달 */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .modal-overlay.open {
+      display: block;
+      opacity: 1;
+    }
+
+    .toss-bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-radius: 28px 28px 0 0;
+      padding: 20px 24px max(24px, env(safe-area-inset-bottom));
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+      z-index: 200;
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .toss-bottom-sheet.open {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #e5e8eb;
+      border-radius: 2px;
+      margin: 0 auto 16px;
+      cursor: pointer;
+    }
+
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .sheet-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+
+    .sheet-price {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 4px 0 2px;
+    }
+
+    /* 퀴즈 500원 쿠폰 적용 스위치 박스 */
+    .coupon-switch-card {
+      background: #fffbeb;
+      border: 1.5px solid #fde68a;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .coupon-switch-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .coupon-switch-left .c-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .coupon-switch-left .c-sub {
+      font-size: 11px;
+      color: #b45309;
+    }
+
+    .coupon-toggle-btn {
+      background: #ea580c;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .coupon-toggle-btn.applied {
+      background: #10b981;
+    }
+
+    /* 토스 기간 선택 탭 */
+    .toss-period-tabs {
+      display: flex;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .period-btn {
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      background: #f2f4f6;
+      color: #6b7684;
+      cursor: pointer;
+    }
+
+    .period-btn.active {
+      background: #333d4b;
+      color: #ffffff;
+    }
+
+    /* ---------------------------------------------------- */
+    /* 3. 이벤트 화면 (Events & Games) */
+    /* ---------------------------------------------------- */
+    .game-section-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 22px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1.5px solid #f1ece4;
+      text-align: center;
+    }
+
+    .game-badge {
+      display: inline-block;
+      background: var(--butter-yellow);
+      color: var(--toast-brown);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+
+    .slice-game-stage {
+      position: relative;
+      height: 140px;
+      background: #fdfaf6;
+      border: 2px dashed #fcd34d;
+      border-radius: var(--radius-md);
+      margin: 16px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .knife-gauge-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--toss-red);
+      box-shadow: 0 0 8px var(--toss-red);
+      border-radius: 2px;
+      left: 10%;
+    }
+
+    .golden-center-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      background: rgba(16, 185, 129, 0.2);
+      border-left: 2px dashed #10b981;
+      border-right: 2px dashed #10b981;
+    }
+
+    /* 뉴스레터 30초 리더 모달 */
+    .newsletter-modal-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 390px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 24px 20px;
+      z-index: 210;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+
+    .modal-close-x {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      border: none;
+      background: #f1f5f9;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .nl-modal-tabs {
+      display: flex;
+      gap: 6px;
+      margin: 14px 0 12px;
+      background: #f8fafc;
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .nl-tab-btn {
+      flex: 1;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      border: none;
+      background: none;
+      border-radius: 8px;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .nl-tab-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .nl-article-view {
+      display: none;
+      text-align: left;
+    }
+
+    .nl-article-view.active {
+      display: block;
+    }
+
+    .nl-article-headline {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--text-main);
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .nl-analogy-box {
+      background: #fefce8;
+      border-left: 3px solid #eab308;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #713f12;
+      margin-bottom: 10px;
+      line-height: 1.4;
+      display: flex;
+      gap: 6px;
+    }
+
+    .nl-story-text {
+      font-size: 12.5px;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .toast-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 300;
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toast-popup.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast-popup" id="toastPopup">
+    <span>🍞</span> <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <div class="app-viewport">
+    
+    <!-- 상단 헤더 -->
+    <header class="app-header">
+      <div class="brand-logo">
+        <span>🥐 MAKJI STOCK</span>
+        <span class="badge">v7 5:5 거래소</span>
+      </div>
+      <div class="user-pill">
+        <span>🪙 보유 빵머니:</span>
+        <b style="color:var(--primary);" id="userPoints">1,500P</b>
+      </div>
+    </header>
+
+    <!-- 실시간 전광판 롤링 티커 -->
+    <div class="market-ticker-bar">
+      <div class="ticker-scroll">
+        🔥 [BREAD-DAQ 5:5 활황장] 마틸다 케이크 검색 1위(+4.75% ▲) • 휘낭시에 릴스 역주행(+5.45% ▲) • 글루텐프리 스콘 줍줍 특가(-3.25% ▼) • ZERO 카스테라 감사세일(-4.05% ▼) • [수요] NAVER 트렌드 양방향 연동 • [공급] ECOS 환율 1,338원(+0.95%) 반영
+      </div>
+    </div>
+
+    <!-- 메인 스크롤 콘텐츠 -->
+    <main class="main-scroll-area">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: 홈 (Home) -->
+      <!-- ============================================== -->
+      <section class="tab-content active" id="tabHome">
+        
+        <!-- BREAD-DAQ 종합 시황 카드 -->
+        <div class="market-status-box">
+          <div class="market-status-top">
+            <span>🏛️ 오늘 아침 9시 BREAD-DAQ 지수</span>
+            <span style="color:#059669;">🟢 실시간 정상 개장</span>
+          </div>
+          <div class="index-large">
+            <span>2,485.40</span>
+            <span class="index-diff">▲ +0.21% (수급 균형)</span>
+          </div>
+          <div style="font-size:12px; color:var(--text-sub);">
+            수요(네이버 트렌드 ±5%)와 공급(ECOS 환율 ±3%) 2대 실물 지표 연동
+          </div>
+          <div class="board-summary-strip">
+            <span style="color:var(--toss-red); font-weight:800;">🔥 상승 5종 (▲)</span>
+            <span style="color:#64748b; font-weight:700;">수급 팽팽</span>
+            <span style="color:var(--toss-blue); font-weight:800;">🌊 하락 5종 (▼)</span>
+          </div>
+        </div>
+
+        <!-- 오늘의 AI 30초 뉴스레터 카드 -->
+        <div class="newsletter-card">
+          <div class="card-title-row">
+            <div class="card-title">
+              <span>🤖 30초 데일리 빵 & 증시 요약</span>
+            </div>
+            <span style="font-size:11px; color:#ea580c; font-weight:800; cursor:pointer;" onclick="openNewsletterModal(0)">전문 읽기 ➔</span>
+          </div>
+          <div class="newsletter-item" onclick="openNewsletterModal(0)">
+            <span class="newsletter-tag" style="background:#fff1f2; color:#e11d48;">수요 폭발</span>
+            <div class="newsletter-title">
+              마틸다 케이크 검색 1위 등극! 인기 급상승 대장주 (+4.75% ▲)
+            </div>
+          </div>
+          <div class="newsletter-item" onclick="openNewsletterModal(1)">
+            <span class="newsletter-tag" style="background:#eff6ff; color:#2563eb;">깜짝 특가</span>
+            <div class="newsletter-title">
+              환율 안정 & 공급 감사 특가! ZERO 카스테라 오늘 -4.05% 줍줍 찬스
+            </div>
+          </div>
+        </div>
+
+        <!-- 내일의 빵 예측 퀴즈 -->
+        <div class="predict-box">
+          <span class="predict-tag">🎁 매일 9시 퀴즈 • 500원 쿠폰 지급</span>
+          <div class="predict-target-bread">마틸다 초코케이크, 내일 시세는?</div>
+          <div class="predict-hint">
+            오늘 실시간 검색 1위로 +4.75% 상승! 과연 내일도 오를까요?
+          </div>
+          <div class="predict-choice-grid">
+            <button class="predict-btn up" onclick="voteQuiz('UP')">
+              <span style="font-size: 20px;">🔥</span>
+              <span>더 오른다 (▲)</span>
+            </button>
+            <button class="predict-btn down" onclick="voteQuiz('DOWN')">
+              <span style="font-size: 20px;">🌊</span>
+              <span>식는다 (▼)</span>
+            </button>
+          </div>
+          <p style="font-size:11px; color:#94a3b8;">
+            * 예측 성공 시 즉시 사용 가능한 500원 할인 쿠폰이 지급됩니다!
+          </p>
+        </div>
+
+        <!-- 오늘의 베이커리 빵운세 위젯 -->
+        <div class="cute-card" style="background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%); border-color: #f0abfc; cursor: pointer;" onclick="switchTab('events')">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size: 28px;">🥠</div>
+            <div>
+              <div style="font-size:14px; font-weight:800; color:#86198f;">오늘의 포춘쿠키 개봉하기</div>
+              <div style="font-size:12px; color:#a21caf;">내 띠별 베이커리 운세 보고 최대 1,000P 적립금 받기</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: 마켓 (Market) -->
+      <!-- ============================================== -->
+      <section class="tab-content" id="tabMarket">
+        
+        <!-- 컨트롤 필터 바 -->
+        <div class="market-control-bar">
+          <span style="font-size:12px; font-weight:800; color:#334155;">오늘의 빵 10종 시세</span>
+          <div class="market-tab-group">
+            <button class="market-filter-btn active" onclick="filterMarket('ALL', this)">전체 10</button>
+            <button class="market-filter-btn" onclick="filterMarket('UP', this)">🔥 상승 5</button>
+            <button class="market-filter-btn" onclick="filterMarket('DOWN', this)">🌊 하락 5</button>
+          </div>
+        </div>
+
+        <!-- TOP 1 오늘의 핫트렌드 대장주 카드 -->
+        <div class="top1-hero-card" onclick="openTossSheet('p10')">
+          <span class="top1-badge">🔥 실시간 검색 1위 대장주</span>
+          <div style="font-size:11px; font-weight:800; color:#e11d48; margin-bottom:2px;">[수요 폭발 프리미엄]</div>
+          <div class="top1-name">마틸다 초코케이크</div>
+          <div class="top1-price-row">
+            <span class="top1-price">44,000원</span>
+            <span class="top1-diff">▲ +2,000원 (+4.75%)</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#9f1239;">
+            <span>💡 퀴즈 500원 쿠폰 적용 시 정가 이하 구매 가능!</span>
+            <span style="font-weight:800;">차트 보기 ➔</span>
+          </div>
+        </div>
+
+        <!-- 10종 리스트 -->
+        <div id="marketItemList">
+          <!-- JS 렌더링 -->
+        </div>
+
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: 이벤트 (Events & Games) -->
+      <!-- ============================================== -->
+      <section class="tab-content" id="tabEvents">
+        
+        <!-- 식빵 자르기 게임 -->
+        <div class="game-section-card">
+          <span class="game-badge">🕹️ 미니게임 1</span>
+          <h3 style="font-size:17px; font-weight:900; color:var(--crust-dark); margin-bottom:4px;">
+            정확히 반으로 잘라라! 골든 슬라이스
+          </h3>
+          <p style="font-size:12px; color:var(--text-sub);">
+            움직이는 칼날 게이지를 정중앙(50%)에 딱 맞추면 1,000P 적립!
+          </p>
+
+          <div class="slice-game-stage">
+            <div class="golden-center-line"></div>
+            <div style="font-size: 54px; user-select:none;">🍞</div>
+            <div class="knife-gauge-line" id="knifeGauge"></div>
+          </div>
+
+          <button class="btn-cute" id="sliceBtn" onclick="stopSliceGauge()">
+            🔪 지금 빵 자르기 (STOP!)
+          </button>
+          <div id="sliceResultText" style="font-size:12px; font-weight:800; color:#059669; margin-top:10px;"></div>
+        </div>
+
+        <!-- 포춘쿠키 개봉 -->
+        <div class="game-section-card">
+          <span class="game-badge">🥠 미니게임 2</span>
+          <h3 style="font-size:17px; font-weight:900; color:var(--crust-dark); margin-bottom:4px;">
+            오늘의 바삭한 포춘쿠키
+          </h3>
+          <p style="font-size:12px; color:var(--text-sub);">
+            쿠키를 반으로 쪼개 행운의 베이커리 명언과 포인트를 획득하세요!
+          </p>
+
+          <div class="cookie-container" onclick="breakCookie()">
+            <div class="cookie-half cookie-left" id="cookieLeft"></div>
+            <div class="cookie-half cookie-right" id="cookieRight"></div>
+          </div>
+
+          <div id="fortuneResultCard" style="display:none; background:#fefce8; border:1px solid #fef08a; border-radius:12px; padding:12px; margin-top:10px;">
+            <div style="font-size:13px; font-weight:800; color:#854d0e;" id="fortuneTitle">행운의 바게트 운세</div>
+            <div style="font-size:12px; color:#713f12; margin:4px 0;" id="fortuneQuote">"오늘 하루도 갓 구운 빵처럼 따뜻하고 부드러운 일만 가득할 거예요!"</div>
+            <div style="font-size:12px; font-weight:800; color:#ea580c;">🎉 500P 적립 완료!</div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 하단 고정 네비게이션 바 -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="switchTab('home', this)">
+        <span class="nav-icon">🏠</span>
+        <span>홈</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('market', this)">
+        <span class="nav-icon">📈</span>
+        <span>시세 전광판</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('events', this)">
+        <span class="nav-icon">🎁</span>
+        <span>이벤트·게임</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- 토스증권 스타일 바텀시트 모달 (차트 및 상세 시세) -->
+  <div class="modal-overlay" id="tossOverlay" onclick="closeTossSheet()"></div>
+  <div class="toss-bottom-sheet" id="tossSheet">
+    <div class="sheet-handle" onclick="closeTossSheet()"></div>
+    
+    <div class="sheet-header">
+      <div>
+        <span class="item-tier-badge tier-t3" id="sheetTier">2만원 이상 (±5.00%)</span>
+        <div class="sheet-title" id="sheetName">마틸다 초코케이크</div>
+      </div>
+      <button style="border:none; background:#f2f4f6; border-radius:50%; width:28px; height:28px; font-weight:800;" onclick="closeTossSheet()">✕</button>
+    </div>
+
+    <div class="sheet-price" id="sheetPrice">44,000원</div>
+    <div style="font-size: 13px; font-weight: 800;" id="sheetDiff" class="rate-up">
+      ▲ +2,000원 (+4.75%) • 오늘 기준
+    </div>
+
+    <!-- 🎁 퀴즈 500원 쿠폰 적용 스위치 -->
+    <div class="coupon-switch-card">
+      <div class="coupon-switch-left">
+        <span class="c-title">🎟️ 퀴즈 정답 500원 할인 쿠폰</span>
+        <span class="c-sub" id="couponSubText">적용 시 오늘 시세에서 즉시 500원 할인!</span>
+      </div>
+      <button class="coupon-toggle-btn" id="couponToggleBtn" onclick="toggleCouponApplication()">
+        쿠폰 적용하기
+      </button>
+    </div>
+
+    <!-- 토스 기간 탭 -->
+    <div class="toss-period-tabs">
+      <button class="period-btn active" onclick="changePeriod('1W')">1주일</button>
+      <button class="period-btn" onclick="changePeriod('1M')">1개월</button>
+      <button class="period-btn" onclick="changePeriod('1D')">오늘(1일)</button>
+    </div>
+
+    <!-- 토스 스타일 캔버스 차트 -->
+    <div style="height: 160px; position: relative; margin: 6px 0 12px;">
+      <canvas id="tossChartCanvas"></canvas>
+    </div>
+
+    <!-- 시세 형성 2대 실물 요인 미니 영수증 -->
+    <div style="background:#f8fafc; border-radius:12px; padding:12px; font-size:12px; margin-bottom:14px; border:1px solid #edf2f7;">
+      <div style="font-weight:800; color:#334155; margin-bottom:6px;">📊 오늘 2대 실물 시세 영수증:</div>
+      <div style="display:flex; justify-content:space-between; color:#64748b; margin-bottom:4px;">
+        <span id="sheetTrendLabel">• 🔥 검색 트렌드 모멘텀 (수요):</span>
+        <b style="color:#ef4444;" id="sheetTrend">+3.80%</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; color:#64748b;">
+        <span>• 💵 수입 원자재 환율 (공급):</span>
+        <b style="color:#d97706;" id="sheetFx">+0.95%</b>
+      </div>
+    </div>
+
+    <!-- 장바구니 담기 버튼 -->
+    <button class="btn-cute" id="sheetCtaBtn" onclick="buyBread()">
+      🛒 오늘 시세로 장바구니 담기
+    </button>
+  </div>
+
+  <!-- AI 뉴스레터 30초 리더 모달 -->
+  <div class="modal-overlay" id="newsletterModal">
+    <div class="newsletter-modal-card">
+      <button class="modal-close-x" onclick="closeNewsletterModal()">✕</button>
+      
+      <div style="text-align: left; padding-right: 30px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size: 18px;">🤖🥖</span>
+          <span style="font-size: 11px; font-weight: 800; color: #059669; background:#ecfdf5; padding:2px 8px; border-radius:12px;">
+            AI 에디터 베이키
+          </span>
+          <span style="font-size: 11px; color: var(--text-muted);">09:00 데일리 브리핑</span>
+        </div>
+        <h3 style="font-size: 17px; font-weight: 900; color: var(--crust-dark); margin-top: 4px;">
+          막지스톡 30초 모닝 시황
+        </h3>
+        <p style="font-size: 11px; color: var(--text-sub); margin-top: 2px;">
+          수요와 공급으로 읽는 오늘의 빵 거래소 리포트!
+        </p>
+      </div>
+
+      <div class="nl-modal-tabs">
+        <button class="nl-tab-btn active" id="nlTabBtn0" onclick="switchNlTab(0)">🔥 수요 폭발 5종</button>
+        <button class="nl-tab-btn" id="nlTabBtn1" onclick="switchNlTab(1)">🌊 줍줍 특가 5종</button>
+      </div>
+
+      <div class="nl-modal-body">
+        <div class="nl-article-view active" id="nlArticle0">
+          <div class="nl-article-headline">
+            🔥 마틸다 케이크 실시간 검색 1위 등극! 인기 대장주 +4.75% 급등
+          </div>
+          <div class="nl-analogy-box">
+            <span style="font-size:16px;">💡</span>
+            <div><b>거래소 1초 해석:</b> 인기 폭발로 시세가 올라도 퀴즈 500원 쿠폰 쓰면 정가 이하 즉시 득템!</div>
+          </div>
+          <div class="nl-story-text">
+            SNS와 숏폼에서 마틸다 케이크와 휘낭시에 먹방이 역주행하며 검색량이 폭발했습니다! 이에 따라 오늘 장에서는 5종의 인기 제품에 수급 프리미엄이 붙었습니다. 단, 예측 퀴즈 500원 쿠폰을 적용하면 정가보다 저렴하게 구매할 수 있습니다.
+          </div>
+          <button class="btn-cute" style="padding:10px; font-size:13px;" onclick="closeNewsletterModal(); openTossSheet('p10');">
+            마틸다 케이크 차트 보러가기 ➔
+          </button>
+        </div>
+
+        <div class="nl-article-view" id="nlArticle1">
+          <div class="nl-article-headline">
+            🌊 환율 안정 & 공급 감사 특가! ZERO 카스테라 오늘 -4.05% 세일
+          </div>
+          <div class="nl-analogy-box">
+            <span style="font-size:16px;">💡</span>
+            <div><b>거래소 1초 해석:</b> 안정된 원가와 수요 쿨다운 품목을 오늘 사면 무조건 이득!</div>
+          </div>
+          <div class="nl-story-text">
+            반면 ZERO 카스테라와 글루텐프리 스콘, 대만식 샌드위치는 수요 안정과 맞물려 파격적인 깜짝 할인(▼)이 적용되었습니다. 오늘처럼 파란불이 켜졌을 때 장바구니에 담아두는 스마트 매수를 추천합니다.
+          </div>
+          <button class="btn-cute" style="padding:10px; font-size:13px;" onclick="closeNewsletterModal(); openTossSheet('p7');">
+            ZERO 카스테라 시세 보러가기 ➔
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 10종 상품 데이터 명세 (5상승 vs 5하락 밸런스)
+    const PRODUCTS = [
+      { id: 'p1',  name: '비건 잉글리시 머핀', basePrice: 1500, tier: 'Tier 1 (±10%)', cap: 0.10, changeRate: 0.0345, diff: 50, currentPrice: 1550, trend: 0.0250, isUp: true, tag: '🔥 건강 챌린지', history: [1470, 1490, 1520, 1500, 1530, 1540, 1550] },
+      { id: 'p2',  name: '대만식 샌드위치',   basePrice: 2400, tier: 'Tier 1 (±10%)', cap: 0.10, changeRate: -0.0225, diff: -50, currentPrice: 2350, trend: -0.0320, isUp: false, tag: '🌊 아침 알뜰 줍줍', history: [2380, 2400, 2360, 2380, 2390, 2370, 2350] },
+      { id: 'p3',  name: '휘낭시에',          basePrice: 3800, tier: 'Tier 1 (±10%)', cap: 0.10, changeRate: 0.0545, diff: 210, currentPrice: 4010, trend: 0.0450, isUp: true, tag: '🔥 릴스 역주행', history: [3750, 3840, 3920, 3880, 3950, 3980, 4010] },
+      { id: 'p4',  name: '글루텐프리 스콘',   basePrice: 3800, tier: 'Tier 1 (±10%)', cap: 0.10, changeRate: -0.0325, diff: -120, currentPrice: 3680, trend: -0.0420, isUp: false, tag: '🌊 티타임 특가', history: [3740, 3720, 3680, 3700, 3710, 3690, 3680] },
+      { id: 'p5',  name: '모닝롤',            basePrice: 4500, tier: 'Tier 1 (±10%)', cap: 0.10, changeRate: -0.0385, diff: -170, currentPrice: 4330, trend: -0.0480, isUp: false, tag: '🌊 착한 빵 데이', history: [4450, 4420, 4380, 4390, 4400, 4360, 4330] },
+      { id: 'p6',  name: '테트리스 브레드',   basePrice: 11000, tier: 'Tier 2 (±7%)', cap: 0.07, changeRate: 0.0415, diff: 460, currentPrice: 11460, trend: 0.0320, isUp: true, tag: '🔥 신메뉴 급상승', history: [11100, 11250, 11150, 11300, 11380, 11420, 11460] },
+      { id: 'p7',  name: 'ZERO 카스테라',     basePrice: 12000, tier: 'Tier 2 (±7%)', cap: 0.07, changeRate: -0.0405, diff: -490, currentPrice: 11510, trend: -0.0500, isUp: false, tag: '🌊 다이어트 감사세일', history: [11750, 11680, 11600, 11580, 11620, 11550, 11510] },
+      { id: 'p8',  name: '티라미수',          basePrice: 15000, tier: 'Tier 2 (±7%)', cap: 0.07, changeRate: 0.0215, diff: 320, currentPrice: 15320, trend: 0.0120, isUp: true, tag: '🔥 완만한 상승', history: [15100, 15150, 15200, 15180, 15250, 15280, 15320] },
+      { id: 'p9',  name: '냉동생지 3종',      basePrice: 21000, tier: 'Tier 3 (±5%)', cap: 0.05, changeRate: -0.0305, diff: -640, currentPrice: 20360, trend: -0.0400, isUp: false, tag: '🌊 홈베이커 대용량 특가', history: [20700, 20650, 20500, 20550, 20480, 20420, 20360] },
+      { id: 'p10', name: '마틸다 초코케이크', basePrice: 42000, tier: 'Tier 3 (±5%)', cap: 0.05, changeRate: 0.0475, diff: 2000, currentPrice: 44000, trend: 0.0380, isUp: true, tag: '🔥 검색 1위 대장주', history: [42600, 43100, 42800, 43400, 43700, 43850, 44000] }
+    ];
+
+    let currentMarketFilter = 'ALL';
+    let tossChartInstance = null;
+    let selectedProduct = PRODUCTS[9];
+    let isCouponApplied = false;
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastPopup');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2400);
+    }
+
+    function switchTab(tabId, navBtn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      if (tabId === 'home') document.getElementById('tabHome').classList.add('active');
+      else if (tabId === 'market') document.getElementById('tabMarket').classList.add('active');
+      else if (tabId === 'events') document.getElementById('tabEvents').classList.add('active');
+
+      if (navBtn) navBtn.classList.add('active');
+      else {
+        const idx = tabId === 'home' ? 0 : (tabId === 'market' ? 1 : 2);
+        document.querySelectorAll('.nav-item')[idx].classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function filterMarket(type, btn) {
+      currentMarketFilter = type;
+      document.querySelectorAll('.market-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMarketList();
+    }
+
+    function renderMarketList() {
+      const listContainer = document.getElementById('marketItemList');
+      listContainer.innerHTML = '';
+
+      const filtered = PRODUCTS.filter(p => {
+        if (currentMarketFilter === 'UP') return p.isUp;
+        if (currentMarketFilter === 'DOWN') return !p.isUp;
+        return true;
+      });
+
+      filtered.forEach(p => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'bread-stock-item';
+        itemEl.onclick = () => openTossSheet(p.id);
+
+        const tierClass = p.tier.startsWith('Tier 1') ? 'tier-t1' : (p.tier.startsWith('Tier 2') ? 'tier-t2' : 'tier-t3');
+        const sign = p.isUp ? '+' : '';
+        const rateClass = p.isUp ? 'rate-up' : 'rate-down';
+        const arrow = p.isUp ? '▲' : '▼';
+
+        itemEl.innerHTML = `
+          <div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <strong style="font-size:14.5px; color:var(--text-main);">${p.name}</strong>
+              <span style="font-size:10.5px; color:#ea580c; font-weight:700;">${p.tag}</span>
+            </div>
+            <div class="item-tier-badge ${tierClass}">${p.tier}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:15px; font-weight:900; color:var(--text-main);">
+              ${p.currentPrice.toLocaleString()}원
+            </div>
+            <div class="item-rate-badge ${rateClass}">
+              ${arrow} ${sign}${(p.changeRate * 100).toFixed(2)}% (${sign}${p.diff.toLocaleString()}원)
+            </div>
+          </div>
+        `;
+        listContainer.appendChild(itemEl);
+      });
+    }
+
+    // 토스증권 바텀시트 모달 열기
+    function openTossSheet(prodId) {
+      selectedProduct = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[9];
+      isCouponApplied = false;
+
+      document.getElementById('sheetName').innerText = selectedProduct.name;
+      document.getElementById('sheetTier').innerText = selectedProduct.tier;
+      
+      const isUp = selectedProduct.isUp;
+      const sign = isUp ? '+' : '';
+      const arrow = isUp ? '▲' : '▼';
+      const rateClass = isUp ? 'rate-up' : 'rate-down';
+
+      const diffEl = document.getElementById('sheetDiff');
+      diffEl.className = rateClass;
+      diffEl.innerText = `${arrow} ${sign}${selectedProduct.diff.toLocaleString()}원 (${sign}${(selectedProduct.changeRate * 100).toFixed(2)}%) • 오늘 기준`;
+
+      const trendEl = document.getElementById('sheetTrend');
+      trendEl.innerText = `${selectedProduct.trend >= 0 ? '+' : ''}${(selectedProduct.trend * 100).toFixed(2)}%`;
+      trendEl.style.color = selectedProduct.trend >= 0 ? '#ef4444' : '#2563eb';
+
+      const trendLabel = document.getElementById('sheetTrendLabel');
+      trendLabel.innerText = selectedProduct.trend >= 0 ? '• 🔥 검색 트렌드 모멘텀 (수요):' : '• 🌊 검색 트렌드 감사 할인 (수요):';
+
+      document.getElementById('sheetFx').innerText = '+0.95%';
+
+      // 쿠폰 버튼 초기화
+      const couponBtn = document.getElementById('couponToggleBtn');
+      couponBtn.className = 'coupon-toggle-btn';
+      couponBtn.innerText = '쿠폰 적용하기';
+      document.getElementById('couponSubText').innerText = '적용 시 오늘 시세에서 즉시 500원 할인!';
+
+      updateSheetPriceDisplay();
+
+      document.getElementById('tossOverlay').classList.add('open');
+      document.getElementById('tossSheet').classList.add('open');
+
+      renderTossChart('1W');
+    }
+
+    function closeTossSheet() {
+      document.getElementById('tossOverlay').classList.remove('open');
+      document.getElementById('tossSheet').classList.remove('open');
+    }
+
+    function updateSheetPriceDisplay() {
+      const priceEl = document.getElementById('sheetPrice');
+      const ctaBtn = document.getElementById('sheetCtaBtn');
+
+      let finalPay = selectedProduct.currentPrice;
+      if (isCouponApplied) {
+        finalPay = Math.max(0, selectedProduct.currentPrice - 500);
+        priceEl.innerHTML = `
+          <span style="text-decoration:line-through; font-size:18px; color:#94a3b8; margin-right:6px;">${selectedProduct.currentPrice.toLocaleString()}원</span>
+          <span style="color:#059669;">${finalPay.toLocaleString()}원</span>
+        `;
+        ctaBtn.innerText = `🛒 500원 쿠폰 적용가 (${finalPay.toLocaleString()}원)로 담기`;
+      } else {
+        priceEl.innerText = `${selectedProduct.currentPrice.toLocaleString()}원`;
+        priceEl.style.color = selectedProduct.isUp ? 'var(--toss-red)' : 'var(--toss-blue)';
+        ctaBtn.innerText = `🛒 오늘 시세 (${finalPay.toLocaleString()}원)로 장바구니 담기`;
+      }
+    }
+
+    function toggleCouponApplication() {
+      isCouponApplied = !isCouponApplied;
+      const btn = document.getElementById('couponToggleBtn');
+      const subText = document.getElementById('couponSubText');
+
+      if (isCouponApplied) {
+        btn.className = 'coupon-toggle-btn applied';
+        btn.innerText = '✓ 쿠폰 적용됨 (-500원)';
+        const diffFromBase = selectedProduct.basePrice - (selectedProduct.currentPrice - 500);
+        if (diffFromBase > 0) {
+          subText.innerHTML = `🎉 정가(${selectedProduct.basePrice.toLocaleString()}원)보다 <strong style="color:#059669;">${diffFromBase.toLocaleString()}원 더 싸게</strong> 득템!`;
+          showToast(`500원 쿠폰 적용! 정가보다 ${diffFromBase.toLocaleString()}원 더 저렴하게 구매합니다.`);
+        } else {
+          subText.innerText = '인기 상승 프리미엄을 500원 쿠폰으로 완벽 상쇄했습니다!';
+          showToast('500원 쿠폰 적용 완료! 500원이 즉시 할인되었습니다.');
+        }
+      } else {
+        btn.className = 'coupon-toggle-btn';
+        btn.innerText = '쿠폰 적용하기';
+        subText.innerText = '적용 시 오늘 시세에서 즉시 500원 할인!';
+        showToast('쿠폰 적용이 해제되었습니다.');
+      }
+      updateSheetPriceDisplay();
+    }
+
+    function renderTossChart(period) {
+      const ctx = document.getElementById('tossChartCanvas').getContext('2d');
+      if (tossChartInstance) tossChartInstance.destroy();
+
+      const isUp = selectedProduct.isUp;
+      const themeColor = isUp ? '#ef4444' : '#3182f6';
+      const bgGrad = isUp ? 'rgba(239, 68, 68, 0.08)' : 'rgba(49, 130, 246, 0.08)';
+
+      const labels = ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'D-1', '오늘'];
+      const data = selectedProduct.history;
+
+      tossChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            borderColor: themeColor,
+            backgroundColor: bgGrad,
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.35,
+            pointRadius: (ctx) => ctx.dataIndex === 6 ? 6 : 2,
+            pointBackgroundColor: themeColor
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (c) => `${c.raw.toLocaleString()}원`
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: {
+              grid: { color: '#f1f5f9' },
+              ticks: {
+                callback: (v) => v.toLocaleString() + '원'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function changePeriod(p) {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderTossChart(p);
+    }
+
+    function buyBread() {
+      const payPrice = isCouponApplied ? (selectedProduct.currentPrice - 500) : selectedProduct.currentPrice;
+      showToast(`🛒 ${selectedProduct.name} (${payPrice.toLocaleString()}원) 장바구니 추가 완료!`);
+      closeTossSheet();
+    }
+
+    // AI 뉴스레터 모달
+    function openNewsletterModal(tabIdx) {
+      document.getElementById('newsletterModal').classList.add('open');
+      switchNlTab(tabIdx);
+    }
+
+    function closeNewsletterModal() {
+      document.getElementById('newsletterModal').classList.remove('open');
+    }
+
+    function switchNlTab(idx) {
+      document.querySelectorAll('.nl-tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', i === idx);
+      });
+      document.querySelectorAll('.nl-article-view').forEach((v, i) => {
+        v.classList.toggle('active', i === idx);
+      });
+    }
+
+    // 예측 퀴즈 투표
+    function voteQuiz(choice) {
+      showToast(`🎉 퀴즈 참여 완료! '500원 할인 쿠폰'이 발급되었습니다.`);
+    }
+
+    // 식빵 자르기 게임
+    let gaugeInterval = null;
+    let gaugePos = 10;
+    let gaugeDir = 1;
+    let isGameRunning = true;
+
+    function startSliceGauge() {
+      const line = document.getElementById('knifeGauge');
+      gaugeInterval = setInterval(() => {
+        if (!isGameRunning) return;
+        gaugePos += gaugeDir * 2.5;
+        if (gaugePos >= 90) gaugeDir = -1;
+        if (gaugePos <= 10) gaugeDir = 1;
+        line.style.left = gaugePos + '%';
+      }, 30);
+    }
+
+    function stopSliceGauge() {
+      const btn = document.getElementById('sliceBtn');
+      if (isGameRunning) {
+        isGameRunning = false;
+        clearInterval(gaugeInterval);
+        const diff = Math.abs(50 - gaugePos);
+        const resultEl = document.getElementById('sliceResultText');
+        if (diff <= 5) {
+          resultEl.innerText = `🎯 대박! 오차 ${(diff*2).toFixed(1)}%로 골든 슬라이스 성공! (+1,000P 지급)`;
+          resultEl.style.color = '#059669';
+          showToast('골든 슬라이스 완벽 성공! 1,000P 적립되었습니다.');
+        } else {
+          resultEl.innerText = `아쉬워요! 오차 ${(diff*2).toFixed(1)}%로 잘렸습니다. (+200P 참가상)`;
+          resultEl.style.color = '#ea580c';
+          showToast('참가상 200P가 적립되었습니다.');
+        }
+        btn.innerText = '🔄 다시 도전하기';
+      } else {
+        isGameRunning = true;
+        btn.innerText = '🔪 지금 빵 자르기 (STOP!)';
+        document.getElementById('sliceResultText').innerText = '';
+        startSliceGauge();
+      }
+    }
+
+    // 포춘쿠키
+    function breakCookie() {
+      const l = document.getElementById('cookieLeft');
+      const r = document.getElementById('cookieRight');
+      l.style.transform = 'rotate(-45deg) translateX(-20px)';
+      r.style.transform = 'rotate(45deg) translateX(20px) scaleX(-1)';
+      document.getElementById('fortuneResultCard').style.display = 'block';
+      showToast('🥠 포춘쿠키가 바삭하게 열렸습니다! (+500P 적립)');
+    }
+
+    window.onload = () => {
+      renderMarketList();
+      startSliceGauge();
+    };
+  </script>
+</body>
+</html>
