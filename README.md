@@ -31,6 +31,10 @@
 - **[MAKJI STOCK v8.0 미니게임천국 프로토타입 (`prototype-v8.html`)](./prototypes/stock/prototype-v8.html)**
 - **[MAKJI STOCK v7.0 프로토타입 (`prototype-v7.html`)](./prototypes/stock/prototype-v7.html)**
   - 코스피 100% 영구 배제! 수요(네이버 검색트렌드 ±5%) + 공급(한국은행 ECOS 환율 ±3%) 2대 실물 지표 연동 (5상승 vs 5하락)
+- **[MAKJI 빵 시세 시뮬레이터 v10.0 (`price-simulator-v10.html`)](./prototypes/price-simulator/price-simulator-v10.html)** ★
+  - 🔍 **정제 키워드 셋 탑재**: 일반명사 마스킹 방지 웰니스 키워드 리스트 뷰어 & API Request JSON 복사 기능
+  - 🎛️ **10종 빵 개별 검색 모멘텀 조절기**: 각 빵의 검색량을 슬라이더로 직접 조절하여 실시간 가격 등락(▲/▼) 즉시 확인
+  - 💵 **환율 & 3단계 캡 연동**: 글로벌 슬라이더(트렌드/환율/캡) 및 퀴즈 500원 쿠폰 적용가 & 55% 마진율 계산기
 - **[MAKJI 빵 시세 시뮬레이터 v9.0 (`price-simulator-v9.html`)](./prototypes/price-simulator/price-simulator-v9.html)**
   - 양방향 트렌드(±5.0%) 슬라이더, 환율(±3.0%) 슬라이더, 3단계 차등 캡(±10%, ±7%, ±5%)
   - **[신규] 🎁 퀴즈 쿠폰 & 게이미피케이션 시너지 마진 분석기**: 500원 쿠폰 적용 시 고객 체감 할인 및 회사 영업 마진 55% 이상 방어율 실시간 검증
@@ -188,7 +192,8 @@ MAKJI 자사몰은 정적인 가격 구조로 인해 고객이 매일 방문할 
     └── proto.html                             # 인터랙션 테스트용 프로토타입
 ```
 
-- [서비스 기획안 및 와이어프레임](docs/BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md): 사용자 여정, 핵심 기능, 화면별 와이어프레임, 감정 헷지 처방전, 데이터 연동 구조
+- [MAKJI STOCK PRD (v2.0, 최신)](docs/MAKJI_STOCK_PRD.md): 9/9 MVP 회의록·9/10 기획안 초안 기준 최신 서비스 요구사항 문서. 서비스 개요, 사용자 흐름, MVP 핵심 기능, 화면 명세, 가격 정책, 구현·운영 계획, 검증 계획, 확장 설계 범위
+- [서비스 기획안 및 와이어프레임 (v1.0, superseded)](docs/BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md): 9/9 회의 이전 초안. 최신 PRD와 차이는 PRD 부록 D 참고
 - [공식 RFP 문서](docs/RFP.pdf): 기업연계 프로젝트 요구사항 및 타임라인
 - [MAKJI 전략 분석 2026](research/MAKJI_STRATEGIC_ANALYSIS_2026.md): 브랜드 가치제안·포지셔닝·SWOT, 국내 웰니스 베이커리 시장규모와 성장성, 국내외 경쟁사, 금융데이터 프로모션 전략
 - [웰니스 베이커리 시장 리서치](research/wellness_bakery_market_research.md): 시장 동향, 고객 페르소나, 경쟁사 및 유통 채널 분석

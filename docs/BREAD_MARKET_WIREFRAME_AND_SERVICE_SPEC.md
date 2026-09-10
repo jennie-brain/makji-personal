@@ -1,9 +1,12 @@
 # MAKJI 빵마켓(Bread Market) 서비스 기획안 & 와이어프레임 명세서
 
-> **문서 버전:** v1.0  
+> **문서 버전:** v1.0 (superseded — 아래 안내 참고)
 > **기준일자:** 2026년 9월 7일  
 > **프로젝트:** ㈜스윗앤스위츠 MAKJI AI 기반 Food FinCommerce Platform ('Bread Market' MVP)  
 > **기획 방향:** 막지(MAKJI)의 공식 인터랙티브 콘텐츠 플랫폼 & 감정 헷지 커머스
+
+> **⚠️ 이 문서는 9/9 MVP 회의 이전 초안이며 최신 기획과 다릅니다.**
+> 최신 PRD는 [`docs/MAKJI_STOCK_PRD.md`](MAKJI_STOCK_PRD.md)를 참고하세요. 특히 이 문서의 '우울해서 빵 샀어' 감정 헷지 처방전, Bakery ETF/FX Bakery 핵심 화면 구성, KOSPI 포함 가격 산정은 이후 팀 결정과 다릅니다(차이는 새 문서 부록 D 참조). 이 문서는 과거 아이디어 기록용으로만 남겨둡니다.
 
 ---
 
