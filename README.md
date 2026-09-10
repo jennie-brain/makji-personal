@@ -4,6 +4,11 @@
 
 ## 프로토타입 & 시뮬레이터
 
+- **[MAKJI STOCK 통합 반응형 웹/앱 최신본 (`makji-stock-app.html`)](./prototypes/stock/makji-stock-app.html)**
+  - 📱 **모바일 화면 자동 핏팅 & A/B 모드 토글 탑재**: [타입 B: 증권 시장 차트형 (BSI 인터랙티브 차트 + 실시간 빵 종목 시세판)] 및 [타입 A: 오늘의 핫딜 실사형] 1클릭 전환 지원
+  - ☔ **공공 API 연동**: 날씨(비 오는 서울 12°C) 및 한국은행/수출입은행 환율 정보 카드 + 뉴닉 스타일 '고슴이의 빵 레터' 실제 경제 기사 3편 완비
+- **[네이버 검색어트렌드 API 키워드 설정 명세서 (`NAVER_SEARCH_TREND_KEYWORD_LIST.md`)](./docs/NAVER_SEARCH_TREND_KEYWORD_LIST.md)**
+  - 🔍 **10종 빵별 키워드 번들링 & API 호출 JSON 페이로드**: 브랜드 고유명 검색 결손(Zero Index) 방지 및 14일 이동평균 모멘텀 수식 정의
 - **[MAKJI STOCK v11.0 9/9 MVP 공식 프로토타입 (`prototype-v11.html`)](./prototypes/stock/prototype-v11.html)** / [메인 파일 (`makji-stock-prototype.html`)](./prototypes/stock/makji-stock-prototype.html)
   - 🏠 **홈 빵지수 제거 & 간결화**: 홈 화면 진입 즉시 **"🎯 내일의 빵 예측하기 [ A / B ]"** 투표가 메인으로 배치 (성공 시 500원 코드 `BREAD2026` 발급) ➔ 모닝 빵뉴스 ➔ 오늘의 빵운세
   - 📈 **Bread Market 화면**: 빵지수(BREAD-DAQ)는 마켓 탭에서만 요약 제공 + 당일 변동폭 **TOP 1 메인 강조 카드** + **TOP 5 랭킹** + 10종 전체 시세표 & 토스 멀티뷰 차트 (최근 7일/30일 추이)

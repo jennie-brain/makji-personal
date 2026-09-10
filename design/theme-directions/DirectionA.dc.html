@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  * { box-sizing: border-box; }
+  a { color: #2563EB; }
+  a:hover { color: #1D4ED8; }
+</style>
+</helmet>
+<div style="width:390px;height:844px;background:#F8FAFC;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;color:#0F172A;display:flex;flex-direction:column;overflow:hidden;">
+
+  <div style="padding:22px 22px 18px;background:linear-gradient(135deg,#2563EB 0%,#3B82F6 100%);color:white;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;letter-spacing:-0.5px;">
+        <span style="font-size:22px;">🍞</span>
+        <span>MAKJI STOCK</span>
+      </div>
+      <span style="font-size:9px;font-weight:700;color:white;background:rgba(255,255,255,0.2);padding:4px 8px;border-radius:6px;white-space:nowrap;">v5.0</span>
+    </div>
+    <div style="font-size:12px;opacity:0.9;margin-top:6px;">검색할수록 내려가는 빵값</div>
+  </div>
+
+  <div style="background:white;border-bottom:1px solid #E5E7EB;padding:10px 22px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;color:#374151;">
+    <span>BREAD-DAQ</span> <span style="color:#DC2626;font-weight:700;margin-right:16px;">2,480.50p ▲ 1.40%</span>
+    <span>KOSPI</span> <span style="color:#2563EB;font-weight:700;">2,580.12p ▼ 1.20%</span>
+  </div>
+
+  <div style="flex:1;overflow:hidden;padding:20px 20px 0;display:flex;flex-direction:column;gap:14px;">
+
+    <div style="background:white;border:1px solid #E5E7EB;border-radius:16px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;">Bread Market Index</span>
+        <span style="font-size:10px;font-weight:700;background:#EFF6FF;color:#1E40AF;padding:4px 8px;border-radius:6px;">평일 장중</span>
+      </div>
+      <div style="font-size:32px;font-weight:800;letter-spacing:-1px;margin-top:10px;color:#111827;">2,480.50<small style="font-size:14px;font-weight:500;color:#9CA3AF;">p</small></div>
+      <div style="display:inline-flex;align-items:center;font-size:12px;font-weight:700;color:#DC2626;background:#FEE2E2;padding:3px 8px;border-radius:6px;margin-top:6px;">▲ +34.20p (+1.40%)</div>
+      <div style="font-size:11px;color:#6B7280;padding-top:12px;border-top:1px solid #F3F4F6;margin-top:14px;">검색 트렌드 할인으로 10종 중 8종목 가격 인하 중</div>
+    </div>
+
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+        <div style="font-size:16px;font-weight:700;letter-spacing:-0.3px;color:#111827;">내일 빵값, 맞혀볼까요?</div>
+        <span style="font-size:10px;font-weight:700;color:#1E40AF;background:#EFF6FF;padding:4px 8px;border-radius:6px;white-space:nowrap;">매일 한 번</span>
+      </div>
+      <div style="background:linear-gradient(135deg,#EFF6FF 0%,#F0F9FF 100%);border:1px solid #DBEAFE;border-radius:16px;padding:18px;">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="width:44px;height:44px;background:white;border:1px solid #E5E7EB;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🍰</div>
+          <div>
+            <div style="font-size:11px;color:#6B7280;">오늘의 예측 종목</div>
+            <div style="font-size:14px;font-weight:700;margin-top:2px;color:#111827;">마틸다 초코케이크</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
+          <div style="text-align:center;padding:11px;border-radius:10px;font-size:12px;font-weight:700;color:#DC2626;background:linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%);border:1px solid #F87171;">📈 UP</div>
+          <div style="text-align:center;padding:11px;border-radius:10px;font-size:12px;font-weight:700;color:#1D4ED8;background:linear-gradient(135deg,#DBEAFE 0%,#BFD0E8 100%);border:1px solid #93C5FD;">📉 DOWN</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:white;border:1px solid #E5E7EB;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+      <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px;">📰 모닝 빵레터</div>
+      <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #F3F4F6;">
+        <div style="width:36px;height:36px;border-radius:8px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🧈</div>
+        <div style="font-size:12px;font-weight:500;line-height:1.5;color:#374151;">버터 모셔오는 푯값 안정! 환율과 스콘 이야기</div>
+      </div>
+      <div style="display:flex;gap:10px;padding-top:8px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🍫</div>
+        <div style="font-size:12px;font-weight:500;line-height:1.5;color:#374151;">마틸다 검색 1위! 검색 트렌드 할인 -5.88%</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display:flex;background:white;border-top:1px solid #E5E7EB;padding:10px 12px 14px;">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#2563EB;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/></svg>
+      <span style="font-size:10px;font-weight:700;">홈</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#9CA3AF;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V11h4v9M10 20V5h4v15M16 20V8h4v12"/></svg>
+      <span style="font-size:10px;font-weight:500;">마켓</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#9CA3AF;">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10h16v11H4ZM3 6h18v4H3Zm9 0v15"/></svg>
+      <span style="font-size:10px;font-weight:500;">이벤트</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
