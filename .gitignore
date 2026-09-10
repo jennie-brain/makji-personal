@@ -2,3 +2,14 @@
 products_utf8.txt
 scraped_details.txt
 scratch/
+
+# Generated browser screenshots and visual verification outputs
+*-preview.png
+*-verified.png
+flow-*.png
+chart-options-*.png
+v*-dashboard.png
+v*-golden.png
+v*-simulator-preview.png
+notion_preview.png
+minigame-*.png
