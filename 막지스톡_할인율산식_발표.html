@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>막지 스톡 할인율 산식</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#F5F5F1; --card:#FFFFFF; --card-2:#FBFBF8;
+  --ink:#15171C; --ink2:#5C6168; --ink3:#8B8F96;
+  --rule:#E2E2DA; --rule-2:#EDEDE6;
+  --fx:#1B4FD8; --fx-soft:rgba(27,79,216,.10); --fx-mid:rgba(27,79,216,.24);
+  --cp:#C07A12; --cp-soft:rgba(192,122,18,.13); --cp-mid:rgba(192,122,18,.28);
+  --warn:#B23A34; --warn-soft:rgba(178,58,52,.10);
+  --ok:#1F6F4A;
+  --sans:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+  --W:1280px; --H:720px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+     -webkit-font-smoothing:antialiased;overflow:hidden}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- stage ---------- */
+#stage{position:fixed;inset:0;display:grid;place-items:center;background:var(--paper)}
+#deck{width:var(--W);height:var(--H);position:relative;transform-origin:center center;
+      background:var(--card);box-shadow:0 1px 2px rgba(21,23,28,.06),0 18px 50px -24px rgba(21,23,28,.22)}
+
+/* ---------- slide ---------- */
+.slide{position:absolute;inset:0;padding:52px 64px 56px;display:none;flex-direction:column}
+.slide.is-active{display:flex}
+.slide.is-cover{padding:0}
+
+/* rails */
+.rail-t{position:absolute;top:0;left:0;right:0;height:44px;padding:0 64px;
+        display:flex;align-items:center;justify-content:space-between;
+        border-bottom:1px solid var(--rule-2);font-family:var(--mono);font-size:10px;
+        letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);z-index:3}
+.rail-t b{color:var(--ink);font-weight:600;letter-spacing:.16em}
+.rail-b{position:absolute;bottom:0;left:0;right:0;height:40px;padding:0 64px;
+        display:flex;align-items:center;gap:14px;border-top:1px solid var(--rule-2);z-index:3}
+#ticks{display:flex;gap:3px;flex:1}
+#ticks button{flex:1;height:22px;border:0;background:none;padding:0;cursor:pointer;
+              display:flex;align-items:center}
+#ticks button i{display:block;width:100%;height:2px;background:var(--rule);transition:background .2s,height .2s}
+#ticks button[aria-current="true"] i{background:var(--fx);height:4px}
+#ticks button:hover i{background:var(--ink3)}
+#ticks button:focus-visible{outline:2px solid var(--fx);outline-offset:2px}
+#counter{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.06em}
+#counter b{color:var(--ink);font-weight:600}
+.navbtn{border:1px solid var(--rule);background:var(--card);color:var(--ink2);
+        width:26px;height:26px;border-radius:2px;cursor:pointer;font-size:13px;line-height:1;
+        display:grid;place-items:center;transition:border-color .15s,color .15s}
+.navbtn:hover{border-color:var(--ink3);color:var(--ink)}
+.navbtn:focus-visible{outline:2px solid var(--fx);outline-offset:2px}
+
+.body{flex:1;margin-top:44px;padding-top:28px;display:flex;flex-direction:column;min-height:0}
+
+/* type */
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+         color:var(--fx);font-weight:600;margin:0 0 10px}
+h1{font-size:52px;line-height:1.08;letter-spacing:-.035em;font-weight:700;margin:0;text-wrap:balance}
+h2{font-size:31px;line-height:1.18;letter-spacing:-.028em;font-weight:700;margin:0 0 6px;text-wrap:balance}
+.sub{font-size:14.5px;line-height:1.6;color:var(--ink2);margin:0;max-width:68ch;font-weight:300}
+.lede{font-size:16px;line-height:1.6;color:var(--ink2);font-weight:300;max-width:64ch;margin:0}
+.note{font-family:var(--mono);font-size:10.5px;color:var(--ink3);line-height:1.65;letter-spacing:.01em}
+strong{font-weight:600}
+mark{background:none;color:var(--fx);font-weight:600}
+mark.c{color:var(--cp)}
+mark.w{color:var(--warn)}
+
+/* cover */
+.cover{height:100%;display:grid;grid-template-columns:1fr 400px}
+.cover-l{padding:64px;display:flex;flex-direction:column;justify-content:space-between}
+.cover-r{background:var(--card-2);border-left:1px solid var(--rule-2);padding:64px 44px;
+         display:flex;flex-direction:column;justify-content:center;gap:0}
+.cover-fig{padding:18px 0;border-bottom:1px solid var(--rule-2)}
+.cover-fig:last-child{border-bottom:0}
+.cover-fig .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+.cover-fig .v{font-family:var(--mono);font-weight:600;font-size:34px;letter-spacing:-.03em;
+              margin-top:4px;line-height:1}
+.cover-fig .n{font-size:11.5px;color:var(--ink2);margin-top:5px;font-weight:300}
+.meta-strip{display:flex;gap:0;border-top:1px solid var(--rule)}
+.meta-strip div{padding:14px 20px 0 0;margin-right:20px;border-right:1px solid var(--rule-2)}
+.meta-strip div:last-child{border-right:0}
+.meta-strip .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
+               text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.meta-strip .v{font-size:12.5px;font-weight:500}
+
+/* layout helpers */
+.cols{display:grid;gap:26px;flex:1;min-height:0}
+.c-2{grid-template-columns:1fr 1fr}
+.c-3{grid-template-columns:repeat(3,1fr)}
+.c-5-7{grid-template-columns:5fr 7fr}
+.c-4-8{grid-template-columns:4fr 8fr}
+.c-7-5{grid-template-columns:7fr 5fr}
+.stack{display:flex;flex-direction:column;gap:14px;min-height:0}
+
+/* panel: used sparingly, not on everything */
+.panel{background:var(--card-2);border:1px solid var(--rule-2);padding:20px 22px}
+.panel.q{background:var(--fx-soft);border-color:transparent}
+.panel.w{background:var(--warn-soft);border-color:transparent}
+.panel h3{margin:0 0 8px;font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+
+/* numbered principle list (real sequence: 3 goals) */
+.goals{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--rule)}
+.goals li{list-style:none;display:grid;grid-template-columns:34px 1fr;gap:14px;
+          padding:16px 0;border-bottom:1px solid var(--rule-2)}
+.goals .n{font-family:var(--mono);font-size:11px;color:var(--fx);font-weight:600;padding-top:3px}
+.goals .t{font-size:15px;font-weight:600;letter-spacing:-.015em}
+.goals .d{font-size:12.5px;color:var(--ink2);margin-top:4px;line-height:1.55;font-weight:300}
+
+/* formula */
+.formula{border:1px solid var(--rule);background:var(--card-2);padding:26px 28px;
+         display:flex;flex-direction:column;gap:16px}
+.frow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.flabel{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+        color:var(--ink3);width:74px;flex:none;padding-top:2px}
+.fexpr{font-family:var(--mono);font-size:17px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.fexpr.big{font-size:21px;font-weight:600}
+.fexpr .fx{color:var(--fx)}
+.fexpr .cp{color:var(--cp)}
+.fexpr .w{color:var(--warn)}
+.fdiv{height:1px;background:var(--rule-2)}
+
+/* KPI row */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--rule);
+      border-bottom:1px solid var(--rule)}
+.kpis.k3{grid-template-columns:repeat(3,1fr)}
+.kpi{padding:15px 18px 15px 0;border-right:1px solid var(--rule-2)}
+.kpi:last-child{border-right:0}
+.kpi .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.kpi .v{font-family:var(--mono);font-size:27px;font-weight:600;letter-spacing:-.03em;margin-top:5px;line-height:1}
+.kpi .n{font-size:11px;color:var(--ink2);margin-top:5px;font-weight:300;line-height:1.45}
+.kpi .v.fx{color:var(--fx)} .kpi .v.cp{color:var(--cp)} .kpi .v.w{color:var(--warn)} .kpi .v.ok{color:var(--ok)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+   color:var(--ink3);font-weight:500;text-align:right;padding:0 0 8px;border-bottom:1px solid var(--rule)}
+th:first-child{text-align:left}
+td{padding:8px 0;border-bottom:1px solid var(--rule-2);text-align:right;
+   font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:11.5px}
+td:first-child{text-align:left;font-family:var(--sans);font-size:12px}
+tr:last-child td{border-bottom:0}
+.tw{width:100%;overflow-x:auto}
+
+/* evidence rows */
+.ev{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.ev li{list-style:none;display:grid;grid-template-columns:26px 1fr auto;gap:16px;align-items:start;
+       padding:13px 0;border-bottom:1px solid var(--rule-2)}
+.ev .n{font-family:var(--mono);font-size:11px;color:var(--fx);font-weight:600;padding-top:2px}
+.ev .t{font-size:13.5px;font-weight:600;letter-spacing:-.012em}
+.ev .d{font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5;font-weight:300}
+.ev .val{font-family:var(--mono);font-size:19px;font-weight:600;letter-spacing:-.025em;
+         text-align:right;white-space:nowrap;padding-top:1px}
+.ev .val small{display:block;font-size:9.5px;font-weight:400;color:var(--ink3);
+               letter-spacing:.08em;margin-top:3px;text-transform:uppercase}
+
+/* verdict */
+.verdict{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;
+         background:var(--fx);color:#fff;padding:16px 22px}
+.verdict .tag{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+              border:1px solid rgba(255,255,255,.45);padding:5px 9px}
+.verdict .t{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.verdict .d{font-size:11.5px;opacity:.82;margin-top:3px;font-weight:300}
+.verdict.open{background:var(--card-2);color:var(--ink);border:1px solid var(--rule)}
+.verdict.open .tag{border-color:var(--rule);color:var(--ink3)}
+.verdict.open .d{color:var(--ink2);opacity:1}
+
+/* option cards */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.opt{border:1px solid var(--rule);padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.opt.pick{border-color:var(--fx);border-width:1.5px;background:var(--fx-soft)}
+.opt .h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.opt .h b{font-size:15px;letter-spacing:-.015em}
+.opt .h span{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.opt.pick .h span{color:var(--fx)}
+.opt .pros{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ink2);line-height:1.5;font-weight:300}
+.opt .pros div{display:grid;grid-template-columns:14px 1fr;gap:6px}
+.opt .pros i{font-style:normal;font-family:var(--mono);font-size:11px}
+.opt .pros .y i{color:var(--ok)} .opt .pros .n i{color:var(--warn)}
+
+/* legend */
+.legend{display:flex;gap:16px;align-items:center;font-size:11px;color:var(--ink2);font-weight:400}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;border-radius:1px;display:block}
+
+/* chart */
+.chart{width:100%;position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+#tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;padding:8px 10px;
+     font-family:var(--mono);font-size:10.5px;line-height:1.55;white-space:nowrap;opacity:0;
+     transition:opacity .12s;z-index:5;transform:translate(-50%,-115%)}
+#tip b{font-weight:600}
+#tip .fx{color:#9DB8FF} #tip .cp{color:#F0C078}
+
+/* timeline (ops rule) */
+.tl{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
+.tl .d{border:1px solid var(--rule);padding:10px 8px;min-height:96px;display:flex;
+       flex-direction:column;gap:6px;background:var(--card)}
+.tl .d.carry{background:var(--cp-soft);border-color:transparent}
+.tl .wd{font-family:var(--mono);font-size:11px;font-weight:600}
+.tl .src{font-size:10px;color:var(--ink2);line-height:1.4;font-weight:300}
+.tl .badge{font-family:var(--mono);font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
+           padding:2px 5px;align-self:flex-start;margin-top:auto}
+.tl .badge.new{background:var(--fx);color:#fff}
+.tl .badge.old{background:var(--cp);color:#fff}
+
+/* next steps */
+.steps{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.steps li{list-style:none;display:grid;grid-template-columns:20px 1fr;gap:12px;padding:11px 0;
+          border-bottom:1px solid var(--rule-2);font-size:12.5px;color:var(--ink2);font-weight:300;line-height:1.5}
+.steps i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink3);padding-top:3px}
+.steps b{color:var(--ink);font-weight:600}
+
+/* motion — base state is the resting state; animation plays from an offset */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.slide.is-active [data-a]{animation:rise .32s cubic-bezier(.22,.7,.3,1) backwards}
+.slide.is-active [data-a="1"]{animation-delay:.02s}
+.slide.is-active [data-a="2"]{animation-delay:.06s}
+.slide.is-active [data-a="3"]{animation-delay:.10s}
+.slide.is-active [data-a="4"]{animation-delay:.14s}
+.slide.is-active [data-a="5"]{animation-delay:.18s}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.slide.is-active .growx{transform-origin:left center;animation:grow .62s cubic-bezier(.22,.7,.3,1) backwards;animation-delay:.2s}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){
+  .slide.is-active [data-a],.slide.is-active .growx{animation:none}
+  *{transition-duration:.01ms!important}
+}
+</style>
+
+<div id="stage">
+  <div id="deck" role="region" aria-label="막지 스톡 할인율 산식 슬라이드">
+    <div id="tip" aria-hidden="true"></div>
+  </div>
+</div>
+
+<script>
+window.DECK = {"meta":{"keyword":"모닝빵","period":"일간 : 2026-06-10 ~ 2026-09-10","fx_days":65,"search_days":93,"sim_days":91,"fx_src":"매매기준율","base_price":4500,"params":{"w_fx":0.28,"scale":50,"w_s":0.1,"cap_fx":28.0,"cap_total":38.0}},"totals":{"median":12.0,"mean":12.5,"max":30.9,"min":5.3,"sd":5.0,"fx_zero_days":26,"fx_zero_pct":28.6},"fx":{"mean_drop":0.185,"max_drop":1.663,"max_rise":-1.535,"n":64,"fx_min":1341.0,"fx_max":1552.0,"fx_first":1523.0,"fx_last":1351.0},"search":{"min":53.1746,"max":100.0,"mean":74.5,"median":75.0},"hist":[{"label":"0%","n":0,"pct":0.0},{"label":"0~5","n":0,"pct":0.0},{"label":"5~10","n":38,"pct":41.8},{"label":"10~15","n":31,"pct":34.1},{"label":"15~20","n":14,"pct":15.4},{"label":"20~25","n":6,"pct":6.6},{"label":"25~30","n":1,"pct":1.1},{"label":"30~38","n":1,"pct":1.1}],"weekday":[{"wd":"월","n":13,"idx":72.4,"coupon":7.24,"fx":6.12,"total":13.37,"fresh":0},{"wd":"화","n":13,"idx":80.2,"coupon":8.01,"fx":4.31,"total":12.32,"fresh":12},{"wd":"수","n":13,"idx":80.7,"coupon":8.07,"fx":4.02,"total":12.09,"fresh":13},{"wd":"목","n":13,"idx":77.4,"coupon":7.74,"fx":5.64,"total":13.38,"fresh":13},{"wd":"금","n":13,"idx":76.3,"coupon":7.64,"fx":3.25,"total":10.88,"fresh":13},{"wd":"토","n":13,"idx":67.5,"coupon":6.75,"fx":6.12,"total":12.88,"fresh":12},{"wd":"일","n":13,"idx":65.9,"coupon":6.59,"fx":6.12,"total":12.72,"fresh":0}],"frozen":[{"date":"2026-06-13","fx":11.87,"coupons":[6.75,7.22,7.62],"totals":[18.62,19.09,19.49],"spread":0.87},{"date":"2026-06-20","fx":6.18,"coupons":[6.31,6.67,7.14],"totals":[12.49,12.84,13.32],"spread":0.83},{"date":"2026-06-27","fx":4.71,"coupons":[7.9,6.11,7.9],"totals":[12.61,10.83,12.61],"spread":1.78},{"date":"2026-07-04","fx":5.45,"coupons":[7.26,7.5,7.7],"totals":[12.72,12.95,13.15],"spread":0.43},{"date":"2026-07-11","fx":5.58,"coupons":[6.75,6.71,7.5],"totals":[12.32,12.28,13.08],"spread":0.8},{"date":"2026-07-18","fx":0,"coupons":[7.54,6.31,7.46],"totals":[7.54,6.31,7.46],"spread":1.23},{"date":"2026-07-25","fx":12.32,"coupons":[5.56,6.63,8.1],"totals":[17.88,18.95,20.42],"spread":2.54},{"date":"2026-08-01","fx":0,"coupons":[6.51,6.35,7.5],"totals":[6.51,6.35,7.5],"spread":1.15},{"date":"2026-08-08","fx":13.27,"coupons":[6.94,6.19,6.94],"totals":[20.21,19.46,20.21],"spread":0.75},{"date":"2026-08-15","fx":2.46,"coupons":[6.15,5.99,6.55],"totals":[8.62,8.46,9.01],"spread":0.55},{"date":"2026-08-22","fx":7.52,"coupons":[7.5,6.94,6.71],"totals":[15.02,14.47,14.23],"spread":0.79},{"date":"2026-08-29","fx":2.53,"coupons":[5.71,7.22,6.94],"totals":[8.24,9.75,9.47],"spread":1.51},{"date":"2026-09-05","fx":7.73,"coupons":[6.87,5.83,6.07],"totals":[14.6,13.57,13.8],"spread":1.03}],"scen":{"include":{"median":12.0,"mean":12.5,"max":30.9,"min":5.3,"zero_days":0,"zero_pct":0.0,"daily_move":4.82,"still_days":16,"still_pct":17.8},"separate":{"median":4.0,"mean":5.1,"max":23.3,"min":0,"zero_days":26,"zero_pct":28.6,"daily_move":4.7,"still_days":33,"still_pct":36.7}},"ev":{"budget":{"fx_alloc":28.0,"fx_used_mean":5.08,"fx_used_pct":18.2,"fx_used_max":23.28,"fx_max_pct":83.1,"cp_alloc":10.0,"cp_used_mean":7.43,"cp_used_pct":74.3,"cp_used_max":10.0,"cp_max_pct":100.0},"variance":{"fx":26.64,"coupon":0.83,"total":25.46,"fx_share":97.0,"cp_share":3.0,"corr":-0.213},"caps":{"fx_cap_hits":0,"total_cap_hits":0,"trigger_drop":2.0,"max_drop_obs":1.663,"n_fx_days":64,"days_over_1":3,"days_over_15":2,"days_over_2":0,"headroom":4.72},"slope":{"effective":14.000000000000002,"per_0_5":7.0,"per_1_0":14.0,"mean_drop":0.185,"mean_drop_disc":2.6},"movement":{"daily_move":4.82,"fresh_move":6.65,"frozen_spread":1.1,"ratio":6.1},"margin":{"max_total":30.86,"p95":20.42,"over_30":1,"over_25":2}},"series":{"date":["2026-06-12","2026-06-13","2026-06-14","2026-06-15","2026-06-16","2026-06-17","2026-06-18","2026-06-19","2026-06-20","2026-06-21","2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-27","2026-06-28","2026-06-29","2026-06-30","2026-07-01","2026-07-02","2026-07-03","2026-07-04","2026-07-05","2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10","2026-07-11","2026-07-12","2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17","2026-07-18","2026-07-19","2026-07-20","2026-07-21","2026-07-22","2026-07-23","2026-07-24","2026-07-25","2026-07-26","2026-07-27","2026-07-28","2026-07-29","2026-07-30","2026-07-31","2026-08-01","2026-08-02","2026-08-03","2026-08-04","2026-08-05","2026-08-06","2026-08-07","2026-08-08","2026-08-09","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-15","2026-08-16","2026-08-17","2026-08-18","2026-08-19","2026-08-20","2026-08-21","2026-08-22","2026-08-23","2026-08-24","2026-08-25","2026-08-26","2026-08-27","2026-08-28","2026-08-29","2026-08-30","2026-08-31","2026-09-01","2026-09-02","2026-09-03","2026-09-04","2026-09-05","2026-09-06","2026-09-07","2026-09-08","2026-09-09","2026-09-10"],"wd":["금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목","금","토","일","월","화","수","목"],"fx":[0,11.87,11.87,11.87,3.78,4.53,0,0,6.18,6.18,6.18,0,3.1,0,1.18,4.71,4.71,4.71,0,0,0,10.82,5.45,5.45,5.45,3.65,10.07,11.06,0.46,5.58,5.58,5.58,0,8.39,2.82,0,0,0,0,12.2,0,3.31,1.89,12.32,12.32,12.32,0,11.44,9.13,21.78,0,0,0,13.08,0.98,6.36,0,13.27,13.27,13.27,0,4.63,0,0,2.46,2.46,2.46,2.46,4.44,23.28,0,7.52,7.52,7.52,4.54,0,0,4.04,2.53,2.53,2.53,12.67,0,15.78,2.06,7.73,7.73,7.73,3.63,4.68,1.56],"cp":[8.41,6.75,7.22,7.62,8.37,9.01,8.25,7.54,6.31,6.67,7.14,8.73,9.01,9.13,7.66,7.9,6.11,7.9,8.21,9.33,8.45,8.06,7.26,7.5,7.7,8.29,8.69,8.69,10.0,6.75,6.71,7.5,8.41,7.18,8.49,5.32,7.54,6.31,7.46,8.17,7.9,6.79,7.9,5.56,6.63,8.1,7.94,7.18,6.07,6.87,6.51,6.35,7.5,6.63,8.02,8.13,7.42,6.94,6.19,6.94,7.46,7.34,7.3,7.02,6.15,5.99,6.55,7.34,8.1,7.58,7.82,7.5,6.94,6.71,7.58,8.29,8.06,7.9,5.71,7.22,6.94,8.93,6.94,6.43,7.34,6.87,5.83,6.07,8.13,7.9,7.22],"tot":[8.41,18.62,19.09,19.49,12.15,13.53,8.25,7.54,12.49,12.84,13.32,8.73,12.1,9.13,8.84,12.61,10.83,12.61,8.21,9.33,8.45,18.88,12.72,12.95,13.15,11.94,18.76,19.75,10.46,12.32,12.28,13.08,8.41,15.58,11.31,5.32,7.54,6.31,7.46,20.37,7.9,10.09,9.79,17.88,18.95,20.42,7.94,18.63,15.21,28.64,6.51,6.35,7.5,19.71,8.99,14.5,7.42,20.21,19.46,20.21,7.46,11.98,7.3,7.02,8.62,8.46,9.01,9.81,12.54,30.86,7.82,15.02,14.47,14.23,12.12,8.29,8.06,11.93,8.24,9.75,9.47,21.6,6.94,22.2,9.4,14.6,13.57,13.8,11.76,12.57,8.79],"fresh":[1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1],"rate":[1533.0,1520.0,null,null,1515.9,1511.0,1518.0,1541.3,1534.5,null,null,1537.6,1534.2,1545.5,1544.2,1539.0,null,null,1543.0,1550.0,1552.0,1540.0,1534.0,null,null,1530.0,1519.0,1507.0,1506.5,1500.5,null,null,1501.0,1492.0,1489.0,1492.0,null,null,null,1479.0,1482.5,1479.0,1477.0,1464.0,null,null,1468.0,1456.0,1446.5,1424.0,1444.5,null,null,1431.0,1430.0,1423.5,1424.5,1411.0,null,null,1419.7,1415.0,1419.5,1420.0,1417.5,null,null,null,1413.0,1389.5,1396.0,1388.5,null,null,1384.0,1384.5,1387.5,1383.5,1381.0,null,null,1368.5,1375.5,1360.0,1358.0,1350.5,null,null,1347.0,1342.5,1341.0],"drop":[-0.657,0.848,0.848,0.848,0.27,0.323,-0.463,-1.535,0.441,0.441,0.441,-0.202,0.221,-0.737,0.084,0.337,0.337,0.337,-0.26,-0.454,-0.129,0.773,0.39,0.39,0.39,0.261,0.719,0.79,0.033,0.398,0.398,0.398,-0.033,0.6,0.201,-0.202,-0.202,-0.202,-0.202,0.871,-0.237,0.236,0.135,0.88,0.88,0.88,-0.273,0.817,0.652,1.556,-1.44,-1.44,-1.44,0.935,0.07,0.455,-0.07,0.948,0.948,0.948,-0.617,0.331,-0.318,-0.035,0.176,0.176,0.176,0.176,0.318,1.663,-0.468,0.537,0.537,0.537,0.324,-0.036,-0.217,0.288,0.181,0.181,0.181,0.905,-0.511,1.127,0.147,0.552,0.552,0.552,0.259,0.334,0.112],"idx":[84.12698,67.46031,72.22222,76.19047,83.73015,90.07936,82.53968,75.39682,63.09523,66.66666,71.42857,87.30158,90.07936,91.26984,76.5873,78.96825,61.11111,78.96825,82.14285,93.25396,84.5238,80.55555,72.61904,75.0,76.98412,82.9365,86.90476,86.90476,100.0,67.46031,67.06349,75.0,84.12698,71.82539,84.92063,53.1746,75.39682,63.09523,74.60317,81.74603,78.96825,67.85714,78.96825,55.55555,66.26984,80.95238,79.36507,71.82539,60.71428,68.65079,65.07936,63.49206,75.0,66.26984,80.15873,81.3492,74.20634,69.44444,61.90476,69.44444,74.60317,73.41269,73.01587,70.23809,61.50793,59.92063,65.47619,73.41269,80.95238,75.79365,78.1746,75.0,69.44444,67.06349,75.79365,82.9365,80.55555,78.96825,57.14285,72.22222,69.44444,89.28571,69.44444,64.28571,73.41269,68.65079,58.33333,60.71428,81.3492,78.96825,72.22222]}};
+</script>
+<script>
+(function(){
+"use strict";
+var D = window.DECK, S = D.series, EV = D.ev, T = D.totals, SC = D.scen;
+var FXC = "#1B4FD8", CPC = "#C07A12", INK = "#15171C", INK2 = "#5C6168",
+    INK3 = "#8B8F96", RULE = "#E2E2DA", WARN = "#B23A34";
+var N = function(v,d){ return Number(v).toFixed(d===undefined?1:d); };
+
+/* ---------- tiny svg helper ---------- */
+function svg(w,h,inner){
+  return '<svg viewBox="0 0 '+w+' '+h+'" role="img" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
+}
+function txt(x,y,s,o){ o=o||{};
+  return '<text x="'+x+'" y="'+y+'" fill="'+(o.fill||INK2)+'" font-size="'+(o.size||10)+'"'+
+    ' font-family="'+(o.mono===false?'inherit':'IBM Plex Mono, monospace')+'"'+
+    ' font-weight="'+(o.w||400)+'" text-anchor="'+(o.anchor||'start')+'"'+
+    (o.ls?' letter-spacing="'+o.ls+'"':'')+'>'+s+'</text>';
+}
+function rect(x,y,w,h,f,r){
+  if(w<=0||h<=0) return '';
+  return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+f+'"'+(r?' rx="'+r+'"':'')+'/>';
+}
+function line(x1,y1,x2,y2,c,w,dash){
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(w||1)+'"'+
+    (dash?' stroke-dasharray="'+dash+'"':'')+'/>';
+}
+
+/* ---------- chart 1: 38%p budget bar ---------- */
+function chartBudget(){
+  var W=560,H=112, x0=0, bw=W, y=30, bh=40;
+  var fxw = bw*28/38, cpw = bw*10/38;
+  var s='';
+  s+= txt(0,12,'할인율 예산 38%p',{size:10,fill:INK3,ls:'.1em'});
+  s+= rect(x0,y,fxw-2,bh,FXC);
+  s+= rect(x0+fxw,y,cpw,bh,CPC);
+  s+= txt(x0+12,y+25,'환율 28%p',{size:13,w:600,fill:'#fff'});
+  s+= txt(x0+fxw+10,y+25,'검색 10%p',{size:12,w:600,fill:'#fff'});
+  s+= line(x0,y+bh+10,x0+fxw-2,y+bh+10,FXC,1);
+  s+= line(x0+fxw,y+bh+10,W,y+bh+10,CPC,1);
+  s+= txt(x0,y+bh+26,'기본 엔진 · 매일 가격에 반영',{size:9.5,fill:INK2});
+  s+= txt(x0+fxw,y+bh+26,'이벤트 쿠폰',{size:9.5,fill:INK2});
+  return svg(W,H,s);
+}
+
+/* ---------- chart 2: scale ×1 vs ×50 ---------- */
+function chartScale(){
+  var W=560,H=150, lab=96, bx=lab+8, bw=W-bx-64, y=26, bh=30, gap=54;
+  var a=EV.budget.fx_used_mean/50, b=EV.budget.fx_used_mean, max=b*1.12;
+  var s='';
+  s+= txt(0,10,'평균 환율할인 (%p)',{size:10,fill:INK3,ls:'.1em'});
+  s+= txt(0,y+20,'0.28만',{size:11.5,fill:INK,w:500});
+  s+= rect(bx,y,Math.max(bw*a/max,2.5),bh,'#C9CBD1',2);
+  s+= txt(bx+Math.max(bw*a/max,2.5)+8,y+20,N(a,2)+'%p  ≈ 5원',{size:12,fill:INK2,w:500});
+  s+= txt(0,y+gap+20,'0.28 × 50',{size:11.5,fill:INK,w:600});
+  s+= '<g class="growx">'+rect(bx,y+gap,bw*b/max,bh,FXC,2)+'</g>';
+  s+= txt(bx+bw*b/max+8,y+gap+20,N(b,2)+'%p  ≈ 229원',{size:12,fill:FXC,w:600});
+  s+= line(0,y+gap+bh+22,W,y+gap+bh+22,RULE,1);
+  s+= txt(0,y+gap+bh+40,'정가 4,500원 기준 · 실효 기울기 0.28 × 50 = 14 · 하락 1% = 할인 14%p',{size:9.5,fill:INK3});
+  return svg(W,H,s);
+}
+
+/* ---------- chart 3: 91-day stacked area ---------- */
+var TS={};
+function chartSeries(){
+  var W=1000,H=286, L=42,R=14,Tp=16,B=30;
+  var pw=W-L-R, ph=H-Tp-B, n=S.tot.length, max=35;
+  var X=function(i){return L+pw*i/(n-1)}, Y=function(v){return Tp+ph-ph*v/max};
+  TS={X:X,Y:Y,n:n,W:W,H:H,L:L,pw:pw,Tp:Tp,ph:ph};
+  var s='';
+  for(var g=0;g<=35;g+=7){
+    s+= line(L,Y(g),W-R,Y(g),g===0?RULE:'#F0F0EA',1);
+    s+= txt(L-8,Y(g)+3.5,String(g),{size:9.5,fill:INK3,anchor:'end'});
+  }
+  s+= txt(L-8,Y(35)-8,'%p',{size:9,fill:INK3,anchor:'end'});
+  /* stacked areas: fx bottom, coupon on top */
+  var pFx='M'+X(0)+' '+Y(0), pTot='M'+X(0)+' '+Y(0), i;
+  for(i=0;i<n;i++) pFx+=' L'+X(i)+' '+Y(S.fx[i]);
+  pFx+=' L'+X(n-1)+' '+Y(0)+' Z';
+  for(i=0;i<n;i++) pTot+=' L'+X(i)+' '+Y(S.tot[i]);
+  pTot+=' L'+X(n-1)+' '+Y(0)+' Z';
+  s+= '<path d="'+pTot+'" fill="'+CPC+'" fill-opacity=".22"/>';
+  s+= '<path d="'+pFx+'" fill="'+FXC+'" fill-opacity=".16"/>';
+  var lTot='', lFx='';
+  for(i=0;i<n;i++){ lTot+=(i?' L':'M')+X(i)+' '+Y(S.tot[i]); lFx+=(i?' L':'M')+X(i)+' '+Y(S.fx[i]); }
+  s+= '<path d="'+lTot+'" fill="none" stroke="'+CPC+'" stroke-width="2" stroke-linejoin="round"/>';
+  s+= '<path d="'+lFx+'" fill="none" stroke="'+FXC+'" stroke-width="2" stroke-linejoin="round"/>';
+  /* median + caps */
+  s+= line(L,Y(T.median),W-R,Y(T.median),INK,1,'4 3');
+  s+= '<rect x="'+(L+4)+'" y="'+(Y(T.median)-15)+'" width="96" height="14" fill="#FFFFFF"/>';
+  s+= txt(L+8,Y(T.median)-4,'중앙값 '+N(T.median)+'%p',{size:9.5,fill:INK,w:600});
+  /* x labels: month starts */
+  var seen={};
+  for(i=0;i<n;i++){ var mo=S.date[i].slice(0,7);
+    if(!seen[mo]){ seen[mo]=1; if(i>2){ s+= line(X(i),Tp,X(i),Tp+ph,'#EDEDE6',1); }
+      s+= txt(X(i),H-10,mo.replace('2026-','')+'월',{size:9.5,fill:INK3,anchor:i<3?'start':'middle'}); } }
+  s+= txt(W-R,H-10,'09-10',{size:9.5,fill:INK3,anchor:'end'});
+  /* hover layer */
+  s+= '<g id="ts-hover" opacity="0">'+line(0,Tp,0,Tp+ph,INK,1)+
+      '<circle cx="0" cy="0" r="4.5" fill="'+CPC+'" stroke="#fff" stroke-width="2"/>'+
+      '<circle cx="0" cy="0" r="4.5" fill="'+FXC+'" stroke="#fff" stroke-width="2"/></g>';
+  s+= '<rect id="ts-cap" x="'+L+'" y="'+Tp+'" width="'+pw+'" height="'+ph+'" fill="transparent" style="cursor:crosshair"/>';
+  return svg(W,H,s);
+}
+
+/* ---------- chart 4: histogram ---------- */
+function chartHist(){
+  var W=520,H=224, L=34,B=36,Tp=12,R=6;
+  var bars=D.hist.filter(function(b){return b.label!=='0%'}), n=bars.length;
+  var pw=W-L-R, ph=H-Tp-B, max=0;
+  bars.forEach(function(b){ if(b.n>max) max=b.n; });
+  var bw=pw/n, s='';
+  s+= line(L,Tp+ph,W-R,Tp+ph,RULE,1);
+  bars.forEach(function(b,i){
+    var h=ph*b.n/max, x=L+bw*i+3, y=Tp+ph-h;
+    s+= rect(x,y,bw-6,h,FXC,3);
+    if(b.n) s+= txt(x+(bw-6)/2,y-6,String(b.n),{size:10.5,fill:INK,w:600,anchor:'middle'});
+    s+= txt(x+(bw-6)/2,Tp+ph+15,b.label,{size:9,fill:INK3,anchor:'middle'});
+    s+= txt(x+(bw-6)/2,Tp+ph+27,N(b.pct,0)+'%',{size:8.5,fill:INK3,anchor:'middle'});
+  });
+  s+= txt(L-6,Tp+10,'일수',{size:9,fill:INK3,anchor:'end'});
+  s+= txt(W-R,H-4,'총할인 구간 (%p)',{size:9,fill:INK3,anchor:'end'});
+  return svg(W,H,s);
+}
+
+/* ---------- chart 5: weekday ---------- */
+function chartWeekday(){
+  var W=560,H=214, L=30,B=44,Tp=14,R=8;
+  var w=D.weekday, n=w.length, pw=W-L-R, ph=H-Tp-B;
+  var avg=D.search.mean, max=0;
+  w.forEach(function(d){ if(d.idx>max) max=d.idx; });
+  max=max*1.1;
+  var bw=pw/n, s='';
+  s+= line(L,Tp+ph,W-R,Tp+ph,RULE,1);
+  s+= line(L,Tp+ph-ph*avg/max,W-R,Tp+ph-ph*avg/max,INK3,1,'3 3');
+  s+= txt(W-R,Tp+ph-ph*avg/max-5,'전체 평균 '+N(avg)+'',{size:9,fill:INK3,anchor:'end'});
+  w.forEach(function(d,i){
+    var h=ph*d.idx/max, x=L+bw*i+7, y=Tp+ph-h, wknd=(d.wd==='토'||d.wd==='일');
+    s+= rect(x,y,bw-14,h,wknd?CPC:'#C6CBD6',3);
+    s+= txt(x+(bw-14)/2,y-6,N(d.idx),{size:10,fill:wknd?CPC:INK2,w:600,anchor:'middle'});
+    s+= txt(x+(bw-14)/2,Tp+ph+16,d.wd,{size:11.5,fill:wknd?CPC:INK,w:600,anchor:'middle',mono:false});
+    s+= txt(x+(bw-14)/2,Tp+ph+30,d.fresh===0?'이월':'신규 '+d.fresh,
+            {size:8.5,fill:d.fresh===0?WARN:INK3,anchor:'middle',w:d.fresh===0?600:400});
+  });
+  s+= txt(L-4,Tp+8,'검색지수',{size:9,fill:INK3,anchor:'end'});
+  s+= txt(L,H-4,'하단 = 환율 신규 반영 일수 (91일 중)',{size:9,fill:INK3});
+  return svg(W,H,s);
+}
+
+/* ---------- chart 6: frozen weekends (slope triplets) ---------- */
+function chartFrozen(){
+  var fz=D.frozen, n=fz.length, W=1000,H=196, L=8,R=8,Tp=18,B=40;
+  var pw=(W-L-R)/n, ph=H-Tp-B, max=34;
+  var s='', Y=function(v){return Tp+ph-ph*v/max};
+  for(var g=0;g<=30;g+=10){ s+= line(L,Y(g),W-R,Y(g),'#F0F0EA',1);
+    s+= txt(L,Y(g)-4,g+'%p',{size:8.5,fill:INK3}); }
+  fz.forEach(function(f,i){
+    var x0=L+pw*i+pw*0.22, step=pw*0.56/2, p='', j;
+    for(j=0;j<3;j++) p+=(j?' L':'M')+(x0+step*j)+' '+Y(f.totals[j]);
+    s+= '<path d="'+p+'" fill="none" stroke="'+FXC+'" stroke-width="2" stroke-linejoin="round"/>';
+    for(j=0;j<3;j++) s+= '<circle cx="'+(x0+step*j)+'" cy="'+Y(f.totals[j])+'" r="3.6" fill="'+FXC+'" stroke="#fff" stroke-width="1.6"/>';
+    s+= txt(x0+step,Y(Math.max.apply(null,f.totals))-10,'±'+N(f.spread),{size:9,fill:INK2,anchor:'middle',w:600});
+    s+= txt(x0+step,H-22,f.date.slice(5),{size:8.5,fill:INK3,anchor:'middle'});
+    if(i<n-1) s+= line(L+pw*(i+1),Tp,L+pw*(i+1),Tp+ph,'#F4F4EE',1);
+  });
+  s+= txt(L,H-6,'각 구간 = 토 · 일 · 월 3일 (환율 고정, 쿠폰만 변동) · 숫자는 3일간 총할인 변동폭',{size:9,fill:INK3});
+  return svg(W,H,s);
+}
+
+/* ---------- chart 7: budget usage ---------- */
+function chartUsage(){
+  var W=460,H=136, L=54, bw=W-L-58, s='';
+  var b=EV.budget;
+  [['환율',b.fx_used_mean,b.fx_alloc,b.fx_used_pct,FXC],
+   ['검색',b.cp_used_mean,b.cp_alloc,b.cp_used_pct,CPC]].forEach(function(r,i){
+    var y=18+i*58, bh=26, full=bw*r[2]/28;
+    s+= txt(0,y+18,r[0],{size:12,fill:INK,w:600,mono:false});
+    s+= rect(L,y,full,bh,'#EDEDE6',2);
+    s+= '<g class="growx">'+rect(L,y,full*r[1]/r[2],bh,r[4],2)+'</g>';
+    s+= txt(L+full+10,y+18,N(r[3],0)+'%',{size:15,fill:r[4],w:600});
+    s+= txt(L,y+bh+15,'평균 '+N(r[1],2)+'%p / 배분 '+N(r[2],0)+'%p',{size:9.5,fill:INK3});
+  });
+  return svg(W,H,s);
+}
+
+/* ---------- chart 8: variance split ---------- */
+function chartVariance(){
+  var W=460,H=96, s='', v=EV.variance, bw=W, y=26, bh=34;
+  s+= txt(0,12,'가격 변동성 기여도',{size:10,fill:INK3,ls:'.1em'});
+  s+= '<g class="growx">'+rect(0,y,bw*v.fx_share/100-2,bh,FXC)+
+      rect(bw*v.fx_share/100,y,bw*v.cp_share/100,bh,CPC)+'</g>';
+  s+= txt(12,y+23,'환율 '+N(v.fx_share)+'%',{size:14,fill:'#fff',w:600});
+  s+= txt(bw-4,y+bh+18,'검색 '+N(v.cp_share)+'%',{size:11,fill:CPC,w:600,anchor:'end'});
+  return svg(W,H,s);
+}
+
+/* ---------- chart 9: scenario compare ---------- */
+function chartScen(){
+  var W=520,H=210, L=0, s='';
+  var rows=[
+    ['표시 할인율 중앙값', SC.include.median, SC.separate.median, '%p', 14],
+    ['할인 0%인 날', SC.include.zero_days, SC.separate.zero_days, '일', 30],
+    ['사실상 정지일', SC.include.still_days, SC.separate.still_days, '일', 40]
+  ];
+  rows.forEach(function(r,i){
+    var y=14+i*66, bw=300, max=r[4];
+    s+= txt(0,y,r[0],{size:11,fill:INK,w:600,mono:false});
+    [[r[1],FXC,'A 포함'],[r[2],'#B9BDC6','B 분리']].forEach(function(p,j){
+      var yy=y+12+j*20;
+      s+= txt(0,yy+9,p[2],{size:9,fill:INK3});
+      s+= rect(46,yy,Math.max(bw*p[0]/max,1.5),13,p[1],2);
+      s+= txt(46+Math.max(bw*p[0]/max,1.5)+7,yy+10,N(p[0], r[3]==='일'?0:1)+r[3],
+              {size:10.5,fill:j?INK2:FXC,w:600});
+    });
+  });
+  return svg(W,H,s);
+}
+
+/* ================= slides ================= */
+var slides=[];
+
+slides.push({sec:'표지', cover:true, html:
+ '<div class="cover">'+
+  '<div class="cover-l">'+
+    '<div data-a="1">'+
+      '<div class="eyebrow">MAKJI STOCK · 가격 산식 검증</div>'+
+      '<h1>환율로<br>빵값을 움직인다</h1>'+
+      '<p class="sub" style="margin-top:18px">일일 할인율 산식의 설계 근거와, 실제 환율·검색량 데이터 '+
+      D.meta.sim_days+'일을 그대로 넣었을 때 나오는 할인율 통계.</p>'+
+    '</div>'+
+    '<div class="meta-strip" data-a="3">'+
+      '<div><div class="k">기간</div><div class="v tnum">2026.06.10 – 09.10</div></div>'+
+      '<div><div class="k">환율</div><div class="v tnum">'+D.meta.fx_days+'영업일 · 매매기준율</div></div>'+
+      '<div><div class="k">검색량</div><div class="v tnum">'+D.meta.search_days+'일 · '+D.meta.keyword+'</div></div>'+
+      '<div><div class="k">시뮬레이션</div><div class="v tnum">'+D.meta.sim_days+'일</div></div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="cover-r" data-a="2">'+
+    '<div class="cover-fig"><div class="k">총할인 중앙값</div>'+
+      '<div class="v tnum" style="color:var(--fx)">'+N(T.median)+'<span style="font-size:17px">%p</span></div>'+
+      '<div class="n">절반의 날이 이보다 높은 할인</div></div>'+
+    '<div class="cover-fig"><div class="k">관측 최대</div>'+
+      '<div class="v tnum">'+N(T.max)+'<span style="font-size:17px">%p</span></div>'+
+      '<div class="n">상한 38%p에 도달한 날 0회</div></div>'+
+    '<div class="cover-fig"><div class="k">할인 0%인 날</div>'+
+      '<div class="v tnum" style="color:var(--ok)">0<span style="font-size:17px">일</span></div>'+
+      '<div class="n">쿠폰을 포함했을 때 (결정 1)</div></div>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'설계 의도', html:
+ '<div data-a="1"><div class="eyebrow">01 — 왜 이 산식인가</div>'+
+ '<h2>세 가지를 동시에 만족시켜야 합니다</h2>'+
+ '<p class="lede">빵값이 스스로 움직여야 하고, 매일 다시 보러 올 이유가 있어야 하고, 그러면서 마진이 깨지면 안 됩니다.</p></div>'+
+ '<div class="cols c-5-7" style="margin-top:24px">'+
+  '<ul class="goals" data-a="2">'+
+   '<li><span class="n">01</span><div><div class="t">바이럴</div><div class="d">빵값이 주식처럼 매일 등락한다는 발상 자체가 콘텐츠가 됩니다.</div></div></li>'+
+   '<li><span class="n">02</span><div><div class="t">재방문</div><div class="d">오늘의 시세를 확인하러 자사몰에 들어오게 만듭니다.</div></div></li>'+
+   '<li><span class="n">03</span><div><div class="t">마진 방어</div><div class="d">어떤 경우에도 총 할인율이 38%를 넘지 않아야 합니다.</div></div></li>'+
+  '</ul>'+
+  '<div class="stack" data-a="3">'+
+   '<div class="panel"><h3>두 지표에 서로 다른 역할을 줍니다</h3>'+
+    '<p class="sub" style="font-size:13px">환율은 <mark>기본 엔진</mark>입니다. 매일 표시 가격을 직접 움직입니다. '+
+    '검색량은 <mark class="c">추가 이벤트</mark>입니다. 관심이 몰린 상품에 쿠폰을 얹습니다.</p></div>'+
+   '<div class="chart">'+chartBudget()+'</div>'+
+   '<p class="note">환율을 고른 이유 — 일일 변동률은 뉴스에 매일 나옵니다. 소비자가 직접 검증할 수 있는 유일한 공개 지표입니다.</p>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'계산식', html:
+ '<div data-a="1"><div class="eyebrow">02 — 계산식</div>'+
+ '<h2>두 항의 합, 그리고 두 개의 캡</h2></div>'+
+ '<div class="cols c-7-5" style="margin-top:22px">'+
+  '<div class="stack">'+
+   '<div class="formula" data-a="2">'+
+    '<div class="frow"><span class="flabel">총 할인율</span>'+
+      '<span class="fexpr big">min(<span class="w">38</span>, <span class="fx">환율할인</span> + <span class="cp">검색쿠폰</span>)</span></div>'+
+    '<div class="fdiv"></div>'+
+    '<div class="frow"><span class="flabel">환율할인</span>'+
+      '<span class="fexpr"><span class="fx">min(28, max(0, 하락율 × 0.28 × 50))</span></span></div>'+
+    '<div class="frow"><span class="flabel">검색쿠폰</span>'+
+      '<span class="fexpr"><span class="cp">검색량지수 × 0.1</span></span></div>'+
+    '<div class="fdiv"></div>'+
+    '<div class="frow"><span class="flabel">하락율</span>'+
+      '<span class="fexpr">(전일 − 당일) ÷ 전일 × 100</span></div>'+
+   '</div>'+
+   '<div class="kpis k3" data-a="3">'+
+    '<div class="kpi"><div class="k">실효 기울기</div><div class="v fx tnum">14</div>'+
+      '<div class="n">0.28 × 50 · 하락 1% = 할인 14%p</div></div>'+
+    '<div class="kpi"><div class="k">28%p 캡 임계</div><div class="v tnum">'+N(EV.caps.trigger_drop,2)+'%</div>'+
+      '<div class="n">일일 하락율이 이 값을 넘을 때</div></div>'+
+    '<div class="kpi"><div class="k">검색쿠폰 범위</div><div class="v cp tnum">'+N(D.search.min*0.1)+'–'+N(D.search.max*0.1)+'</div>'+
+      '<div class="n">%p · 지수 0~100을 0.1배</div></div>'+
+   '</div>'+
+  '</div>'+
+  '<div class="stack" data-a="4">'+
+   '<div class="panel q"><h3>하락만 취급합니다</h3><p class="sub" style="font-size:12.5px">'+
+    '환율이 오른 날은 <strong>max(0, …)</strong>로 잘려 환율할인이 0이 됩니다. 정가보다 비싸게 파는 날은 없습니다.</p></div>'+
+   '<div class="panel"><h3>기준은 언제나 정가입니다</h3><p class="sub" style="font-size:12.5px">'+
+    '전일 가격이 아니라 정가에 할인율을 적용합니다. 같은 하락율이 며칠 이어져도 할인이 복리로 쌓이지 않습니다.</p></div>'+
+   '<div class="panel w"><h3>38%p는 마진 최종선</h3><p class="sub" style="font-size:12.5px">'+
+    '두 항의 배분(28 + 10)이 곧 상한입니다. 산식 구조상 38%를 넘을 수 없습니다.</p></div>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'스케일 50', html:
+ '<div data-a="1"><div class="eyebrow">03 — 파라미터</div>'+
+ '<h2>0.28은 배분, 50은 스케일입니다</h2>'+
+ '<p class="lede">둘을 곱하면 14지만 문서에 나눠 적는 이유가 있습니다. 하나는 예산이고 하나는 체감 보정이라, 나중에 조정할 때 건드리는 쪽이 다릅니다.</p></div>'+
+ '<div class="cols c-7-5" style="margin-top:24px">'+
+  '<div class="stack">'+
+   '<div class="chart" data-a="2">'+chartScale()+'</div>'+
+   '<p class="note" data-a="3">원달러 일일 하락율은 평균 '+N(D.fx.mean_drop,3)+'%입니다. 0.28만 곱하면 평균 할인이 '+
+   N(EV.budget.fx_used_mean/50,2)+'%p — 4,500원 빵에서 5원입니다. 아무도 시세가 움직였다고 느끼지 못합니다.</p>'+
+  '</div>'+
+  '<div class="stack" data-a="4">'+
+   '<div class="panel"><h3>0.28 — 예산 배분</h3><p class="sub" style="font-size:12.5px">'+
+    '최대 할인율 38%p 중 환율에 할당한 <strong>28%p</strong>. 할인 정책을 바꾸려면 이 값을 조정합니다.</p></div>'+
+   '<div class="panel"><h3>50 — 체감 스케일</h3><p class="sub" style="font-size:12.5px">'+
+    '환율 변동폭이 워낙 작아 붙인 임의 배수. 시세판이 너무 잠잠하거나 너무 요동치면 이 값을 조정합니다.</p></div>'+
+   '<div class="panel w"><h3>28%p 캡은 사고 방지용</h3><p class="sub" style="font-size:12.5px">'+
+    '이론상 하락율 '+N(EV.caps.trigger_drop,2)+'%를 넘으면 28%p를 초과합니다. 실측 '+EV.caps.n_fx_days+
+    '영업일 중 발동 <strong>0회</strong> — 평시 운영엔 간섭하지 않고 외환 충격 때만 작동합니다.</p></div>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'운영 룰', html:
+ '<div data-a="1"><div class="eyebrow">04 — 운영 룰</div>'+
+ '<h2>매일 09:00 개장, 전날 데이터로</h2>'+
+ '<p class="lede">데이터랩 API는 어제 23:59까지 집계된 값만 제공합니다. 자정 반영은 데이터가 아직 없을 수 있어 09:00 개장으로 맞춥니다.</p></div>'+
+ '<div class="stack" style="margin-top:22px">'+
+  '<div data-a="2"><div class="tl">'+
+   ['화','수','목','금','토','일','월'].map(function(w,i){
+     var src=['월 종가','화 종가','수 종가','목 종가','금 종가','금 종가 (이월)','금 종가 (이월)'][i];
+     var carry=i>=5;
+     return '<div class="d'+(carry?' carry':'')+'"><div class="wd">'+w+'요일 09:00</div>'+
+            '<div class="src">'+src+'</div><span class="badge '+(carry?'old':'new')+'">'+(carry?'이월':'신규')+'</span></div>';
+   }).join('')+
+  '</div></div>'+
+  '<div class="cols c-3" style="flex:none;margin-top:6px" data-a="3">'+
+   '<div class="panel"><h3>비영업일 이월</h3><p class="sub" style="font-size:12.5px">'+
+    '외환시장이 쉬는 날은 직전 영업일 하락율을 그대로 씁니다. <strong>금요일 종가가 토·일·월 3일</strong>을 결정합니다.</p></div>'+
+   '<div class="panel"><h3>주 4일 신규 · 3일 이월</h3><p class="sub" style="font-size:12.5px">'+
+    '화~토는 매일 새 환율이 반영되고, 일요일과 월요일만 금요일 값을 물려받습니다.</p></div>'+
+   '<div class="panel w"><h3>연휴는 최대 5일</h3><p class="sub" style="font-size:12.5px">'+
+    '추석·설처럼 휴장이 이어지면 동결 구간이 5일까지 늘어납니다. 결정 2에서 다룹니다.</p></div>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'실데이터 결과', html:
+ '<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px" data-a="1">'+
+  '<div><div class="eyebrow">05 — 실데이터 결과</div>'+
+  '<h2>'+D.meta.sim_days+'일을 그대로 넣으면</h2></div>'+
+  '<div class="legend"><span><i style="background:'+FXC+'"></i>환율할인</span>'+
+  '<span><i style="background:'+CPC+'"></i>+ 검색쿠폰 (총할인)</span></div>'+
+ '</div>'+
+ '<div class="chart" data-a="2" style="margin-top:16px">'+chartSeries()+'</div>'+
+ '<div class="kpis" data-a="3" style="margin-top:14px">'+
+  '<div class="kpi"><div class="k">중앙값</div><div class="v fx tnum">'+N(T.median)+'%p</div>'+
+   '<div class="n">4,500원 → '+Math.round(4500*(1-T.median/100)).toLocaleString()+'원</div></div>'+
+  '<div class="kpi"><div class="k">평균 / 표준편차</div><div class="v tnum">'+N(T.mean)+' / '+N(T.sd)+'</div>'+
+   '<div class="n">%p · 분포가 좁지 않습니다</div></div>'+
+  '<div class="kpi"><div class="k">최대 / 최소</div><div class="v tnum">'+N(T.max)+' / '+N(T.min)+'</div>'+
+   '<div class="n">%p · 38%p 캡 도달 0회</div></div>'+
+  '<div class="kpi"><div class="k">일 변동폭 평균</div><div class="v tnum">'+N(EV.movement.daily_move,2)+'%p</div>'+
+   '<div class="n">매일 가격이 실제로 움직입니다</div></div>'+
+ '</div>'});
+
+slides.push({sec:'분포', html:
+ '<div data-a="1"><div class="eyebrow">06 — 분포</div>'+
+ '<h2>절반이 10~20%p 구간에 모입니다</h2></div>'+
+ '<div class="cols c-7-5" style="margin-top:20px">'+
+  '<div class="chart" data-a="2">'+chartHist()+'</div>'+
+  '<div class="stack" data-a="3">'+
+   '<div class="tw"><table><thead><tr><th>구간 (%p)</th><th>일수</th><th>비중</th><th>4,500원 기준</th></tr></thead><tbody>'+
+    D.hist.filter(function(b){return b.label!=='0%'&&b.n>0}).map(function(b){
+      var lo=parseFloat(b.label.split('~')[0])||0;
+      return '<tr><td>'+b.label+'</td><td>'+b.n+'일</td><td>'+N(b.pct,0)+'%</td><td>−'+
+        Math.round(4500*lo/100).toLocaleString()+'원 이상</td></tr>';
+    }).join('')+
+   '</tbody></table></div>'+
+   '<div class="panel q" style="margin-top:2px"><h3>읽는 법</h3><p class="sub" style="font-size:12.5px">'+
+    '5%p 미만인 날이 하나도 없습니다. 쿠폰이 항상 '+N(D.search.min*0.1)+'%p 이상 깔리기 때문입니다. '+
+    '반대로 25%p를 넘는 날은 '+EV.margin.over_25+'일뿐이라 고할인은 희소 이벤트로 관리됩니다.</p></div>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'요일 패턴', html:
+ '<div data-a="1"><div class="eyebrow">07 — 요일 패턴</div>'+
+ '<h2>주말은 검색 피크가 아니라 저점입니다</h2>'+
+ '<p class="lede">"주말엔 검색량이 크게 움직이니 가격이 고정돼도 괜찮다"는 가정을 데이터로 확인했습니다. 반대였습니다.</p></div>'+
+ '<div class="cols c-7-5" style="margin-top:20px">'+
+  '<div class="chart" data-a="2">'+chartWeekday()+'</div>'+
+  '<div class="stack" data-a="3">'+
+   '<div class="panel"><h3>빵 검색은 평일 아침 장보기 패턴</h3><p class="sub" style="font-size:12.5px">'+
+    '월·화가 피크(+8%), 금·토가 바닥(−9%, −12%)입니다. 주말에 관심이 몰린다는 통념과 반대입니다.</p></div>'+
+   '<div class="panel w"><h3>하필 같은 요일에 환율도 멈춥니다</h3><p class="sub" style="font-size:12.5px">'+
+    '일요일과 월요일은 환율 신규 반영이 <strong>0회</strong>입니다. 가격도 멈추고 쿠폰도 최저인 구간이 겹칩니다.</p></div>'+
+   '<p class="note">지수 범위 '+N(D.search.min)+'~'+N(D.search.max)+' · 3개월 최대일 = 100 기준 · 키워드 '+D.meta.keyword+'</p>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'주말 동결', html:
+ '<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px" data-a="1">'+
+  '<div><div class="eyebrow">08 — 주말 동결</div>'+
+  '<h2>토·일·월 '+D.frozen.length+'개 구간 전수 검증</h2></div>'+
+  '<div class="legend"><span style="color:var(--ink2)">각 선 = 한 주말의 총할인 3일치</span></div>'+
+ '</div>'+
+ '<div class="chart" data-a="2" style="margin-top:14px">'+chartFrozen()+'</div>'+
+ '<div class="cols c-3" style="flex:none;margin-top:12px" data-a="3">'+
+  '<div class="kpi" style="border-right:1px solid var(--rule-2);border-top:1px solid var(--rule);padding-top:14px">'+
+   '<div class="k">동결 중 변동폭</div><div class="v cp tnum">'+N(EV.movement.frozen_spread)+'%p</div>'+
+   '<div class="n">쿠폰만 움직인 결과 · 4,500원에서 '+Math.round(4500*EV.movement.frozen_spread/100)+'원</div></div>'+
+  '<div class="kpi" style="border-right:1px solid var(--rule-2);border-top:1px solid var(--rule);padding-top:14px">'+
+   '<div class="k">환율 갱신일 변동폭</div><div class="v fx tnum">'+N(EV.movement.fresh_move)+'%p</div>'+
+   '<div class="n">화~토는 확실히 움직입니다</div></div>'+
+  '<div class="kpi" style="border-top:1px solid var(--rule);padding-top:14px">'+
+   '<div class="k">차이</div><div class="v w tnum">'+N(EV.movement.ratio)+'배</div>'+
+   '<div class="n">쿠폰만으로는 주말 시세판을 못 살립니다</div></div>'+
+ '</div>'});
+
+slides.push({sec:'근거 1', html:
+ '<div data-a="1"><div class="eyebrow">09 — 산식을 지지하는 근거</div>'+
+ '<h2>설계 의도가 실제로 구현됐는가</h2>'+
+ '<p class="lede">할인율 결과를 다시 통계 내어, "환율이 엔진, 검색이 보너스"라는 의도가 데이터에서 확인되는지 검증했습니다.</p></div>'+
+ '<div class="cols c-5-7" style="margin-top:22px">'+
+  '<div class="stack" data-a="2">'+
+   '<div class="chart">'+chartUsage()+'</div>'+
+   '<div class="chart">'+chartVariance()+'</div>'+
+  '</div>'+
+  '<ul class="ev" data-a="3">'+
+   '<li><span class="n">01</span><div><div class="t">예산이 여유 있게 운용됩니다</div>'+
+    '<div class="d">환율은 배분 28%p 중 평균 '+N(EV.budget.fx_used_mean,2)+'%p만 사용. 검색은 10%p를 '+
+    N(EV.budget.cp_used_pct,0)+'% 사용해 안정적으로 바닥을 깔아줍니다.</div></div>'+
+    '<div class="val" style="color:var(--fx)">'+N(EV.budget.fx_used_pct,0)+'%<small>환율 소진율</small></div></li>'+
+   '<li><span class="n">02</span><div><div class="t">가격을 움직이는 건 환율입니다</div>'+
+    '<div class="d">총할인 변동성의 '+N(EV.variance.fx_share)+'%가 환율에서 나옵니다. 검색은 수준을 올려주되 변동은 거의 만들지 않습니다 — 설계 의도와 정확히 일치합니다.</div></div>'+
+    '<div class="val" style="color:var(--fx)">'+N(EV.variance.fx_share)+'%<small>환율 기여</small></div></li>'+
+   '<li><span class="n">03</span><div><div class="t">두 지표가 중복되지 않습니다</div>'+
+    '<div class="d">환율할인과 검색쿠폰의 상관계수가 '+N(EV.variance.corr,3)+' — 거의 무상관입니다. 서로 다른 정보를 담고 있어 단순 합산이 정당합니다.</div></div>'+
+    '<div class="val">'+N(EV.variance.corr,2)+'<small>상관계수</small></div></li>'+
+  '</ul>'+
+ '</div>'});
+
+slides.push({sec:'근거 2', html:
+ '<div data-a="1"><div class="eyebrow">10 — 산식을 지지하는 근거</div>'+
+ '<h2>캡 · 체감 · 마진</h2></div>'+
+ '<ul class="ev" data-a="2" style="margin-top:18px">'+
+  '<li><span class="n">04</span><div><div class="t">캡이 평시 운영에 간섭하지 않습니다</div>'+
+   '<div class="d">28%p 캡은 일일 하락율 '+N(EV.caps.trigger_drop,2)+'%에서 발동합니다. 관측 '+EV.caps.n_fx_days+
+   '영업일 중 1.0% 이상이 '+EV.caps.days_over_1+'일, 1.5% 이상이 '+EV.caps.days_over_15+'일, 2.0% 이상은 '+
+   EV.caps.days_over_2+'일. 꼬리가 매우 얇아 외환 충격 때만 작동합니다.</div></div>'+
+   '<div class="val" style="color:var(--ok)">0회<small>캡 발동</small></div></li>'+
+  '<li><span class="n">05</span><div><div class="t">스케일 50이 없으면 시세판이 성립하지 않습니다</div>'+
+   '<div class="d">평균 하락율 '+N(D.fx.mean_drop,3)+'%에 0.28만 곱하면 평균 할인 '+N(EV.budget.fx_used_mean/50,2)+
+   '%p. 4,500원에서 5원이라 체감이 불가능합니다. 50을 곱해 '+N(EV.budget.fx_used_mean,2)+'%p, 229원이 됩니다.</div></div>'+
+   '<div class="val" style="color:var(--fx)">×50<small>체감 보정</small></div></li>'+
+  '<li><span class="n">06</span><div><div class="t">가격이 매일 실제로 바뀝니다</div>'+
+   '<div class="d">일 변동폭 평균 '+N(EV.movement.daily_move,2)+'%p. 환율이 갱신되는 화~토는 '+
+   N(EV.movement.fresh_move,2)+'%p씩 움직여 재방문 유인이 성립합니다. 토·일·월만 '+
+   N(EV.movement.frozen_spread,2)+'%p로 사실상 정지입니다.</div></div>'+
+   '<div class="val">'+N(EV.movement.daily_move,2)+'<small>일 변동 %p</small></div></li>'+
+  '<li><span class="n">07</span><div><div class="t">마진이 구조적으로 방어됩니다</div>'+
+   '<div class="d">총할인 최대 '+N(EV.margin.max_total)+'%p로 38%p 캡에 한 번도 닿지 않았습니다. 95%의 날이 '+
+   N(EV.margin.p95)+'%p 이하이고, 30%p 이상은 '+EV.margin.over_30+'일뿐입니다.</div></div>'+
+   '<div class="val" style="color:var(--ok)">'+N(EV.margin.p95)+'<small>95퍼센타일 %p</small></div></li>'+
+ '</ul>'});
+
+slides.push({sec:'결정 1', html:
+ '<div data-a="1"><div class="eyebrow">11 — 남은 결정 ①</div>'+
+ '<h2>검색쿠폰을 표시 할인율에 포함할까요</h2>'+
+ '<p class="lede">전광판에 뜨는 숫자가 "환율할인"인지 "환율할인 + 쿠폰"인지의 문제입니다. 같은 산식이지만 소비자가 보는 화면이 달라집니다.</p></div>'+
+ '<div class="cols c-5-7" style="margin-top:22px">'+
+  '<div class="chart" data-a="2">'+chartScen()+'</div>'+
+  '<div class="stack" data-a="3">'+
+   '<div class="opts">'+
+    '<div class="opt pick"><div class="h"><b>A. 쿠폰 포함</b><span>권고</span></div>'+
+     '<div class="pros">'+
+      '<div class="y"><i>+</i><span>할인 0%인 날이 '+SC.separate.zero_days+'일 → <strong>0일</strong></span></div>'+
+      '<div class="y"><i>+</i><span>중앙값 '+N(SC.include.median)+'%p로 간판 숫자가 3배</span></div>'+
+      '<div class="y"><i>+</i><span>정지일 '+N(SC.separate.still_pct,0)+'% → '+N(SC.include.still_pct,0)+'%</span></div>'+
+      '<div class="n"><i>−</i><span>환율=가격, 검색=보너스 구조가 흐려짐</span></div>'+
+     '</div></div>'+
+    '<div class="opt"><div class="h"><b>B. 쿠폰 분리</b><span>현재안</span></div>'+
+     '<div class="pros">'+
+      '<div class="y"><i>+</i><span>역할 분리가 명확해 설명이 쉬움</span></div>'+
+      '<div class="n"><i>−</i><span>'+SC.separate.zero_days+'일('+N(SC.separate.zero_pct,0)+'%)은 정가 그대로 노출</span></div>'+
+      '<div class="n"><i>−</i><span>표시 중앙값이 '+N(SC.separate.median)+'%p로 약함</span></div>'+
+      '<div class="n"><i>−</i><span>주말 3일 표시가격 완전 고정</span></div>'+
+     '</div></div>'+
+   '</div>'+
+   '<div class="verdict"><span class="tag">권고</span>'+
+    '<div><div class="t">A. 쿠폰 포함 — 할인 0%인 날과 주말 동결을 한 번에 해결합니다</div>'+
+    '<div class="d">체감 변동폭은 두 안이 거의 같습니다(' +N(SC.include.daily_move,2)+'%p vs '+N(SC.separate.daily_move,2)+'%p). 얻는 것만 있고 잃는 것은 설명 복잡도뿐입니다.</div></div></div>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'결정 2', html:
+ '<div data-a="1"><div class="eyebrow">12 — 남은 결정 ②</div>'+
+ '<h2>주말 3일 동결을 받아들일까요</h2>'+
+ '<p class="lede">외환시장이 쉬므로 금요일 종가가 토·일·월을 결정합니다. 쿠폰만으로는 메워지지 않는다는 것이 '+D.frozen.length+'개 구간 전수 검증 결과입니다.</p></div>'+
+ '<div class="cols c-2" style="margin-top:22px">'+
+  '<div class="stack" data-a="2">'+
+   '<div class="tw"><table><thead><tr><th>판단 근거</th><th>값</th></tr></thead><tbody>'+
+    '<tr><td>동결 구간 총할인 변동폭</td><td>'+N(EV.movement.frozen_spread)+'%p</td></tr>'+
+    '<tr><td>환율 갱신일 변동폭</td><td>'+N(EV.movement.fresh_move)+'%p</td></tr>'+
+    '<tr><td>차이</td><td>'+N(EV.movement.ratio)+'배</td></tr>'+
+    '<tr><td>동결 중 총할인 중앙값</td><td>'+N(T.median)+'%p</td></tr>'+
+    '<tr><td>가격 환산 (4,500원)</td><td>'+Math.round(4500*EV.movement.frozen_spread/100)+'원</td></tr>'+
+    '<tr><td>연휴 시 최대 동결</td><td>5일</td></tr>'+
+   '</tbody></table></div>'+
+   '<p class="note">주말은 검색량도 저점이라(토 −12%) 쿠폰이 메워줄 여지 자체가 작습니다.</p>'+
+  '</div>'+
+  '<div class="stack" data-a="3">'+
+   '<div class="panel q"><h3>수용하는 쪽을 권고합니다</h3><p class="sub" style="font-size:12.5px">'+
+    '동결 중에도 총할인 중앙값이 '+N(T.median)+'%p로 숫자 자체는 건강합니다. '+
+    '<strong>"외환시장이 쉬는 날엔 시세도 쉽니다"</strong>는 주식 시장 메타포와도 오히려 잘 맞습니다.</p></div>'+
+   '<div class="panel"><h3>대안 — 주말 결산 이벤트</h3><p class="sub" style="font-size:12.5px">'+
+    '수용이 어렵다면 주말에 한해 주간 누적 하락률을 별도 이벤트로 운영하는 안이 있습니다. 다만 산식이 두 개가 되어 설명 비용이 늘어납니다.</p></div>'+
+   '<div class="verdict open"><span class="tag">확인 필요</span>'+
+    '<div><div class="t">검색 키워드별 편차</div>'+
+    '<div class="d">이번 검증은 '+D.meta.keyword+' 1종 기준입니다. 저검색량 상품은 지수가 0에 붙어 쿠폰이 상시 0이 될 수 있어, 10종 전체 키워드 확인이 필요합니다.</div></div></div>'+
+  '</div>'+
+ '</div>'});
+
+slides.push({sec:'정리', html:
+ '<div data-a="1"><div class="eyebrow">13 — 정리</div>'+
+ '<h2>확정된 것과 남은 것</h2></div>'+
+ '<div class="cols c-2" style="margin-top:24px">'+
+  '<div class="stack" data-a="2">'+
+   '<div class="panel" style="background:var(--card);border-color:var(--rule)">'+
+    '<h3 style="color:var(--fx)">확정</h3>'+
+    '<ul class="steps" style="margin:8px 0 0">'+
+     '<li><i>✓</i><span><b>환율할인</b> = min(28, max(0, 하락율 × 0.28 × 50))</span></li>'+
+     '<li><i>✓</i><span><b>검색쿠폰</b> = 검색량지수 × 0.1</span></li>'+
+     '<li><i>✓</i><span><b>총 상한</b> 38%p · 할인은 정가 기준, 복리 없음</span></li>'+
+     '<li><i>✓</i><span><b>반영</b> 매일 09:00 개장 · D-1 데이터</span></li>'+
+     '<li><i>✓</i><span><b>비영업일</b> 직전 영업일 하락율 이월</span></li>'+
+    '</ul></div>'+
+   '<div class="kpis k3" style="border-bottom:0">'+
+    '<div class="kpi"><div class="k">검증 기간</div><div class="v tnum" style="font-size:21px">'+D.meta.sim_days+'일</div></div>'+
+    '<div class="kpi"><div class="k">캡 발동</div><div class="v ok tnum" style="font-size:21px">0회</div></div>'+
+    '<div class="kpi"><div class="k">중앙값</div><div class="v fx tnum" style="font-size:21px">'+N(T.median)+'%p</div></div>'+
+   '</div>'+
+  '</div>'+
+  '<div class="stack" data-a="3">'+
+   '<div class="panel" style="background:var(--card);border-color:var(--rule)">'+
+    '<h3 style="color:var(--warn)">결정 대기</h3>'+
+    '<ul class="steps" style="margin:8px 0 0">'+
+     '<li><i>1</i><span><b>쿠폰을 표시 할인율에 포함할지</b> — 포함 권고. 할인 0%인 날 26일 → 0일</span></li>'+
+     '<li><i>2</i><span><b>주말 3일 동결 수용 여부</b> — 수용 권고. 시세판 메타포와 부합</span></li>'+
+    '</ul></div>'+
+   '<div class="panel" style="background:var(--card);border-color:var(--rule)">'+
+    '<h3>다음 작업</h3>'+
+    '<ul class="steps" style="margin:8px 0 0">'+
+     '<li><i>→</i><span>환율 데이터 소스 확정 — 매매기준율 / 서울외국환중개 종가 / ECOS</span></li>'+
+     '<li><i>→</i><span>10종 전체 키워드로 쿠폰 분포 재검증</span></li>'+
+     '<li><i>→</i><span>확정 산식을 PRD에 반영</span></li>'+
+    '</ul></div>'+
+  '</div>'+
+ '</div>'});
+
+/* ================= render & nav ================= */
+var deck=document.getElementById('deck'), tip=document.getElementById('tip'), cur=0;
+var frag='';
+slides.forEach(function(s,i){
+  frag+='<section class="slide'+(s.cover?' is-cover':'')+'" id="sl'+i+'" aria-hidden="true">'+
+    (s.cover?'':'<div class="rail-t"><b>막지 스톡 · 할인율 산식</b><span>'+s.sec+'</span></div><div class="body">')+
+    s.html+(s.cover?'':'</div>')+'</section>';
+});
+deck.insertAdjacentHTML('afterbegin',frag);
+
+var rail=document.createElement('div');
+rail.className='rail-b';
+rail.innerHTML='<button class="navbtn" id="prev" aria-label="이전 슬라이드">‹</button>'+
+  '<button class="navbtn" id="next" aria-label="다음 슬라이드">›</button>'+
+  '<div id="ticks"></div><div id="counter"><b>01</b> / '+String(slides.length).padStart(2,'0')+'</div>';
+deck.appendChild(rail);
+
+var ticks=document.getElementById('ticks');
+slides.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.innerHTML='<i></i>'; b.title=(i+1)+'. '+s.sec;
+  b.setAttribute('aria-label',(i+1)+'. '+s.sec);
+  b.onclick=function(){go(i)};
+  ticks.appendChild(b);
+});
+var tickEls=ticks.querySelectorAll('button'),
+    slideEls=deck.querySelectorAll('.slide'),
+    counter=document.getElementById('counter');
+
+function go(i){
+  if(i<0||i>=slides.length) return;
+  cur=i; tip.style.opacity=0;
+  slideEls.forEach(function(el,j){
+    var on=j===i;
+    el.classList.toggle('is-active',on);
+    el.setAttribute('aria-hidden',on?'false':'true');
+  });
+  tickEls.forEach(function(el,j){ el.setAttribute('aria-current',j===i?'true':'false') });
+  counter.innerHTML='<b>'+String(i+1).padStart(2,'0')+'</b> / '+String(slides.length).padStart(2,'0');
+  if(slides[i].sec==='실데이터 결과') bindTS();
+}
+document.getElementById('prev').onclick=function(){go(cur-1)};
+document.getElementById('next').onclick=function(){go(cur+1)};
+addEventListener('keydown',function(e){
+  var k=e.key;
+  if(k==='ArrowRight'||k==='PageDown'||k===' '){ e.preventDefault(); go(cur+1); }
+  else if(k==='ArrowLeft'||k==='PageUp'){ e.preventDefault(); go(cur-1); }
+  else if(k==='Home'){ e.preventDefault(); go(0); }
+  else if(k==='End'){ e.preventDefault(); go(slides.length-1); }
+});
+
+/* timeseries hover */
+function bindTS(){
+  var cap=document.getElementById('ts-cap'), hov=document.getElementById('ts-hover');
+  if(!cap||cap.dataset.bound) return;
+  cap.dataset.bound='1';
+  var lineEl=hov.querySelector('line'), dots=hov.querySelectorAll('circle');
+  var svgEl=cap.ownerSVGElement, wrap=svgEl.parentNode;
+  cap.addEventListener('mousemove',function(e){
+    var r=svgEl.getBoundingClientRect(), sc=TS.W/r.width;
+    var vx=(e.clientX-r.left)*sc;
+    var i=Math.round((vx-TS.L)/TS.pw*(TS.n-1));
+    i=Math.max(0,Math.min(TS.n-1,i));
+    var x=TS.X(i);
+    hov.setAttribute('opacity','1');
+    lineEl.setAttribute('x1',x); lineEl.setAttribute('x2',x);
+    dots[0].setAttribute('cx',x); dots[0].setAttribute('cy',TS.Y(S.tot[i]));
+    dots[1].setAttribute('cx',x); dots[1].setAttribute('cy',TS.Y(S.fx[i]));
+    tip.innerHTML='<b>'+S.date[i]+' ('+S.wd[i]+')</b>'+(S.fresh[i]?'':' <span style="opacity:.6">이월</span>')+
+      '<br>환율 <span class="fx">'+N(S.drop[i],3)+'%</span> → <span class="fx">'+N(S.fx[i])+'%p</span>'+
+      '<br>검색 <span class="cp">'+N(S.idx[i])+'</span> → <span class="cp">'+N(S.cp[i])+'%p</span>'+
+      '<br>총할인 <b>'+N(S.tot[i])+'%p</b> · '+Math.round(4500*(1-S.tot[i]/100)).toLocaleString()+'원';
+    var wr=wrap.getBoundingClientRect();
+    tip.style.left=(x/sc)+'px';
+    tip.style.top=(TS.Y(S.tot[i])/sc)+'px';
+    tip.style.opacity=1;
+  });
+  cap.addEventListener('mouseleave',function(){ hov.setAttribute('opacity','0'); tip.style.opacity=0; });
+}
+
+/* fit stage */
+function fit(){
+  var s=Math.min(innerWidth/1280, innerHeight/720);
+  deck.style.transform='scale('+s+')';
+}
+addEventListener('resize',fit); fit(); go(0);
+})();
+</script>
+
+</body>
+</html>
