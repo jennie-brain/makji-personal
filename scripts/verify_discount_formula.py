@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """막지 스톡 할인율 산식 검증 - 입력: 데이터랩.xlsx + 환율데이터.xls 만 사용"""
-import re, html, json, openpyxl, statistics as st, datetime as dt, collections, os
+import re, html, json, math, openpyxl, statistics as st, datetime as dt, collections, os
 
 D = os.path.expanduser('~/Downloads')
 OUT = os.path.dirname(os.path.abspath(__file__))
@@ -114,6 +114,10 @@ mf, mc = st.mean(fx_d), st.mean(cp_d)
 vf, vc, vt = st.pvariance(fx_d), st.pvariance(cp_d), st.pvariance(tot_d)
 cov = st.mean([(fx_d[i] - mf) * (cp_d[i] - mc) for i in range(len(daily))])
 corr = cov / ((vf ** .5) * (vc ** .5))
+# Fisher z 검정 — 상관의 부호를 근거로 쓸 수 있는지 판단하기 위한 양측 p값.
+# 근거로 쓰는 것은 |corr|가 0에 가깝다는 사실이지 부호가 아니다.
+_z = math.atanh(corr) * math.sqrt(len(daily) - 3)
+corr_p = 2 * (1 - 0.5 * (1 + math.erf(abs(_z) / math.sqrt(2))))
 
 evidence = {
     'budget': {'fx_alloc': CAP_FX, 'fx_used_mean': round(mf, 2), 'fx_used_pct': pct(mf, CAP_FX),
@@ -122,7 +126,8 @@ evidence = {
                'cp_used_max': round(max(cp_d), 2), 'cp_max_pct': pct(max(cp_d), 10)},
     'variance': {'fx': round(vf, 2), 'coupon': round(vc, 2), 'total': round(vt, 2),
                  'fx_share': pct(vf, vf + vc), 'cp_share': pct(vc, vf + vc),
-                 'corr': round(corr, 3)},
+                 'corr': round(corr, 3), 'corr_p': round(corr_p, 3),
+                 'corr_abs': round(abs(corr), 3)},
     'caps': {'fx_cap_hits': sum(1 for v in fx_d if v >= CAP_FX),
              'total_cap_hits': sum(1 for v in tot_d if v >= CAP_TOTAL),
              'trigger_drop': round(CAP_FX / (W_FX * SCALE), 2),

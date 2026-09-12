@@ -683,8 +683,10 @@ slides.push({sec:'근거 1', html:
     '<div class="d">총할인 변동성의 '+N(EV.variance.fx_share)+'%가 환율에서 나옵니다. 검색은 수준을 올려주되 변동은 거의 만들지 않습니다 — 설계 의도와 정확히 일치합니다.</div></div>'+
     '<div class="val" style="color:var(--fx)">'+N(EV.variance.fx_share)+'%<small>환율 기여</small></div></li>'+
    '<li><span class="n">03</span><div><div class="t">두 지표가 중복되지 않습니다</div>'+
-    '<div class="d">환율할인과 검색쿠폰의 상관계수가 '+N(EV.variance.corr,3)+' — 거의 무상관입니다. 서로 다른 정보를 담고 있어 단순 합산이 정당합니다.</div></div>'+
-    '<div class="val">'+N(EV.variance.corr,2)+'<small>상관계수</small></div></li>'+
+    '<div class="d">환율할인과 검색쿠폰의 상관계수 '+N(EV.variance.corr,3)+' — <strong>절댓값이 0에 가깝습니다.</strong> '+
+    '두 항이 서로 다른 정보를 담고 있어, 더해도 같은 것을 두 번 세지 않습니다. '+
+    '부호(음수)는 91일 표본에서 p=0.042로 경계선이라 근거로 쓰지 않습니다.</div></div>'+
+    '<div class="val">'+N(Math.abs(EV.variance.corr),2)+'<small>|상관계수|</small></div></li>'+
   '</ul>'+
  '</div>'});
 
