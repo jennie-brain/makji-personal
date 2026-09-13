@@ -1,0 +1,32 @@
+name: MAKJI Auto-Log & PRD Verification
+
+on:
+  push:
+    branches: [ main, 'docs/**', 'feat/**' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-logs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Sync Decision Index
+        run: |
+          python scripts/sync_decision_index.py
+
+      - name: Verify Index Cleanliness
+        run: |
+          git status --porcelain
+          if [[ -n $(git status --porcelain logs/decision-log/DECISION_INDEX.md) ]]; then
+            echo "::error::DECISION_INDEX.md is not synchronized. Please run 'python scripts/sync_decision_index.py' before committing."
+            exit 1
+          fi
+          echo "Decision Index is up to date."
