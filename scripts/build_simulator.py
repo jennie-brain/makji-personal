@@ -1,0 +1,1748 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Generate MAKJI STOCK 91-Day Discount Formula Interactive Simulator HTML
+Embeds the actual 91-day dataset from:
+- C:/Users/Administrator/Downloads/환율.xlsx
+- C:/Users/Administrator/Downloads/모닝빵 검색_데이터랩.xlsx
+- C:/Users/Administrator/Downloads/막지스톡_할인율산식_검증.xlsx
+"""
+
+import json
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATASET_PATH = BASE_DIR / "docs" / "02_pricing_engine" / "data" / "dataset_91d.json"
+
+with open(DATASET_PATH, "r", encoding="utf-8") as f:
+    DATASET = json.load(f)
+
+DATASET_JSON = json.dumps(DATASET, ensure_ascii=False)
+
+HTML_TEMPLATE = """<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAKJI STOCK · 91일 할인율 산식 실데이터 시뮬레이터</title>
+  <meta name="description" content="환율 배분(W_fx), 검색 배분(W_s), 스케일(Scale 0~200)에 따른 91일간의 할인율 및 통계 민감도 시뮬레이터">
+  
+  <!-- Pretendard & Chart.js & SheetJS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-sub: #f8fafc;
+      --border: #e2e8f0;
+      --border-focus: #3b82f6;
+      --ink: #0f172a;
+      --ink-muted: #64748b;
+      --ink-sub: #334155;
+
+      --blue: #2563eb;
+      --blue-light: #eff6ff;
+      --blue-border: #bfdbfe;
+      --sky: #0284c7;
+      --orange: #ea580c;
+      --orange-light: #fff7ed;
+      --amber: #d97706;
+      --amber-light: #fef3c7;
+      --emerald: #059669;
+      --emerald-light: #ecfdf5;
+      --rose: #e11d48;
+      --rose-light: #ffe4e6;
+      --navy: #0e2f50;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      padding: 24px 20px 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #0e2f50 0%, #1e3a8a 60%, #1d4ed8 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    .header::after {
+      content: "🥐 38% CAP";
+      position: absolute;
+      right: 36px;
+      bottom: 20px;
+      font-size: 52px;
+      font-weight: 900;
+      opacity: 0.08;
+      letter-spacing: -2px;
+      pointer-events: none;
+    }
+    .header-badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      color: #e0f2fe;
+      backdrop-filter: blur(4px);
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 850;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 15px;
+      color: #cbd5e1;
+      max-width: 920px;
+      line-height: 1.6;
+    }
+
+    /* PRESETS BAR */
+    .presets-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .presets-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink-muted);
+      margin-right: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .preset-btn {
+      background: var(--surface-sub);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--ink-sub);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preset-btn:hover {
+      background: var(--blue-light);
+      color: var(--blue);
+      border-color: var(--blue-border);
+      transform: translateY(-1px);
+    }
+    .preset-btn.active {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+      box-shadow: 0 2px 8px rgba(14, 47, 80, 0.25);
+    }
+
+    /* CONTROLS SECTION */
+    .controls-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      padding: 26px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .controls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .controls-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggles-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-sub);
+      cursor: pointer;
+      user-select: none;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      display: inline-block;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #cbd5e1;
+      border-radius: 999px;
+      transition: 0.25s;
+    }
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    input:checked + .toggle-slider {
+      background: var(--blue);
+    }
+    input:checked + .toggle-slider::before {
+      transform: translateX(18px);
+    }
+
+    /* SLIDERS GRID */
+    .sliders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .slider-item {
+      background: var(--surface-sub);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+    .slider-item:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .slider-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .slider-val-badge {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--blue);
+      min-width: 60px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .slider-item input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .slider-item input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--blue);
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .slider-item input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+    }
+    .slider-hint {
+      font-size: 12px;
+      color: var(--ink-muted);
+      line-height: 1.4;
+    }
+
+    /* FORMULA LIVE DISPLAY BANNER */
+    .formula-banner {
+      background: #0f172a;
+      color: #f8fafc;
+      border-radius: var(--radius-md);
+      padding: 18px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-left: 5px solid var(--orange);
+    }
+    .formula-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .formula-main {
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+      font-family: var(--font-mono, monospace);
+    }
+    .formula-main span.hl-fx { color: #60a5fa; font-weight: 850; }
+    .formula-main span.hl-s { color: #fbbf24; font-weight: 850; }
+    .formula-main span.hl-cap { color: #f87171; font-weight: 850; }
+    .formula-sub {
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+    .formula-metrics {
+      display: flex;
+      gap: 20px;
+      background: rgba(255,255,255,0.06);
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .f-metric {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .f-metric-label {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .f-metric-val {
+      font-size: 17px;
+      font-weight: 900;
+      color: #38bdf8;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* KPI DASHBOARD */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--border);
+    }
+    .kpi-card.primary::before { background: var(--blue); }
+    .kpi-card.amber::before { background: var(--amber); }
+    .kpi-card.emerald::before { background: var(--emerald); }
+    .kpi-card.rose::before { background: var(--rose); }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .kpi-label {
+      font-size: 13px;
+      font-weight: 750;
+      color: var(--ink-muted);
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--ink-muted);
+      font-weight: 500;
+    }
+    .kpi-num {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -1px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi-unit {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      margin-left: 2px;
+    }
+    .kpi-footer {
+      font-size: 12px;
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-top: 1px dashed #f1f5f9;
+      padding-top: 8px;
+    }
+
+    /* VARIANCE SHARE BAR */
+    .variance-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .variance-bar {
+      height: 14px;
+      border-radius: 999px;
+      display: flex;
+      overflow: hidden;
+      background: #e2e8f0;
+    }
+    .v-fx {
+      background: var(--sky);
+      transition: width 0.3s ease;
+    }
+    .v-coupon {
+      background: var(--amber);
+      transition: width 0.3s ease;
+    }
+    .v-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 750;
+    }
+    .v-label-fx { color: var(--sky); }
+    .v-label-cp { color: var(--amber); }
+
+    /* CHARTS SECTION */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+    @media (max-width: 1024px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    .chart-box {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .chart-box.full-width {
+      grid-column: 1 / -1;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chart-title-area h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .chart-title-area p {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      margin-top: 2px;
+    }
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 310px;
+    }
+    .chart-container.large {
+      height: 360px;
+    }
+
+    /* TABLE SECTION */
+    .table-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-pill {
+      background: var(--surface-sub);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 750;
+      color: var(--ink-sub);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .filter-pill:hover {
+      background: #e2e8f0;
+    }
+    .filter-pill.active {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-input {
+      background: var(--surface-sub);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      width: 200px;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--blue);
+      background: white;
+    }
+    .btn-action {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12.5px;
+      font-weight: 750;
+      color: var(--ink-sub);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.15s;
+    }
+    .btn-action:hover {
+      background: #f1f5f9;
+      color: var(--blue);
+      border-color: var(--blue-border);
+    }
+
+    .table-wrap {
+      max-height: 480px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: right;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      color: var(--ink-muted);
+      font-weight: 800;
+      font-size: 12px;
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
+      z-index: 10;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    th:first-child, td:first-child,
+    th:nth-child(2), td:nth-child(2),
+    th:nth-child(3), td:nth-child(3) {
+      text-align: left;
+    }
+    td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+    tr:hover td {
+      background: #f8fafc;
+    }
+    tr.is-weekend td {
+      background: #fafafa;
+    }
+    tr.is-cap td {
+      background: #fff1f2;
+      font-weight: 750;
+    }
+    tr.is-zero-fx td:nth-child(7) {
+      color: #94a3b8;
+    }
+    .tag-fresh {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 750;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .tag-carried {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 750;
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    /* FOOTER */
+    .footer-note {
+      text-align: center;
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-badge-row">
+      <span class="badge">📊 실데이터 91일 백테스팅 (2026.06.12 ~ 09.10)</span>
+      <span class="badge">⚙️ 2-Factor 동적 시뮬레이터</span>
+      <span class="badge">🛡️ 38% Hard Margin Cap</span>
+    </div>
+    <h1>MAKJI STOCK · 91일 할인율 산식 민감도 시뮬레이터</h1>
+    <p>
+      기업 발표 덱(슬라이드 8)의 <strong>환율 배분(0.28)</strong>, <strong>검색 배분(0.10)</strong>, <strong>스케일 승수(50, 0~200 가변)</strong> 파라미터를 실시간 조정하여 91일간의 일별 할인율 궤적, 대표 통계치(중앙값, 평균, 상한 도달 횟수, 분산 기여도), 그리고 최종 빵 판매가의 거동을 정밀 검증합니다.
+    </p>
+  </header>
+
+  <!-- PRESETS BAR -->
+  <section class="presets-bar">
+    <span class="presets-label">시나리오 프리셋:</span>
+    <button class="preset-btn active" id="btnPresetOriginal" onclick="applyPreset('original')">
+      🏛️ 슬라이드 8 원안 (28% / 10% / Scale 50)
+    </button>
+    <button class="preset-btn" id="btnPresetAdr50" onclick="applyPreset('adr50')">
+      ⚖️ 최근 확정안 (20% / 18% / Scale 50)
+    </button>
+    <button class="preset-btn" id="btnPresetAdr20" onclick="applyPreset('adr20')">
+      🌿 안정형 기획안 (20% / 18% / Scale 20)
+    </button>
+    <button class="preset-btn" id="btnPresetScale0" onclick="applyPreset('scale0')">
+      📉 스케일 0 (환율무력화 / 순수 검색쿠폰)
+    </button>
+    <button class="preset-btn" id="btnPresetScale100" onclick="applyPreset('scale100')">
+      ⚡ 스케일 100 (고변동형 / 체감 2배)
+    </button>
+    <button class="preset-btn" id="btnPresetScale200" onclick="applyPreset('scale200')">
+      🔥 스케일 200 (한계치 / 캡 발동 빈발)
+    </button>
+    <button class="preset-btn" style="margin-left:auto;" onclick="resetDefaults()">
+      🔄 초기화
+    </button>
+  </section>
+
+  <!-- CONTROLS CARD -->
+  <section class="controls-card">
+    <div class="controls-header">
+      <div class="controls-title">
+        🎛️ 산식 파라미터 미세 조정 (Interactive Parameters)
+      </div>
+      <div class="toggles-group">
+        <label class="toggle-label" title="환율과 검색 가중치의 합을 38%로 자동 연동합니다.">
+          <span class="toggle-switch">
+            <input type="checkbox" id="lockSumToggle" checked onchange="toggleLockSum(this.checked)">
+            <span class="toggle-slider"></span>
+          </span>
+          <span>합산 38% 자동 연동 (W_fx + W_s = 38%)</span>
+        </label>
+        <label class="toggle-label" title="환율 캡을 W_fx * 100으로 자동 동기화합니다.">
+          <span class="toggle-switch">
+            <input type="checkbox" id="autoCapFxToggle" checked onchange="toggleAutoCapFx(this.checked)">
+            <span class="toggle-slider"></span>
+          </span>
+          <span>환율 상한 자동 연동 (Cap = W_fx × 100)</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="sliders-grid">
+      <!-- W_FX -->
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="slider-title">💵 환율 배분 ($W_{FX}$)</span>
+          <span class="slider-val-badge" id="valWfx">28.0% (0.28)</span>
+        </div>
+        <input type="range" id="sliderWfx" min="0" max="38" step="1" value="28" oninput="onWfxChange(this.value)">
+        <span class="slider-hint">총 38%p 중 환율 하락에 배정할 최대 할인율 (0% ~ 38%)</span>
+      </div>
+
+      <!-- W_S -->
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="slider-title">🔍 검색 배분 ($W_{S}$)</span>
+          <span class="slider-val-badge" id="valWs">10.0% (0.10)</span>
+        </div>
+        <input type="range" id="sliderWs" min="0" max="38" step="1" value="10" oninput="onWsChange(this.value)">
+        <span class="slider-hint">네이버 검색지수(0~100)에 곱해지는 쿠폰 계수 (0% ~ 38%)</span>
+      </div>
+
+      <!-- SCALE -->
+      <div class="slider-item" style="border-left: 3px solid var(--rose);">
+        <div class="slider-top">
+          <span class="slider-title">🎯 환율 승수 스케일 ($SCALE$)</span>
+          <span class="slider-val-badge" style="color:var(--rose);" id="valScale">50</span>
+        </div>
+        <input type="range" id="sliderScale" min="0" max="200" step="1" value="50" oninput="onScaleChange(this.value)">
+        <span class="slider-hint">미세한 일일 환율 변동을 체감 할인으로 증폭하는 배율 (0 ~ 200)</span>
+      </div>
+
+      <!-- CAP_TOTAL -->
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="slider-title">🛡️ 총 할인율 상한 ($CAP_{TOTAL}$)</span>
+          <span class="slider-val-badge" id="valCapTotal">38.0%</span>
+        </div>
+        <input type="range" id="sliderCapTotal" min="20" max="50" step="1" value="38" oninput="onCapTotalChange(this.value)">
+        <span class="slider-hint">마진 보호를 위한 강제 차단선 (기본 38.0%p)</span>
+      </div>
+
+      <!-- BASE PRICE -->
+      <div class="slider-item">
+        <div class="slider-top">
+          <span class="slider-title">🏷️ 시뮬레이션 정가 (Base Price)</span>
+          <span class="slider-val-badge" id="valBasePrice">4,500원</span>
+        </div>
+        <input type="range" id="sliderBasePrice" min="2000" max="8000" step="100" value="4500" oninput="onBasePriceChange(this.value)">
+        <span class="slider-hint">할인율 적용 기준 소비자가 (모닝빵 기본 4,500원)</span>
+      </div>
+    </div>
+
+    <!-- LIVE FORMULA BANNER -->
+    <div class="formula-banner">
+      <div class="formula-text">
+        <div class="formula-main" id="formulaDisplay">
+          총할인율 = min(<span class="hl-cap">38.0%p</span>, <span class="hl-fx">환율할인</span> + <span class="hl-s">검색쿠폰</span>)
+        </div>
+        <div class="formula-sub" id="formulaSubDisplay">
+          환율할인 = min(28.0, max(0, 하락율 × 0.28 × 50)) ｜ 검색쿠폰 = 검색지수 × 0.10
+        </div>
+      </div>
+      <div class="formula-metrics">
+        <div class="f-metric">
+          <span class="f-metric-label">실효 기울기</span>
+          <span class="f-metric-val" id="metricSlope">14.0</span>
+        </div>
+        <div class="f-metric">
+          <span class="f-metric-label">캡 발동 임계 하락율</span>
+          <span class="f-metric-val" id="metricTrigger">2.00%</span>
+        </div>
+        <div class="f-metric">
+          <span class="f-metric-label">평균 하락시 환율할인</span>
+          <span class="f-metric-val" id="metricMeanDropDisc">2.6%p</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPI SUMMARY CARDS -->
+  <section class="kpi-grid">
+    <!-- MEDIAN -->
+    <div class="kpi-card primary">
+      <div class="kpi-top">
+        <span class="kpi-label">총 할인율 중앙값</span>
+        <span class="kpi-sub">50% 일수 기준</span>
+      </div>
+      <div class="kpi-num" id="kpiMedian">12.0<span class="kpi-unit">%p</span></div>
+      <div class="kpi-footer" id="kpiMedianFoot">
+        정가 대비 약 3,960원
+      </div>
+    </div>
+
+    <!-- MEAN & STD -->
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <span class="kpi-label">총 할인율 평균</span>
+        <span class="kpi-sub">표준편차</span>
+      </div>
+      <div class="kpi-num" id="kpiMean">12.5<span class="kpi-unit">%p</span></div>
+      <div class="kpi-footer" id="kpiStdFoot">
+        표준편차 ±5.05%p
+      </div>
+    </div>
+
+    <!-- MAX / MIN -->
+    <div class="kpi-card emerald">
+      <div class="kpi-top">
+        <span class="kpi-label">최대 / 최소 할인율</span>
+        <span class="kpi-sub">91일 관측</span>
+      </div>
+      <div class="kpi-num" style="font-size:26px;" id="kpiMaxMin">30.9<span class="kpi-unit">%p</span> / 5.3<span class="kpi-unit">%p</span></div>
+      <div class="kpi-footer" id="kpiHeadroomFoot">
+        38% 상한까지 여유: 7.14%p
+      </div>
+    </div>
+
+    <!-- CAP HITS -->
+    <div class="kpi-card rose">
+      <div class="kpi-top">
+        <span class="kpi-label">38% 상한 도달 일수</span>
+        <span class="kpi-sub">마진 방어선</span>
+      </div>
+      <div class="kpi-num" id="kpiCapHits">0<span class="kpi-unit">회</span></div>
+      <div class="kpi-footer" id="kpiCapHitsFoot">
+        환율 캡 발동: 0회 (0.0%)
+      </div>
+    </div>
+
+    <!-- ZERO FX DAYS -->
+    <div class="kpi-card amber">
+      <div class="kpi-top">
+        <span class="kpi-label">환율할인 0% 일수</span>
+        <span class="kpi-sub">상승/정체일</span>
+      </div>
+      <div class="kpi-num" id="kpiZeroFx">26<span class="kpi-unit">일</span></div>
+      <div class="kpi-footer" id="kpiZeroFxFoot">
+        전체 91일 중 28.6%
+      </div>
+    </div>
+
+    <!-- VARIANCE SHARE -->
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <span class="kpi-label">변동성 기여도 (분산)</span>
+        <span class="kpi-sub">상관계수 r = <span id="kpiCorr">-0.21</span></span>
+      </div>
+      <div class="variance-bar-wrap">
+        <div class="variance-bar">
+          <div class="v-fx" id="barFxShare" style="width: 97%;"></div>
+          <div class="v-coupon" id="barCpShare" style="width: 3%;"></div>
+        </div>
+        <div class="v-labels">
+          <span class="v-label-fx" id="lblFxShare">환율 97.0%</span>
+          <span class="v-label-cp" id="lblCpShare">검색 3.0%</span>
+        </div>
+      </div>
+      <div class="kpi-footer">
+        환율이 변동을 주도하고 검색이 바닥을 지탱
+      </div>
+    </div>
+
+    <!-- AVERAGE PRICE -->
+    <div class="kpi-card">
+      <div class="kpi-top">
+        <span class="kpi-label">평균 실구매가</span>
+        <span class="kpi-sub">정가 기준</span>
+      </div>
+      <div class="kpi-num" style="font-size:28px;" id="kpiAvgPrice">3,937<span class="kpi-unit">원</span></div>
+      <div class="kpi-footer" id="kpiPriceRangeFoot">
+        최저 3,111원 ~ 최고 4,261원
+      </div>
+    </div>
+  </section>
+
+  <!-- CHARTS GRID -->
+  <section class="charts-grid">
+    <!-- CHART 1: TIMELINE -->
+    <div class="chart-box full-width">
+      <div class="chart-header">
+        <div class="chart-title-area">
+          <h3>📈 91일 할인율 일별 시계열 추이 (Timeline Trend)</h3>
+          <p>2026.06.12 ~ 09.10 ｜ 총할인율(청록), 환율할인(파랑), 검색쿠폰(골드) 및 38% 상한선</p>
+        </div>
+      </div>
+      <div class="chart-container large">
+        <canvas id="timelineChart"></canvas>
+      </div>
+    </div>
+
+    <!-- CHART 2: DISTRIBUTION HISTOGRAM -->
+    <div class="chart-box">
+      <div class="chart-header">
+        <div class="chart-title-area">
+          <h3>📊 총 할인율 구간별 일수 분포 (Distribution)</h3>
+          <p>91일 중 각 할인율 구간에 머무른 일수 및 비율</p>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="histChart"></canvas>
+      </div>
+    </div>
+
+    <!-- CHART 3: DAY OF WEEK -->
+    <div class="chart-box">
+      <div class="chart-header">
+        <div class="chart-title-area">
+          <h3>📅 요일별 평균 할인율 구조 (Day of Week)</h3>
+          <p>월~일 요일별 환율할인(하단) + 검색쿠폰(상단) 적층 구조</p>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="weekdayChart"></canvas>
+      </div>
+    </div>
+
+    <!-- CHART 4: SCALE SENSITIVITY CURVE -->
+    <div class="chart-box full-width">
+      <div class="chart-header">
+        <div class="chart-title-area">
+          <h3>🎯 환율 승수($SCALE$, 0 ~ 200) 변동에 따른 민감도 곡선</h3>
+          <p>현재 W_fx, W_s 설정에서 스케일을 0부터 200까지 늘릴 때 평균 할인율(파랑), 중앙값(녹색), 38% 캡 도달 일수(빨강) 시뮬레이션</p>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="scaleCurveChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLE SECTION -->
+  <section class="table-card">
+    <div class="table-controls">
+      <div class="filter-pills">
+        <button class="filter-pill active" onclick="filterTable('all', this)">전체 (91일)</button>
+        <button class="filter-pill" onclick="filterTable('weekday', this)">평일만 (65일)</button>
+        <button class="filter-pill" onclick="filterTable('weekend', this)">주말만 (26일)</button>
+        <button class="filter-pill" onclick="filterTable('zero-fx', this)">환율 0%인 날</button>
+        <button class="filter-pill" onclick="filterTable('high-disc', this)">고할인 (20% 이상)</button>
+        <button class="filter-pill" onclick="filterTable('cap-hit', this)">상한 도달일</button>
+      </div>
+      <div class="table-actions">
+        <input type="text" class="search-input" id="tableSearch" placeholder="날짜 또는 요일 검색..." oninput="onSearchTable(this.value)">
+        <button class="btn-action" onclick="exportCsv()">📥 CSV 내보내기</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>날짜</th>
+            <th>요일</th>
+            <th>기준일 (D-1)</th>
+            <th>환율 (원)</th>
+            <th>전일대비 하락율</th>
+            <th>환율 할인율</th>
+            <th>검색지수</th>
+            <th>검색 쿠폰</th>
+            <th>총 할인율</th>
+            <th>최종 판매가</th>
+            <th>구분</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="footer-note">
+    MAKJI STOCK Pricing Engine Simulator · 91-Day Real Backtesting Dataset (2026.06.12 ~ 09.10) · Generated for Jennie
+  </footer>
+
+</div>
+
+<!-- JAVASCRIPT SIMULATION LOGIC -->
+<script>
+  // 1. EMBEDDED REAL 91-DAY DATASET
+  const RAW_DATA = """ + DATASET_JSON + """;
+
+  // 2. SIMULATION STATE
+  let state = {
+    w_fx: 0.28,
+    w_s: 0.10,
+    scale: 50,
+    cap_total: 38.0,
+    cap_fx: 28.0,
+    base_price: 4500,
+    lock_sum: true,
+    auto_cap_fx: true,
+    filter: 'all',
+    searchQuery: ''
+  };
+
+  let computedRows = [];
+  let charts = {};
+
+  // HELPER MATH
+  function round(val, d=2) {
+    return Number(Math.round(val + 'e' + d) + 'e-' + d);
+  }
+  function median(arr) {
+    if (!arr.length) return 0;
+    const s = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(s.length / 2);
+    return s.length % 2 !== 0 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+  }
+  function mean(arr) {
+    if (!arr.length) return 0;
+    return arr.reduce((acc, v) => acc + v, 0) / arr.length;
+  }
+  function variance(arr, m) {
+    if (arr.length < 2) return 0;
+    if (m === undefined) m = mean(arr);
+    return arr.reduce((acc, v) => acc + (v - m) ** 2, 0) / arr.length;
+  }
+  function stdDev(arr, m) {
+    return Math.sqrt(variance(arr, m));
+  }
+
+  // 3. CORE CALCULATION ENGINE
+  function runSimulation() {
+    computedRows = RAW_DATA.map((d, idx) => {
+      // Formula:
+      // fx_disc = min(cap_fx, max(0, drop * w_fx * scale))
+      // coupon = search_idx * w_s
+      // total = min(cap_total, fx_disc + coupon)
+      const fx_disc = Math.min(state.cap_fx, Math.max(0, d.drop * state.w_fx * state.scale));
+      const coupon = d.idx * state.w_s;
+      const total = Math.min(state.cap_total, fx_disc + coupon);
+      const price = Math.round(state.base_price * (1 - total / 100));
+
+      return {
+        ...d,
+        idxNo: idx + 1,
+        fx_disc: round(fx_disc, 2),
+        coupon: round(coupon, 2),
+        total: round(total, 2),
+        price: price,
+        isCapTotal: total >= state.cap_total - 1e-6,
+        isCapFx: fx_disc >= state.cap_fx - 1e-6,
+        isZeroFx: fx_disc <= 0.0001,
+        isWeekend: d.wd === '토' || d.wd === '일'
+      };
+    });
+
+    updateUI();
+  }
+
+  // 4. UPDATE UI
+  function updateUI() {
+    // Update live formula display
+    document.getElementById('formulaDisplay').innerHTML = 
+      `총할인율 = min(<span class="hl-cap">${state.cap_total.toFixed(1)}%p</span>, <span class="hl-fx">환율할인</span> + <span class="hl-s">검색쿠폰</span>)`;
+    document.getElementById('formulaSubDisplay').innerHTML = 
+      `환율할인 = min(${state.cap_fx.toFixed(1)}, max(0, 하락율 × ${state.w_fx.toFixed(2)} × ${state.scale})) ｜ 검색쿠폰 = 검색지수 × ${state.w_s.toFixed(2)}`;
+
+    const slope = round(state.w_fx * state.scale, 2);
+    document.getElementById('metricSlope').textContent = slope.toFixed(1);
+    const trigger = (state.w_fx * state.scale > 0) ? round(state.cap_fx / (state.w_fx * state.scale), 2) : 999;
+    document.getElementById('metricTrigger').textContent = trigger > 100 ? '발동불가' : trigger.toFixed(2) + '%';
+    const meanDrop = 0.185; // avg FX drop %
+    document.getElementById('metricMeanDropDisc').textContent = (meanDrop * slope).toFixed(1) + '%p';
+
+    // Metrics computation
+    const totals = computedRows.map(r => r.total);
+    const fxs = computedRows.map(r => r.fx_disc);
+    const coupons = computedRows.map(r => r.coupon);
+    const prices = computedRows.map(r => r.price);
+
+    const med = round(median(totals), 1);
+    const avg = round(mean(totals), 1);
+    const sdev = round(stdDev(totals), 2);
+    const mx = round(Math.max(...totals), 1);
+    const mn = round(Math.min(...totals), 1);
+    const capHits = computedRows.filter(r => r.isCapTotal).length;
+    const fxCapHits = computedRows.filter(r => r.isCapFx).length;
+    const zeroFx = computedRows.filter(r => r.isZeroFx).length;
+
+    // Variance Share & Correlation
+    const vf = variance(fxs);
+    const vc = variance(coupons);
+    let fxShare = 0;
+    if (vf + vc > 0) fxShare = round((vf / (vf + vc)) * 100, 1);
+    const cpShare = round(100 - fxShare, 1);
+
+    // Pearson Correlation
+    const mf = mean(fxs);
+    const mc = mean(coupons);
+    let cov = 0;
+    for (let i = 0; i < computedRows.length; i++) {
+      cov += (fxs[i] - mf) * (coupons[i] - mc);
+    }
+    cov /= computedRows.length;
+    let corr = 0;
+    if (vf > 0 && vc > 0) {
+      corr = round(cov / (Math.sqrt(vf) * Math.sqrt(vc)), 2);
+    }
+
+    // Fill KPI Elements
+    document.getElementById('kpiMedian').innerHTML = `${med.toFixed(1)}<span class="kpi-unit">%p</span>`;
+    document.getElementById('kpiMedianFoot').textContent = `정가 대비 약 ${Math.round(state.base_price * (1 - med/100)).toLocaleString()}원`;
+
+    document.getElementById('kpiMean').innerHTML = `${avg.toFixed(1)}<span class="kpi-unit">%p</span>`;
+    document.getElementById('kpiStdFoot').textContent = `표준편차 ±${sdev.toFixed(2)}%p`;
+
+    document.getElementById('kpiMaxMin').innerHTML = `${mx.toFixed(1)}<span class="kpi-unit">%p</span> / ${mn.toFixed(1)}<span class="kpi-unit">%p</span>`;
+    const headroom = round(state.cap_total - mx, 1);
+    document.getElementById('kpiHeadroomFoot').textContent = `${state.cap_total.toFixed(1)}% 상한까지 여유: ${headroom >= 0 ? headroom.toFixed(1) + '%p' : '0%p (상한도달)'}`;
+
+    document.getElementById('kpiCapHits').innerHTML = `${capHits}<span class="kpi-unit">회</span>`;
+    document.getElementById('kpiCapHitsFoot').textContent = `환율 캡 발동: ${fxCapHits}회 (${((fxCapHits/91)*100).toFixed(1)}%)`;
+
+    document.getElementById('kpiZeroFx').innerHTML = `${zeroFx}<span class="kpi-unit">일</span>`;
+    document.getElementById('kpiZeroFxFoot').textContent = `전체 91일 중 ${((zeroFx/91)*100).toFixed(1)}%`;
+
+    document.getElementById('kpiCorr').textContent = corr.toFixed(2);
+    document.getElementById('barFxShare').style.width = fxShare + '%';
+    document.getElementById('barCpShare').style.width = cpShare + '%';
+    document.getElementById('lblFxShare').textContent = `환율 ${fxShare.toFixed(1)}%`;
+    document.getElementById('lblCpShare').textContent = `검색 ${cpShare.toFixed(1)}%`;
+
+    const avgPrice = Math.round(mean(prices));
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    document.getElementById('kpiAvgPrice').innerHTML = `${avgPrice.toLocaleString()}<span class="kpi-unit">원</span>`;
+    document.getElementById('kpiPriceRangeFoot').textContent = `최저 ${minPrice.toLocaleString()}원 ~ 최고 ${maxPrice.toLocaleString()}원`;
+
+    // Render Charts and Table
+    renderCharts();
+    renderTable();
+  }
+
+  // 5. CHART.JS RENDERING
+  function renderCharts() {
+    const dates = computedRows.map(r => r.date.slice(5)); // MM-DD
+    const totals = computedRows.map(r => r.total);
+    const fxs = computedRows.map(r => r.fx_disc);
+    const coupons = computedRows.map(r => r.coupon);
+
+    // --- CHART 1: TIMELINE ---
+    if (!charts.timeline) {
+      const ctx1 = document.getElementById('timelineChart').getContext('2d');
+      charts.timeline = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [
+            {
+              label: '총 할인율 (%p)',
+              data: totals,
+              borderColor: '#0284c7',
+              backgroundColor: 'rgba(2, 132, 199, 0.08)',
+              borderWidth: 2.5,
+              fill: true,
+              tension: 0.2,
+              pointRadius: 2,
+              pointHoverRadius: 5
+            },
+            {
+              label: '환율 할인율 (%p)',
+              data: fxs,
+              borderColor: '#60a5fa',
+              borderWidth: 1.5,
+              borderDash: [3, 3],
+              tension: 0.2,
+              pointRadius: 0
+            },
+            {
+              label: '검색 쿠폰 (%p)',
+              data: coupons,
+              borderColor: '#f59e0b',
+              borderWidth: 1.5,
+              tension: 0.2,
+              pointRadius: 0
+            },
+            {
+              label: '38% 하드캡 상한',
+              data: Array(dates.length).fill(state.cap_total),
+              borderColor: '#ef4444',
+              borderWidth: 2,
+              borderDash: [6, 4],
+              pointRadius: 0,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: Math.max(state.cap_total + 5, 40),
+              ticks: { callback: v => v + '%p' }
+            },
+            x: {
+              ticks: { maxTicksLimit: 15 }
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                title: ctx => {
+                  const idx = ctx[0].dataIndex;
+                  const row = computedRows[idx];
+                  return `${row.date} (${row.wd}) ｜ 환율: ${row.fx ? row.fx.toLocaleString()+'원' : '이월'}`;
+                },
+                afterBody: ctx => {
+                  const idx = ctx[0].dataIndex;
+                  const row = computedRows[idx];
+                  return `하락율: ${row.drop}% ｜ 검색지수: ${row.idx.toFixed(1)} ｜ 판매가: ${row.price.toLocaleString()}원`;
+                }
+              }
+            }
+          }
+        }
+      });
+    } else {
+      charts.timeline.data.labels = dates;
+      charts.timeline.data.datasets[0].data = totals;
+      charts.timeline.data.datasets[1].data = fxs;
+      charts.timeline.data.datasets[2].data = coupons;
+      charts.timeline.data.datasets[3].data = Array(dates.length).fill(state.cap_total);
+      charts.timeline.data.datasets[3].label = `${state.cap_total}% 하드캡 상한`;
+      charts.timeline.options.scales.y.max = Math.max(state.cap_total + 5, 40);
+      charts.timeline.update();
+    }
+
+    // --- CHART 2: DISTRIBUTION HISTOGRAM ---
+    const bins = [
+      { label: '0%', min: 0, max: 0.01 },
+      { label: '0~5%p', min: 0.01, max: 5 },
+      { label: '5~10%p', min: 5, max: 10 },
+      { label: '10~15%p', min: 10, max: 15 },
+      { label: '15~20%p', min: 15, max: 20 },
+      { label: '20~25%p', min: 20, max: 25 },
+      { label: '25~30%p', min: 25, max: 30 },
+      { label: '30~38%p', min: 30, max: state.cap_total },
+      { label: `${state.cap_total}% 캡도달`, min: state.cap_total, max: 999 }
+    ];
+
+    const binCounts = bins.map(b => {
+      if (b.min === b.max) return totals.filter(v => v === 0).length;
+      if (b.max === 999) return totals.filter(v => v >= state.cap_total - 1e-6).length;
+      return totals.filter(v => v >= b.min && v < b.max).length;
+    });
+
+    if (!charts.hist) {
+      const ctx2 = document.getElementById('histChart').getContext('2d');
+      charts.hist = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: bins.map(b => b.label),
+          datasets: [{
+            label: '일수 (일)',
+            data: binCounts,
+            backgroundColor: bins.map((b, i) => i === bins.length - 1 ? '#f87171' : (i < 4 ? '#38bdf8' : '#0284c7')),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                afterLabel: ctx => {
+                  const pct = ((ctx.parsed.y / 91) * 100).toFixed(1);
+                  return `비중: ${pct}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 5 } }
+          }
+        }
+      });
+    } else {
+      charts.hist.data.labels = bins.map(b => b.label);
+      charts.hist.data.datasets[0].data = binCounts;
+      charts.hist.update();
+    }
+
+    // --- CHART 3: DAY OF WEEK ---
+    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    const wdFx = [];
+    const wdCp = [];
+
+    weekdays.forEach(w => {
+      const subset = computedRows.filter(r => r.wd === w);
+      wdFx.push(subset.length ? round(mean(subset.map(r => r.fx_disc)), 2) : 0);
+      wdCp.push(subset.length ? round(mean(subset.map(r => r.coupon)), 2) : 0);
+    });
+
+    if (!charts.weekday) {
+      const ctx3 = document.getElementById('weekdayChart').getContext('2d');
+      charts.weekday = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+          labels: weekdays,
+          datasets: [
+            {
+              label: '평균 환율할인 (%p)',
+              data: wdFx,
+              backgroundColor: '#60a5fa',
+              borderRadius: 4
+            },
+            {
+              label: '평균 검색쿠폰 (%p)',
+              data: wdCp,
+              backgroundColor: '#fbbf24',
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true, ticks: { callback: v => v + '%p' } }
+          }
+        }
+      });
+    } else {
+      charts.weekday.data.datasets[0].data = wdFx;
+      charts.weekday.data.datasets[1].data = wdCp;
+      charts.weekday.update();
+    }
+
+    // --- CHART 4: SCALE SENSITIVITY CURVE (SCALE 0 ~ 200) ---
+    const scaleSteps = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200];
+    const curveMeans = [];
+    const curveMedians = [];
+    const curveHits = [];
+
+    scaleSteps.forEach(sc => {
+      const scTotals = RAW_DATA.map(d => {
+        const fx = Math.min(state.cap_fx, Math.max(0, d.drop * state.w_fx * sc));
+        const cp = d.idx * state.w_s;
+        return Math.min(state.cap_total, fx + cp);
+      });
+      curveMeans.push(round(mean(scTotals), 1));
+      curveMedians.push(round(median(scTotals), 1));
+      curveHits.push(scTotals.filter(t => t >= state.cap_total - 1e-6).length);
+    });
+
+    if (!charts.scaleCurve) {
+      const ctx4 = document.getElementById('scaleCurveChart').getContext('2d');
+      charts.scaleCurve = new Chart(ctx4, {
+        type: 'line',
+        data: {
+          labels: scaleSteps.map(s => 'Scale ' + s),
+          datasets: [
+            {
+              label: '평균 할인율 (%p)',
+              data: curveMeans,
+              borderColor: '#2563eb',
+              backgroundColor: 'transparent',
+              borderWidth: 2.5,
+              tension: 0.3,
+              yAxisID: 'y'
+            },
+            {
+              label: '중앙값 할인율 (%p)',
+              data: curveMedians,
+              borderColor: '#059669',
+              backgroundColor: 'transparent',
+              borderWidth: 2.5,
+              tension: 0.3,
+              yAxisID: 'y'
+            },
+            {
+              label: '38% 캡 도달 일수 (회)',
+              data: curveHits,
+              borderColor: '#dc2626',
+              backgroundColor: 'rgba(220, 38, 38, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.2,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              position: 'left',
+              beginAtZero: true,
+              max: 40,
+              ticks: { callback: v => v + '%p' }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              beginAtZero: true,
+              max: 91,
+              grid: { drawOnChartArea: false },
+              ticks: { callback: v => v + '일' }
+            }
+          }
+        }
+      });
+    } else {
+      charts.scaleCurve.data.datasets[0].data = curveMeans;
+      charts.scaleCurve.data.datasets[1].data = curveMedians;
+      charts.scaleCurve.data.datasets[2].data = curveHits;
+      charts.scaleCurve.update();
+    }
+  }
+
+  // 6. RENDER DATA TABLE
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    let filtered = computedRows;
+
+    // Filter logic
+    if (state.filter === 'weekday') filtered = filtered.filter(r => !r.isWeekend);
+    else if (state.filter === 'weekend') filtered = filtered.filter(r => r.isWeekend);
+    else if (state.filter === 'zero-fx') filtered = filtered.filter(r => r.isZeroFx);
+    else if (state.filter === 'high-disc') filtered = filtered.filter(r => r.total >= 20.0);
+    else if (state.filter === 'cap-hit') filtered = filtered.filter(r => r.isCapTotal);
+
+    // Search query
+    if (state.searchQuery.trim()) {
+      const q = state.searchQuery.trim().toLowerCase();
+      filtered = filtered.filter(r => r.date.includes(q) || r.wd.includes(q));
+    }
+
+    filtered.forEach(r => {
+      const tr = document.createElement('tr');
+      if (r.isCapTotal) tr.className = 'is-cap';
+      else if (r.isWeekend) tr.className = 'is-weekend';
+      if (r.isZeroFx) tr.classList.add('is-zero-fx');
+
+      const dropColor = r.drop > 0 ? '#ef4444' : (r.drop < 0 ? '#3b82f6' : '#64748b');
+      const dropSign = r.drop > 0 ? '+' : '';
+
+      tr.innerHTML = `
+        <td style="font-weight:700;color:var(--ink-muted);">${r.idxNo}</td>
+        <td style="font-weight:700;">${r.date}</td>
+        <td><span style="font-weight:700;color:${r.isWeekend ? '#ea580c' : '#0f172a'};">${r.wd}</span></td>
+        <td style="color:var(--ink-muted);font-size:12px;">${r.src}</td>
+        <td>${r.fx ? r.fx.toLocaleString() : '<span style="color:#94a3b8;">이월</span>'}</td>
+        <td style="font-weight:700;color:${dropColor};">${dropSign}${r.drop}%</td>
+        <td style="font-weight:750;color:#0284c7;">${r.fx_disc.toFixed(2)}%p</td>
+        <td style="color:#475569;">${r.idx.toFixed(1)}</td>
+        <td style="font-weight:750;color:#d97706;">${r.coupon.toFixed(2)}%p</td>
+        <td style="font-weight:900;font-size:14px;color:${r.isCapTotal ? '#e11d48' : '#0f172a'};">${r.total.toFixed(2)}%p</td>
+        <td style="font-weight:800;color:var(--navy);">${r.price.toLocaleString()}원</td>
+        <td>${r.fresh ? '<span class="tag-fresh">신규</span>' : '<span class="tag-carried">이월</span>'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // 7. CONTROLS EVENT HANDLERS
+  function onWfxChange(val) {
+    state.w_fx = Number(val) / 100;
+    document.getElementById('valWfx').textContent = `${val}.0% (${state.w_fx.toFixed(2)})`;
+
+    if (state.lock_sum) {
+      const newWs = Math.max(0, 38 - Number(val));
+      state.w_s = newWs / 100;
+      document.getElementById('sliderWs').value = newWs;
+      document.getElementById('valWs').textContent = `${newWs}.0% (${state.w_s.toFixed(2)})`;
+    }
+
+    if (state.auto_cap_fx) {
+      state.cap_fx = Number(val);
+    }
+
+    clearActivePreset();
+    runSimulation();
+  }
+
+  function onWsChange(val) {
+    state.w_s = Number(val) / 100;
+    document.getElementById('valWs').textContent = `${val}.0% (${state.w_s.toFixed(2)})`;
+
+    if (state.lock_sum) {
+      const newWfx = Math.max(0, 38 - Number(val));
+      state.w_fx = newWfx / 100;
+      document.getElementById('sliderWfx').value = newWfx;
+      document.getElementById('valWfx').textContent = `${newWfx}.0% (${state.w_fx.toFixed(2)})`;
+      if (state.auto_cap_fx) {
+        state.cap_fx = newWfx;
+      }
+    }
+
+    clearActivePreset();
+    runSimulation();
+  }
+
+  function onScaleChange(val) {
+    state.scale = Number(val);
+    document.getElementById('valScale').textContent = val;
+    clearActivePreset();
+    runSimulation();
+  }
+
+  function onCapTotalChange(val) {
+    state.cap_total = Number(val);
+    document.getElementById('valCapTotal').textContent = `${val}.0%`;
+    runSimulation();
+  }
+
+  function onBasePriceChange(val) {
+    state.base_price = Number(val);
+    document.getElementById('valBasePrice').textContent = `${Number(val).toLocaleString()}원`;
+    runSimulation();
+  }
+
+  function toggleLockSum(checked) {
+    state.lock_sum = checked;
+    if (checked) {
+      // Re-align to 38%
+      const curWfx = Math.round(state.w_fx * 100);
+      const newWs = Math.max(0, 38 - curWfx);
+      state.w_s = newWs / 100;
+      document.getElementById('sliderWs').value = newWs;
+      document.getElementById('valWs').textContent = `${newWs}.0% (${state.w_s.toFixed(2)})`;
+      runSimulation();
+    }
+  }
+
+  function toggleAutoCapFx(checked) {
+    state.auto_cap_fx = checked;
+    if (checked) {
+      state.cap_fx = Math.round(state.w_fx * 100);
+      runSimulation();
+    }
+  }
+
+  // 8. PRESETS
+  function applyPreset(name) {
+    clearActivePreset();
+
+    if (name === 'original') {
+      // W_fx = 28%, W_s = 10%, Scale = 50
+      setSliders(28, 10, 50, 38, 4500);
+      document.getElementById('btnPresetOriginal').classList.add('active');
+    } else if (name === 'adr50') {
+      // W_fx = 20%, W_s = 18%, Scale = 50
+      setSliders(20, 18, 50, 38, 4500);
+      document.getElementById('btnPresetAdr50').classList.add('active');
+    } else if (name === 'adr20') {
+      // W_fx = 20%, W_s = 18%, Scale = 20
+      setSliders(20, 18, 20, 38, 4500);
+      document.getElementById('btnPresetAdr20').classList.add('active');
+    } else if (name === 'scale0') {
+      // W_fx = 20%, W_s = 18%, Scale = 0
+      setSliders(20, 18, 0, 38, 4500);
+      document.getElementById('btnPresetScale0').classList.add('active');
+    } else if (name === 'scale100') {
+      // W_fx = 28%, W_s = 10%, Scale = 100
+      setSliders(28, 10, 100, 38, 4500);
+      document.getElementById('btnPresetScale100').classList.add('active');
+    } else if (name === 'scale200') {
+      // W_fx = 28%, W_s = 10%, Scale = 200
+      setSliders(28, 10, 200, 38, 4500);
+      document.getElementById('btnPresetScale200').classList.add('active');
+    }
+
+    runSimulation();
+  }
+
+  function setSliders(wfx, ws, scale, capTotal, price) {
+    state.w_fx = wfx / 100;
+    state.w_s = ws / 100;
+    state.scale = scale;
+    state.cap_total = capTotal;
+    state.cap_fx = wfx;
+    state.base_price = price;
+
+    document.getElementById('sliderWfx').value = wfx;
+    document.getElementById('valWfx').textContent = `${wfx}.0% (${state.w_fx.toFixed(2)})`;
+
+    document.getElementById('sliderWs').value = ws;
+    document.getElementById('valWs').textContent = `${ws}.0% (${state.w_s.toFixed(2)})`;
+
+    document.getElementById('sliderScale').value = scale;
+    document.getElementById('valScale').textContent = scale;
+
+    document.getElementById('sliderCapTotal').value = capTotal;
+    document.getElementById('valCapTotal').textContent = `${capTotal}.0%`;
+
+    document.getElementById('sliderBasePrice').value = price;
+    document.getElementById('valBasePrice').textContent = `${price.toLocaleString()}원`;
+  }
+
+  function clearActivePreset() {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  }
+
+  function resetDefaults() {
+    applyPreset('original');
+  }
+
+  // 9. TABLE FILTER & SEARCH
+  function filterTable(type, btn) {
+    state.filter = type;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderTable();
+  }
+
+  function onSearchTable(query) {
+    state.searchQuery = query;
+    renderTable();
+  }
+
+  // 10. CSV EXPORT
+  function exportCsv() {
+    const headers = ['No', '날짜', '요일', '기준일(D-1)', '환율', '하락율(%)', '환율할인(%p)', '검색지수', '검색쿠폰(%p)', '총할인(%p)', '판매가(원)', '구분'];
+    const rows = computedRows.map(r => [
+      r.idxNo, r.date, r.wd, r.src, r.fx || '', r.drop, r.fx_disc, r.idx, r.coupon, r.total, r.price, r.fresh ? '신규' : '이월'
+    ]);
+
+    let csvContent = "\\uFEFF" + headers.join(',') + "\\n";
+    rows.forEach(r => {
+      csvContent += r.join(',') + "\\n";
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `makji_stock_simulation_Wfx${state.w_fx}_Ws${state.w_s}_Scale${state.scale}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // INITIAL BOOTSTRAP
+  window.addEventListener('DOMContentLoaded', () => {
+    runSimulation();
+  });
+</script>
+
+</body>
+</html>
+"""
+
+def main():
+    target_path = BASE_DIR / "prototypes" / "simulator" / "discount-formula-simulator.html"
+    root_path = BASE_DIR / "막지스톡_할인율산식_시뮬레이터.html"
+
+    target_path.write_text(HTML_TEMPLATE, encoding="utf-8")
+    root_path.write_text(HTML_TEMPLATE, encoding="utf-8")
+
+    print(f"[OK] Generated: {target_path}")
+    print(f"[OK] Generated: {root_path}")
+
+if __name__ == "__main__":
+    main()
