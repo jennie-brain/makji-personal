@@ -1,220 +1,120 @@
-# MAKJI Bread Market
+# 🥐 MAKJI STOCK (막지스톡)
 
-> 실제 시장의 변화를 오늘의 할인으로 연결하는 MAKJI 자사몰 데일리 커머스 프로젝트
+> ### *"살 때는 주식처럼, 받을 때는 선물처럼"*
+> **프리미엄 웰니스 베이커리 '막지(MAKJI)' 브랜드 RFP 기반 동적 시세 연동 서비스 기획 저장소**
 
-## 프로토타입 & 시뮬레이터
+[![Decision Index](https://img.shields.io/badge/ADR_Index-Synced-brightgreen)](logs/decision-log/DECISION_INDEX.md)
+[![Max Discount Cap](https://img.shields.io/badge/Discount_Cap-38%25_Hard_Limit-orange)](#-할인율-산출-엔진-핵심-규격)
+[![AI Log](https://img.shields.io/badge/AI_Logged-Gemini_3.8_Flash-blue)](logs/ai-log/)
 
-- **[MAKJI STOCK 통합 반응형 웹/앱 최신본 (`makji-stock-app.html`)](./prototypes/stock/makji-stock-app.html)**
-  - 📱 **모바일 화면 자동 핏팅 & A/B 모드 토글 탑재**: [타입 B: 증권 시장 차트형 (BSI 인터랙티브 차트 + 실시간 빵 종목 시세판)] 및 [타입 A: 오늘의 핫딜 실사형] 1클릭 전환 지원
-  - ☔ **공공 API 연동**: 날씨(비 오는 서울 12°C) 및 한국은행/수출입은행 환율 정보 카드 + 뉴닉 스타일 '고슴이의 빵 레터' 실제 경제 기사 3편 완비
-- **[네이버 검색어트렌드 API 키워드 설정 명세서 (`NAVER_SEARCH_TREND_KEYWORD_LIST.md`)](./docs/NAVER_SEARCH_TREND_KEYWORD_LIST.md)**
-  - 🔍 **10종 빵별 키워드 번들링 & API 호출 JSON 페이로드**: 브랜드 고유명 검색 결손(Zero Index) 방지 및 14일 이동평균 모멘텀 수식 정의
-- **[MAKJI STOCK v11.0 9/9 MVP 공식 프로토타입 (`prototype-v11.html`)](./prototypes/stock/prototype-v11.html)** / [메인 파일 (`makji-stock-prototype.html`)](./prototypes/stock/makji-stock-prototype.html)
-  - 🏠 **홈 빵지수 제거 & 간결화**: 홈 화면 진입 즉시 **"🎯 내일의 빵 예측하기 [ A / B ]"** 투표가 메인으로 배치 (성공 시 500원 코드 `BREAD2026` 발급) ➔ 모닝 빵뉴스 ➔ 오늘의 빵운세
-  - 📈 **Bread Market 화면**: 빵지수(BREAD-DAQ)는 마켓 탭에서만 요약 제공 + 당일 변동폭 **TOP 1 메인 강조 카드** + **TOP 5 랭킹** + 10종 전체 시세표 & 토스 멀티뷰 차트 (최근 7일/30일 추이)
-  - 🎮 **이벤트 화면**: 황금 식빵 자르기 게임 (1일 1회 500원 쿠폰 캡) + 바삭 포춘쿠키 빵운세
-  - 🚫 **폐기/미확정 요소 전면 배제**: '우울해서 빵 샀어', 'ETF', 'FX' 등 9/9 회의록에 없는 군더더기 완전 삭제!
-- **[MAKJI STOCK v10.0 풀 유저 플로우 & RFP 확장 프로토타입 (`prototype-v10.html`)](./prototypes/stock/prototype-v10.html)**
-  - 🗺️ **발표덱용 End-to-End User Flow 5단계 완성**: 홈(시장지표) ➔ 시세표(토스 멀티뷰) ➔ RFP확장(ETF·FX) ➔ 미니게임(500원 쿠폰) ➔ 장바구니/카페24 결제 주문서 ➔ 주문 완료(재방문 알림 훅)
-  - 💼 **RFP ② Bakery ETF (나만의 빵 포트폴리오)**: 웰니스 블루칩 ETF, 저혈당 안심 포뮬러 ETF 원클릭 일괄 담기
-  - 💱 **RFP ③ FX Bakery (실시간 환율 연동 빵)**: 엔화(JPY) 하락 연계 말차 샌드(-15%), 유로(EUR) 연계 프랑스 버터 휘낭시에
-  - 📊 **RFP ④ Bread Index (브랜드 종합 지수)**: 판매량(40%)+재구매율(25%)+검색트렌드(20%)+환율(15%) 가중치 1,024.5p 실시간 연동
-  - 🛒 **카페24 결제 전환 연계**: 미니게임 500원 쿠폰 자동 적용, 투명 영수증, 간편결제(토스/카카오/네이버페이) 시뮬레이션 및 주문완료 뷰 탑재
-- **[MAKJI STOCK v9.0 멀티뷰 차트 & 미니게임천국 프로토타입 (`prototype-v9.html`)](./prototypes/stock/prototype-v9.html)**
-  - 📊 **토스증권 스타일 3대 차트 멀티뷰 탑재**: 간편 라인(기본) + 일봉 캔들스틱 + 혜택 밴드 듀얼 모드 지원
-  - 🔍 **심플 툴팁**: 하루 1회 가격 변동에 맞춰 날짜 + 최종 시세 + 등락폭만 직관적 표시
-  - 🎮 **MAKJI 미니게임천국 5종 완비**: 골든 슬라이스, 식빵 탑 쌓기, 달려라 식빵, 빵 짝맞추기, 황금 포춘쿠키
-  - 🛡️ **마진 방어 1일 1회 데일리 쿠폰 캡**: 당일 첫 판 500원 쿠폰 1장 지급 후, 2회차부터는 TOP 10 랭킹 달성을 위한 무제한 경쟁!
-  - 🏆 **TOP 10 명예의 전당 랭킹**: 닉네임 입력 후 실시간 소팅 및 10위 캡 유지
-- **[BREAD-DAQ 3대 차트 시각화 비교 뷰어 (`chart-options-preview.html`)](./prototypes/experiments/chart-options-preview.html)**
-  - 토스 간편 라인 vs 일봉 캔들스틱 vs 정가 대비 혜택 밴드 인터랙티브 비교
-- **[MAKJI STOCK v8.0 미니게임천국 프로토타입 (`prototype-v8.html`)](./prototypes/stock/prototype-v8.html)**
-- **[MAKJI STOCK v7.0 프로토타입 (`prototype-v7.html`)](./prototypes/stock/prototype-v7.html)**
-  - 코스피 100% 영구 배제! 수요(네이버 검색트렌드 ±5%) + 공급(한국은행 ECOS 환율 ±3%) 2대 실물 지표 연동 (5상승 vs 5하락)
-- **[MAKJI 빵 시세 시뮬레이터 v10.0 (`price-simulator-v10.html`)](./prototypes/price-simulator/price-simulator-v10.html)** ★
-  - 🔍 **정제 키워드 셋 탑재**: 일반명사 마스킹 방지 웰니스 키워드 리스트 뷰어 & API Request JSON 복사 기능
-  - 🎛️ **10종 빵 개별 검색 모멘텀 조절기**: 각 빵의 검색량을 슬라이더로 직접 조절하여 실시간 가격 등락(▲/▼) 즉시 확인
-  - 💵 **환율 & 3단계 캡 연동**: 글로벌 슬라이더(트렌드/환율/캡) 및 퀴즈 500원 쿠폰 적용가 & 55% 마진율 계산기
-- **[MAKJI 빵 시세 시뮬레이터 v9.0 (`price-simulator-v9.html`)](./prototypes/price-simulator/price-simulator-v9.html)**
-  - 양방향 트렌드(±5.0%) 슬라이더, 환율(±3.0%) 슬라이더, 3단계 차등 캡(±10%, ±7%, ±5%)
-  - **[신규] 🎁 퀴즈 쿠폰 & 게이미피케이션 시너지 마진 분석기**: 500원 쿠폰 적용 시 고객 체감 할인 및 회사 영업 마진 55% 이상 방어율 실시간 검증
-- **[빵 시세 시스템 공식 명세서 v9.0 (`PRICE_SIMULATOR_V9.md`)](./docs/price-simulator/PRICE_SIMULATOR_V9.md)**
+---
 
+## 📌 1. 프로젝트 개요 (Overview)
 
+본 저장소는 건강한 웰니스 베이커리 브랜드 **'막지(MAKJI)'**의 기업 RFP 요구사항에 맞춰, 외부 시장 지표(외환시장 환율, 네이버 검색 트렌드)를 베이커리 가격에 실시간 연동하여 매일 아침 고객의 재방문과 자사몰 실구매 전환을 유도하는 **MAKJI STOCK** 서비스 기획 저장소입니다.
 
-
-## 1. 프로젝트 개요
-
-Bread Market은 MAKJI 자사몰([makji.kr](https://makji.kr))에 고객이 매일 방문할 이유를 만드는 실시간 할인 서비스입니다. 환율, 금값, 주식, 날씨, SNS 트렌드처럼 매일 달라지는 외부 데이터를 상품 가격과 프로모션의 기준으로 활용합니다.
-
-시장 데이터 자체가 서비스의 목적은 아닙니다. 무작위 할인 대신 누구나 이해할 수 있는 실제 데이터에 할인 근거를 두어 고객에게는 "오늘은 어떤 빵이 저렴할까?"라는 기대를, 브랜드에는 반복 방문과 구매 전환의 기회를 제공하는 것이 핵심입니다.
-
-## 2. 문제 정의
-
-### 문제
-
-MAKJI 자사몰은 정적인 가격 구조 때문에 고객이 매일 다시 방문해야 할 동기가 부족하며, 이로 인해 재방문율과 구매 전환이 정체될 수 있습니다.
-
-### 기회
-
-기업은 외부 시장 데이터를 가격 변동의 기준으로 활용해 달라고 요구했지만, 어떤 지표를 어떤 제품과 연결할지에 대한 구체적인 원칙은 제시하지 않았습니다. 연결 논리가 약하면 데이터 기반 할인도 고객에게는 근거 없는 무작위 이벤트처럼 보일 수 있습니다.
-
-### 해결 방향
-
-각 시장지표와 제품의 연결 이유를 먼저 설계하고, 해당 규칙에 따라 상품가·쿠폰·이벤트가 매일 자동 갱신되는 구조를 구현합니다. 고객 화면에는 할인율뿐 아니라 할인 이유도 함께 보여 주어 서비스의 신뢰성과 이해도를 높입니다.
-
-## 3. 핵심 MVP 범위
-
-### 기획
-
-- 시장지표와 제품을 연결하는 기준 및 스토리 설계
-- 지표 변화에 따른 할인·이벤트 발동 조건 정의
-- 고객이 이해할 수 있는 할인 사유와 콘텐츠 문구 설계
-- 가격 급변, 데이터 누락, 중복 쿠폰 등을 고려한 운영 안전장치 정의
-
-### 구현
-
-```text
-외부 데이터 수집
-(주식·환율·금·날씨·SNS 트렌드)
-        ↓
-데이터 정규화 및 유효성 검증
-        ↓
-할인·이벤트 룰 엔진 판단
-        ↓
-할인율 상·하한 및 운영 정책 검증
-        ↓
-카페24 API 연동
-(상품가·쿠폰·이벤트 자동 갱신)
-        ↓
-자사몰 노출 및 실행 결과 기록
+```mermaid
+flowchart LR
+    A["외부 데이터<br>(환율 20% + 검색량 18%)"] --> B["MAKJI STOCK<br>(일일 시세 & 인터랙티브 탐색)"]
+    B --> C["게이미피케이션<br>(내일 가격 예측 퀘스트)"]
+    B --> D["자사몰 구매 전환<br>('막지에서 구매하기')"]
+    D --> E["선물 언박싱<br>(웰니스 케어 & 감동 경험)"]
 ```
 
-### 핵심 산출물
+---
 
-- 지표–제품 매핑 및 할인 정책 문서
-- 외부 데이터 수집 모듈
-- 할인·이벤트 룰 엔진
-- 카페24 상품가·쿠폰 연동 기능
-- 동작 가능한 사용자 프로토타입
-- 데이터 수집, 가격 변경, 오류 이력 로그
-
-## 4. 지표–제품 연결 설계 원칙
-
-최종 매핑은 팀의 상품 분석과 데이터 검증을 거쳐 확정합니다. 다음 기준을 공통 원칙으로 사용합니다.
-
-| 원칙 | 확인 질문 |
-| --- | --- |
-| 설명 가능성 | 고객이 지표와 제품의 관계를 한 문장으로 이해할 수 있는가? |
-| 관련성 | 원재료, 생산, 계절, 소비 상황 또는 브랜드 이야기와 연결되는가? |
-| 반복 가능성 | 일회성 아이디어가 아니라 지속적으로 운영할 수 있는가? |
-| 변동 적정성 | 데이터가 너무 자주 또는 지나치게 크게 바뀌지 않는가? |
-| 사업 안전성 | 마진, 재고, 쿠폰 중복 등 운영 제약 안에서 실행 가능한가? |
-| 검증 가능성 | 사용한 데이터와 할인 결과를 기록하고 재현할 수 있는가? |
-
-## 5. 자사몰 유입 활성화
-
-Bread Market의 할인 결과를 메타 광고와 SNS 콘텐츠의 소재로 활용해 신규 고객을 자사몰 구매까지 연결합니다.
+## 📂 2. 파일트리 구조 (Directory Tree)
 
 ```text
-SNS·메타 광고
-"오늘의 환율 할인 빵" 등 데이터 기반 소재
-        ↓
-이벤트 랜딩 페이지
-오늘의 지표·할인 이유·대상 상품 안내
-        ↓
-상품 탐색 및 혜택 적용
-        ↓
-카페24 자사몰 구매 전환
-        ↓
-재방문 장치
-내일의 할인 예고·쿠폰·공유 콘텐츠
-```
-
-팀의 주요 과업은 다음과 같습니다.
-
-- 핵심 고객군 및 광고 타깃 설정
-- Bread Market과 일관된 이벤트 콘셉트 기획
-- SNS 광고 소재 및 이벤트 랜딩 페이지 설계
-- 광고 클릭부터 구매까지의 전환 흐름 구현
-- 유입, 참여, 상품 클릭, 쿠폰 발급, 구매 전환 지표 측정
-
-## 6. 기대 효과 및 측정 지표
-
-| 목표 | 주요 지표 |
-| --- | --- |
-| 매일 방문할 이유 형성 | 재방문율, 방문 빈도, 직접 유입 비중 |
-| 이벤트 참여 확대 | 랜딩 페이지 도달률, 체류 시간, 참여율 |
-| 상품 관심 증대 | 상품 상세 클릭률, 쿠폰 발급률, 장바구니 전환율 |
-| 실제 매출 기여 | 구매 전환율, 쿠폰 사용률, 객단가, 프로모션 매출 |
-| 운영 안정성 확보 | 데이터 수집 성공률, 가격 갱신 성공률, 오류·롤백 건수 |
-
-## 7. 포트폴리오 서술 예시
-
-### 문제 정의
-
-MAKJI 자사몰은 정적인 가격 구조로 인해 고객이 매일 방문할 이유가 부족했고, 재방문과 구매 전환을 높일 새로운 장치가 필요했습니다.
-
-### 원인 분석
-
-외부 시장 데이터를 가격 변동 기준으로 활용해 달라는 기업 요구사항은 있었지만, 지표와 제품을 연결하는 기준이 구체화되지 않아 무작위 할인처럼 인식될 위험이 있었습니다.
-
-### 솔루션
-
-시장지표와 제품의 연결 논리, 할인 조건, 운영 안전장치를 설계했습니다. 외부 데이터 수집부터 룰 판단, 카페24 상품가·쿠폰 갱신까지 이어지는 자동화 구조와 고객용 프로토타입으로 이를 구체화했습니다.
-
-### 임팩트
-
-기업의 실제 비즈니스 요구를 데이터 기반 의사결정 구조로 전환하고, 기획 논리가 실제 서비스에서 동작할 수 있음을 프로토타입으로 검증했습니다. 향후에는 재방문율, 쿠폰 사용률, 구매 전환율을 중심으로 사업 효과를 검증할 수 있습니다.
-
-> 아직 측정하지 않은 성과는 수치로 단정하지 않습니다. 프로토타입 단계에서는 구현·검증한 범위를 제시하고, 운영 이후 실제 지표로 임팩트 항목을 갱신합니다.
-
-## 8. 문서 및 파일 안내
-
-```text
-.
-├── index.html                                 # 🌐 실시간 웹 프로토타입 메인 엔트리
-├── README.md                                  # 🧭 프로젝트 종합 대시보드
+makji-personal/
+├── .github/
+│   └── workflows/
+│       └── auto-log-verification.yml       # ADR 인덱스 정합성 CI 검증 워크플로우
+├── docs/                                  # 5단계 체계적 기획 문서군
+│   ├── 00_rfp/                            # 기업 RFP 분석 및 요구사항 정의
+│   │   ├── RFP.pdf                        # 원본 RFP 문서
+│   │   └── RFP_ANALYSIS.md                # RFP 핵심 분석 및 제약조건
+│   ├── 01_concept/                        # 브랜드 세계관 및 스토리텔링
+│   │   ├── 9_10_기획안_초안.md              # 초기 기획안 원본
+│   │   └── BRAND_STORYTELLING.md          # '살 때는 주식처럼, 받을 때는 선물처럼' 감성 여정
+│   ├── 02_pricing_engine/                 # 가격 결정 엔진 및 통계 검증
+│   │   ├── FORMULA_SPECIFICATION.md       # 공식 할인율 산식 명세 (20% + 18% = 38%)
+│   │   ├── VERIFICATION_REPORT_GEMINI.md  # 91일 실데이터 백테스팅 경영진 검증 보고서
+│   │   └── data/                          # 외환/트렌드 실데이터 및 검증 엑셀 시트
+│   ├── 03_product_spec/                   # 제품 사양 및 PRD
+│   │   ├── KEYWORD_MAPPING.md             # 10대 웰니스 제품-검색어 매핑
+│   │   └── PRD.md                         # 제품 요구사항 정의서 (기능/비기능 명세)
+│   └── 04_presentations/                  # 시각화 발표 자료
+│       └── 막지스톡_할인율산식_발표.html     # 경영진 보고용 인터랙티브 발표 덱
+├── prototypes/                            # 실감형 인터랙티브 프로토타입
+│   ├── exchange/
+│   │   └── makji-stock-exchange.html      # 빵 시세 거래소 캔들 차트 프로토타입
+│   └── simulator/
+│       └── price-simulator.html           # 2-Factor 할인율 동적 시뮬레이터
+├── logs/                                  # 자동화 로깅 및 의사결정 레코드
+│   ├── README.md                          # 로깅 시스템 안내 가이드
+│   ├── ai-log/                            # AI 협업 세션 로그
+│   │   ├── 20260912_initial_restructuring.md
+│   │   └── git-activity.log               # Git 훅에 의한 자동 커밋 로그
+│   └── decision-log/                      # 아키텍처 및 기획 의사결정 (ADR)
+│       ├── ADR-001_slogan_and_unboxing_flow.md
+│       ├── ADR-002_formula_weights_20_18_38.md
+│       ├── ADR-003_weekend_carryover_policy.md
+│       └── DECISION_INDEX.md              # 자동 동기화되는 ADR 누적 인덱스
+├── scripts/                               # 자동화 스크립트 도구
+│   ├── auto_log.py                        # AI 작업 기록 및 ADR 생성 CLI 도구
+│   ├── sync_decision_index.py             # ADR 인덱스 자동 동기화 스크립트
+│   └── install_hooks.ps1                  # 로컬 Git hook 설치기
+├── index.html                             # 모바일 최적화 웹 메인 애플리케이션 (GitHub Pages)
 ├── .gitignore
-├── docs/                                      # 📄 서비스 기획, 스펙 및 RFP 문서
-│   ├── BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md  # 빵마켓 서비스 기획안 & 와이어프레임 명세서
-│   ├── RFP.pdf                                # 기업연계 프로젝트 공식 RFP
-│   └── images/                                # 기획/마케팅 시각화 에셋
-│       ├── bread_prescription_ui.jpg
-│       └── meta_ad_creative.jpg
-├── research/                                  # 📊 시장 리서치 & 분석 보고서
-│   ├── MAKJI_STRATEGIC_ANALYSIS_2026.md       # MAKJI 전략 분석 2026 (SWOT, 포지셔닝)
-│   ├── wellness_bakery_market_research.md     # 웰니스 베이커리 시장 심층 리서치
-│   ├── WELLNESS_BAKERY_DEEP_RESEARCH.md       # 글로벌 레퍼런스 비교 분석
-│   └── report-source.md                       # 리서치 세부 데이터 소스
-└── prototypes/                                # 🧪 서브/참고용 프로토타입 아카이브
-    ├── makji-mobile-prototype.html            # 모바일 뷰 프로토타입
-    └── proto.html                             # 인터랙션 테스트용 프로토타입
+└── README.md                              # 본 문서
 ```
 
-- [MAKJI STOCK PRD (v2.0, 최신)](docs/MAKJI_STOCK_PRD.md): 9/9 MVP 회의록·9/10 기획안 초안 기준 최신 서비스 요구사항 문서. 서비스 개요, 사용자 흐름, MVP 핵심 기능, 화면 명세, 가격 정책, 구현·운영 계획, 검증 계획, 확장 설계 범위
-- [서비스 기획안 및 와이어프레임 (v1.0, superseded)](docs/BREAD_MARKET_WIREFRAME_AND_SERVICE_SPEC.md): 9/9 회의 이전 초안. 최신 PRD와 차이는 PRD 부록 D 참고
-- [공식 RFP 문서](docs/RFP.pdf): 기업연계 프로젝트 요구사항 및 타임라인
-- [MAKJI 전략 분석 2026](research/MAKJI_STRATEGIC_ANALYSIS_2026.md): 브랜드 가치제안·포지셔닝·SWOT, 국내 웰니스 베이커리 시장규모와 성장성, 국내외 경쟁사, 금융데이터 프로모션 전략
-- [웰니스 베이커리 시장 리서치](research/wellness_bakery_market_research.md): 시장 동향, 고객 페르소나, 경쟁사 및 유통 채널 분석
-- [글로벌 레퍼런스 비교](research/WELLNESS_BAKERY_DEEP_RESEARCH.md): MAKJI 시장 분석과 국내외 사례 비교
-- [오늘의 빵 배당 운영 권장안](docs/MAKJI_BREAD_DIVIDEND_RECOMMENDATIONS.md): KOSPI 기반 할인율, 제품 선정 점수, 손익·재고 안전장치, UX와 A/B 테스트
+---
 
-## 9. 현재 단계
+## ⚡ 3. 할인율 산출 엔진 핵심 규격
 
-현재 저장소는 서비스 기획과 웹 프로토타입을 중심으로 구성되어 있습니다. 실제 운영을 위해서는 외부 데이터 제공처 선정, 지표–제품 매핑 검증, 카페24 API 권한 및 정책 확인, 가격 변경 안전장치, 분석 이벤트 정의가 추가로 필요합니다.
+| 지표 항목 | 최대 가중치 | 산정 기준 및 스토리텔링 | 비고 |
+| :--- | :---: | :--- | :--- |
+| **환율 하락 (USD/KRW)** | **20.0%** | 유기농 밀가루, AOP 버터 수입 원가 절감 혜택 전액 환원 | 일일 하락폭 × 20.0 스케일 팩터 |
+| **검색량 상승 (네이버 트렌드)** | **18.0%** | 소비자의 관심과 검색이 모여 커지는 대중 참여 할인 | 네이버 데이터랩 상대지수(0~100) × 0.18 |
+| **총합 마진 방어선** | **38.0% (Hard Cap)** | `min(38.0%, 환율할인 + 검색할인)` 강제 차단 | 재무적 역마진 원천 방어 |
+| **코스피 (KOSPI) 게릴라** | 이벤트 전용 | 코스피 +1.5% 급등 마감 시에만 깜짝 쿠폰 발급 | 총 할인 38% 캡 내에서만 합산 |
+| **주말 외환 휴장 정책** | 이월 승계 | 금요일 16:30 서울외환시장 종가를 주말 내내 유지 | "주말 장외 특가 확정 마켓"으로 브랜딩 |
 
-## 10. 소비자물가 프로토타입 버전
+---
 
-- `prototypes/makji-household-cpi-v1.html`: 우리 집 간식 물가지수 초기안
-- `prototypes/makji-household-cpi-v2.html`: 주가 차트 제거 및 MECE 간식 카테고리 적용안
-- `prototypes/makji-household-cpi-v3.html`: 간편한 정보 구조, MAKJI 제품 스토리, 신뢰형 금융지표 UI 적용안
-- `prototypes/makji-household-cpi-v4.html`: 화면당 단일 과업, 선택 후 제품 연결, 최소 문구 중심 전환형 프로토타입
-- `prototypes/makji-bread-dividend-v5.html`: KOSPI 변동 폭으로 할인율을 결정하는 ‘오늘의 빵 배당’ 프로토타입
-- `prototypes/makji-bread-dividend-v6.html`: 할인 규칙과 제품별 할인 한도를 반영한 사용자 흐름 프로토타입
-- `prototypes/makji-bread-dividend-v7.html`: 금융 앱 문법을 걷어내고 제품 공개·쿠폰 준비·자사몰 이동을 완성한 베이커리 리워드 UX
-- `prototypes/makji-daily-market-v8.html`: 경제지표에 따라 테마·대표 제품·제품별 혜택이 매일 바뀌는 다중 제품 마켓 UX
-- `prototypes/makji-toss-bread-exchange.html`: 토스 증권 UI/UX를 그대로 이식한 실시간 빵 거래소 (인터랙티브 캔버스 차트, 양방향 호가창, 실시간 틱 체결 피드, 서킷브레이커/사이드카 15분 타임세일 모달, 금 최고가 50% 잭팟 팝업, 토스 바텀시트 결제 어포던스)
-- `index.html`: 현재 최신 버전인 토스 증권형 실시간 빵 거래소 배포용 화면
+## 🤖 4. 자동 로깅 시스템 (AI-Log & Decision-Log)
 
-이후 변경안은 기존 파일을 덮어쓰지 않고 `v3`, `v4`처럼 새 HTML 파일로 추가합니다.
+본 프로젝트는 기획 과정에서 발생하는 모든 의사결정과 AI 협업 과정을 추적 가능하도록 자동화된 시스템을 탑재하고 있습니다.
+
+### 4-1. AI 작업 로그 기록
+```bash
+python scripts/auto_log.py ai \
+  --model "Gemini 3.8 Flash" \
+  --topic "할인율 산식 최적화" \
+  --summary "환율 20% + 검색 18% = 38% 하드캡 확정 및 검증" \
+  --files "docs/02_pricing_engine/FORMULA_SPECIFICATION.md"
+```
+
+### 4-2. 의사결정 레코드(ADR) 생성 및 색인 갱신
+```bash
+python scripts/auto_log.py decision \
+  --title "주말 외환시장 휴장 시 금요일 종가 이월 정책" \
+  --decider "기획팀 & 경영진" \
+  --status "Accepted" \
+  --context "토/일 외환시장 미운영 대응" \
+  --decision "금요일 종가 유지 및 주말 특가 브랜딩" \
+  --consequences "주말 구매 전환율 방어"
+```
+* 새 ADR이 생성되면 `scripts/sync_decision_index.py`가 자동 호출되어 [`DECISION_INDEX.md`](logs/decision-log/DECISION_INDEX.md)가 갱신됩니다.
+* 로컬 Git `post-commit` 훅을 통해 커밋 시마다 색인이 무결하게 동기화됩니다.
+
+---
+
+## 🌐 5. 프로토타입 및 프레젠테이션 바로보기
+
+1. **[모바일 통합 서비스 (index.html)](./index.html):** 선물 상자 언박싱 모션과 주식 시세 전광판, 10종 빵장, 자사몰 구매 아웃링크가 통합된 메인 웹앱.
+2. **[빵 시세 거래소 프로토타입](./prototypes/exchange/makji-stock-exchange.html):** 캔들 차트와 호가창 메타포 인터랙션.
+3. **[동적 가격 시뮬레이터](./prototypes/simulator/price-simulator.html):** 환율/검색량 슬라이더를 조작하며 실시간 산식을 테스트하는 도구.
+4. **[경영진 산식 검증 발표 덱](./docs/04_presentations/막지스톡_할인율산식_발표.html):** 91일 실데이터 백테스팅 결과와 3대 리스크 보완 전략 덱.

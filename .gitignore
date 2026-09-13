@@ -1,15 +1,36 @@
-# Scratch files
-products_utf8.txt
-scraped_details.txt
-scratch/
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Generated browser screenshots and visual verification outputs
-*-preview.png
-*-verified.png
-flow-*.png
-chart-options-*.png
-v*-dashboard.png
-v*-golden.png
-v*-simulator-preview.png
-notion_preview.png
-minigame-*.png
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+
+# Node / Web
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Large Data & Archives
+*.zip
+*.tar.gz
+*.rar
+tmp/
+temp/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+logs/ai-log/git-activity.log
