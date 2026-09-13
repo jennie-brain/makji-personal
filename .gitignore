@@ -33,4 +33,4 @@ temp/
 *.swo
 
 # Project specific
-logs/ai-log/git-activity.log.bak
+logs/ai-log/git-activity.log
