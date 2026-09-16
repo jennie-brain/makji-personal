@@ -26,6 +26,9 @@ yarn-error.log*
 tmp/
 temp/
 
+# Headless browser automation profiles (screenshot tooling scratch dirs)
+.chrome-*/
+
 # IDE / Editor
 .vscode/
 .idea/

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>MAKJI STOCK · 빵마켓 탐색</title>
+<link rel="stylesheet" href="ui.css">
+<style>html,body{width:402px;height:874px;overflow:hidden;background:#fff}</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="screens.js"></script>
+<script>
+document.getElementById('app').outerHTML = SCREENS.market();
+/* '실시간 차트'가 화면 맨 위로 오도록 스크롤한 상태 */
+var b = document.querySelector('.body'), t = document.querySelector('.bm-sect');
+b.scrollTop += t.getBoundingClientRect().top - b.getBoundingClientRect().top - 16;
+</script>
+</body>
+</html>

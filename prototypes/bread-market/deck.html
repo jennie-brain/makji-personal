@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>MAKJI STOCK 빵마켓 · 발표용</title>
+<link rel="stylesheet" href="ui.css">
+<style>html,body{width:1920px;height:1080px;overflow:hidden}</style>
+</head>
+<body>
+<div class="deck" id="deck"></div>
+<script src="screens.js"></script>
+<script>
+/* 사용자 흐름: 랜딩 → 탐색 → 근거 확인 → 선택 */
+var steps = [
+  ['market',  '랜딩 · 오늘의 빵'],
+  ['market',  '탐색 · 실시간 차트', 1],
+  ['detail',  '근거 확인'],
+  ['handoff', '선택 · 자사몰 연결']
+];
+document.getElementById('deck').innerHTML = steps.map(function (s, i) {
+  return '<div class="slot" data-i="' + i + '"><div class="frame">' + SCREENS[s[0]]() + '</div>' +
+         '<div class="step">' + s[1] + '</div></div>';
+}).join('');
+steps.forEach(function (s, i) {
+  if (!s[2]) return;
+  var slot = document.querySelector('.slot[data-i="' + i + '"]');
+  var b = slot.querySelector('.body'), t = slot.querySelector('.bm-sect');
+  b.scrollTop += t.getBoundingClientRect().top - b.getBoundingClientRect().top - 16;
+});
+</script>
+</body>
+</html>

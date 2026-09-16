@@ -684,6 +684,12 @@
     }
 
     /* FOOTER */
+    .fx-cap-panel { background: var(--blue-light); border: 1px solid var(--blue-border); border-radius: 14px; padding: 20px; }
+    .fx-cap-panel[hidden] { display: none; }
+    .fx-cap-panel p { font-size: 13px; color: var(--ink-sub); margin-bottom: 14px; }
+    .fx-cap-panel input[type="number"] { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; }
+    .fx-cap-panel .toggle-label { flex-wrap: wrap; }
+    .preset-btn:focus-visible, .btn-action:focus-visible { outline: 3px solid var(--blue-border); outline-offset: 3px; }
     .footer-note {
       text-align: center;
       font-size: 13px;
@@ -742,6 +748,7 @@
         🎛️ 산식 파라미터 미세 조정 (Interactive Parameters)
       </div>
       <div class="toggles-group">
+        <button class="btn-action" id="btnFxCaps" aria-expanded="false" aria-controls="fxCapPanel" onclick="toggleFxCapPanel()">⚖️ 환율 양방향 캡 조정</button>
         <label class="toggle-label" title="환율과 검색 가중치의 합을 38%로 자동 연동합니다.">
           <span class="toggle-switch">
             <input type="checkbox" id="lockSumToggle" checked onchange="toggleLockSum(this.checked)">
@@ -766,8 +773,8 @@
           <span class="slider-title">💵 환율 배분 ($W_{FX}$)</span>
           <span class="slider-val-badge" id="valWfx">28.0% (0.28)</span>
         </div>
-        <input type="range" id="sliderWfx" min="0" max="38" step="1" value="28" oninput="onWfxChange(this.value)">
-        <span class="slider-hint">총 38%p 중 환율 하락에 배정할 최대 할인율 (0% ~ 38%)</span>
+        <input type="range" id="sliderWfx" min="0" max="100" step="1" value="28" oninput="onWfxChange(this.value)">
+        <span class="slider-hint">환율 변동에 곱하는 반영 비율입니다. 상승은 할증, 하락은 할인으로 반영합니다. 캡과는 별도로 설정할 수 있습니다.</span>
       </div>
 
       <!-- W_S -->
@@ -809,6 +816,25 @@
         <input type="range" id="sliderBasePrice" min="2000" max="8000" step="100" value="4500" oninput="onBasePriceChange(this.value)">
         <span class="slider-hint">할인율 적용 기준 소비자가 (모닝빵 기본 4,500원)</span>
       </div>
+    </div>
+
+    <div class="fx-cap-panel" id="fxCapPanel" hidden>
+      <p><strong>환율 하락 → 양수 할인 / 환율 상승 → 음수 할인(할증)</strong><br>캡은 환율 변동률(%)이 아니라 산식 적용 후 환율 할인·할증(%p)의 한도입니다. 검색쿠폰이 할증을 상쇄할 수 있으므로 모든 상승일에 정가를 넘는 것은 아닙니다. 판매가는 매일 정가 기준이며 누적되지 않습니다.</p>
+      <div class="sliders-grid">
+        <label class="slider-item">
+          <span class="slider-title">환율 하락 시 할인 상한 (+%p)</span>
+          <input type="number" id="inputFxUpper" min="0" max="100" step="0.1" value="28" oninput="onFxCapChange('upper', this)">
+          <span class="toggle-label"><input type="checkbox" id="enableFxUpper" checked onchange="state.cap_fx_enabled=this.checked; clearActivePreset(); runSimulation()"> 할인 상한 적용</span>
+          <span class="slider-hint">직접 수정하면 기존 ‘환율 상한 자동 연동’이 해제됩니다. 총 할인 상한은 별도로 유지됩니다.</span>
+        </label>
+        <label class="slider-item">
+          <span class="slider-title">환율 상승 시 할증 한도 (−%p)</span>
+          <input type="number" id="inputFxLower" min="0" max="100" step="0.1" value="28" oninput="onFxCapChange('lower', this)">
+          <span class="toggle-label"><input type="checkbox" id="enableFxLower" checked onchange="state.cap_fx_lower_enabled=this.checked; clearActivePreset(); runSimulation()"> 할증 한도 적용</span>
+          <span class="slider-hint">28 입력 시 하한은 −28%p입니다. 0은 기존처럼 상승 반영을 차단하며, 체크 해제 시 하한을 없앱니다.</span>
+        </label>
+      </div>
+      <p id="fxCapSummary" style="margin:14px 0 0;" aria-live="polite"></p>
     </div>
 
     <!-- LIVE FORMULA BANNER -->
@@ -892,7 +918,7 @@
     <div class="kpi-card amber">
       <div class="kpi-top">
         <span class="kpi-label">환율할인 0% 일수</span>
-        <span class="kpi-sub">상승/정체일</span>
+        <span class="kpi-sub">할증일은 별도 집계</span>
       </div>
       <div class="kpi-num" id="kpiZeroFx">26<span class="kpi-unit">일</span></div>
       <div class="kpi-footer" id="kpiZeroFxFoot">
@@ -941,7 +967,7 @@
       <div class="chart-header">
         <div class="chart-title-area">
           <h3>📈 91일 할인율 일별 시계열 추이 (Timeline Trend)</h3>
-          <p>2026.06.12 ~ 09.10 ｜ 총할인율(청록), 환율할인(파랑), 검색쿠폰(골드) 및 38% 상한선</p>
+          <p>2026.06.12 ~ 09.10 ｜ 순할인율(청록), 환율 할인·할증(파랑), 검색쿠폰(골드) 및 할인 상한선 · 음수는 정가 대비 할증입니다.</p>
         </div>
       </div>
       <div class="chart-container large">
@@ -997,6 +1023,7 @@
         <button class="filter-pill" onclick="filterTable('weekday', this)">평일만 (65일)</button>
         <button class="filter-pill" onclick="filterTable('weekend', this)">주말만 (26일)</button>
         <button class="filter-pill" onclick="filterTable('zero-fx', this)">환율 0%인 날</button>
+        <button class="filter-pill" onclick="filterTable('surcharge', this)">정가 초과일</button>
         <button class="filter-pill" onclick="filterTable('high-disc', this)">고할인 (20% 이상)</button>
         <button class="filter-pill" onclick="filterTable('cap-hit', this)">상한 도달일</button>
       </div>
@@ -1016,10 +1043,10 @@
             <th>기준일 (D-1)</th>
             <th>환율 (원)</th>
             <th>전일대비 하락율</th>
-            <th>환율 할인율</th>
+            <th>환율 할인 / 할증</th>
             <th>검색지수</th>
             <th>검색 쿠폰</th>
-            <th>총 할인율</th>
+            <th>순 할인율 (음수=할증)</th>
             <th>최종 판매가</th>
             <th>구분</th>
           </tr>
@@ -1049,6 +1076,9 @@
     scale: 50,
     cap_total: 38.0,
     cap_fx: 28.0,
+    cap_fx_lower: 28.0,
+    cap_fx_enabled: true,
+    cap_fx_lower_enabled: true,
     base_price: 4500,
     lock_sum: true,
     auto_cap_fx: true,
@@ -1083,13 +1113,38 @@
   }
 
   // 3. CORE CALCULATION ENGINE
+  function calculateFx(drop, scale = state.scale) {
+    const raw = drop * state.w_fx * scale;
+    return Math.min(state.cap_fx_enabled ? state.cap_fx : Infinity,
+      Math.max(state.cap_fx_lower_enabled ? -state.cap_fx_lower : -Infinity, raw));
+  }
+
+  function toggleFxCapPanel() {
+    const panel = document.getElementById('fxCapPanel');
+    panel.hidden = !panel.hidden;
+    document.getElementById('btnFxCaps').setAttribute('aria-expanded', String(!panel.hidden));
+  }
+
+  function onFxCapChange(side, input) {
+    if (input.value.trim() === '' || !input.validity.valid) return;
+    const value = Number(input.value);
+    if (!Number.isFinite(value)) return;
+    if (side === 'upper') {
+      state.cap_fx = value;
+      state.auto_cap_fx = false;
+      document.getElementById('autoCapFxToggle').checked = false;
+    } else state.cap_fx_lower = value;
+    clearActivePreset();
+    runSimulation();
+  }
+
   function runSimulation() {
     computedRows = RAW_DATA.map((d, idx) => {
       // Formula:
-      // fx_disc = min(cap_fx, max(0, drop * w_fx * scale))
+      // Signed FX adjustment: positive discount, negative surcharge.
       // coupon = search_idx * w_s
       // total = min(cap_total, fx_disc + coupon)
-      const fx_disc = Math.min(state.cap_fx, Math.max(0, d.drop * state.w_fx * state.scale));
+      const fx_disc = calculateFx(d.drop);
       const coupon = d.idx * state.w_s;
       const total = Math.min(state.cap_total, fx_disc + coupon);
       const price = Math.round(state.base_price * (1 - total / 100));
@@ -1102,8 +1157,9 @@
         total: round(total, 2),
         price: price,
         isCapTotal: total >= state.cap_total - 1e-6,
-        isCapFx: fx_disc >= state.cap_fx - 1e-6,
-        isZeroFx: fx_disc <= 0.0001,
+        isCapFx: (state.cap_fx_enabled && d.drop * state.w_fx * state.scale > state.cap_fx) ||
+          (state.cap_fx_lower_enabled && d.drop * state.w_fx * state.scale < -state.cap_fx_lower),
+        isZeroFx: Math.abs(fx_disc) <= 0.0001,
         isWeekend: d.wd === '토' || d.wd === '일'
       };
     });
@@ -1113,18 +1169,22 @@
 
   // 4. UPDATE UI
   function updateUI() {
+    document.getElementById('inputFxUpper').value = state.cap_fx;
+    document.getElementById('inputFxLower').value = state.cap_fx_lower;
+    document.getElementById('enableFxUpper').checked = state.cap_fx_enabled;
+    document.getElementById('enableFxLower').checked = state.cap_fx_lower_enabled;
+    document.getElementById('fxCapSummary').textContent = `환율 반영 비율 ${(state.w_fx * 100).toFixed(1)}% × Scale ${state.scale} ｜ 환율 조정 범위: ${state.cap_fx_lower_enabled ? '−' + state.cap_fx_lower.toFixed(1) : '하한 없음'} ~ ${state.cap_fx_enabled ? '+' + state.cap_fx.toFixed(1) : '상한 없음'}%p ｜ 총 할인 상한 ${state.cap_total}%p`;
     // Update live formula display
     document.getElementById('formulaDisplay').innerHTML = 
-      `총할인율 = min(<span class="hl-cap">${state.cap_total.toFixed(1)}%p</span>, <span class="hl-fx">환율할인</span> + <span class="hl-s">검색쿠폰</span>)`;
+      `순할인율 = min(<span class="hl-cap">${state.cap_total.toFixed(1)}%p</span>, <span class="hl-fx">환율 할인·할증</span> + <span class="hl-s">검색쿠폰</span>)`;
     document.getElementById('formulaSubDisplay').innerHTML = 
-      `환율할인 = min(${state.cap_fx.toFixed(1)}, max(0, 하락율 × ${state.w_fx.toFixed(2)} × ${state.scale})) ｜ 검색쿠폰 = 검색지수 × ${state.w_s.toFixed(2)}`;
+      `환율조정 = min(${state.cap_fx_enabled ? state.cap_fx.toFixed(1) : '∞'}, max(${state.cap_fx_lower_enabled ? '-' + state.cap_fx_lower.toFixed(1) : '-∞'}, 하락률 × ${state.w_fx.toFixed(2)} × ${state.scale})) ｜ 검색쿠폰 = 검색지수 × ${state.w_s.toFixed(2)} ｜ 판매가 = 정가 × (1 − 순할인율/100)`;
 
     const slope = round(state.w_fx * state.scale, 2);
     document.getElementById('metricSlope').textContent = slope.toFixed(1);
     const trigger = (state.w_fx * state.scale > 0) ? round(state.cap_fx / (state.w_fx * state.scale), 2) : 999;
-    document.getElementById('metricTrigger').textContent = trigger > 100 ? '발동불가' : trigger.toFixed(2) + '%';
-    const meanDrop = 0.185; // avg FX drop %
-    document.getElementById('metricMeanDropDisc').textContent = (meanDrop * slope).toFixed(1) + '%p';
+    document.getElementById('metricTrigger').textContent = !state.cap_fx_enabled || trigger > 100 ? '발동불가' : trigger.toFixed(2) + '%';
+    document.getElementById('metricMeanDropDisc').textContent = mean(computedRows.filter(r => r.drop > 0).map(r => r.fx_disc)).toFixed(1) + '%p';
 
     // Metrics computation
     const totals = computedRows.map(r => r.total);
@@ -1176,7 +1236,7 @@
     document.getElementById('kpiCapHitsFoot').textContent = `환율 캡 발동: ${fxCapHits}회 (${((fxCapHits/91)*100).toFixed(1)}%)`;
 
     document.getElementById('kpiZeroFx').innerHTML = `${zeroFx}<span class="kpi-unit">일</span>`;
-    document.getElementById('kpiZeroFxFoot').textContent = `전체 91일 중 ${((zeroFx/91)*100).toFixed(1)}%`;
+    document.getElementById('kpiZeroFxFoot').textContent = `환율 할증 ${computedRows.filter(r => r.fx_disc < 0).length}일 / 정가 초과 ${computedRows.filter(r => r.price > state.base_price).length}일`;
 
     document.getElementById('kpiCorr').textContent = corr.toFixed(2);
     document.getElementById('barFxShare').style.width = fxShare + '%';
@@ -1211,7 +1271,7 @@
           labels: dates,
           datasets: [
             {
-              label: '총 할인율 (%p)',
+              label: '순 할인율 (음수=할증, %p)',
               data: totals,
               borderColor: '#0284c7',
               backgroundColor: 'rgba(2, 132, 199, 0.08)',
@@ -1222,7 +1282,7 @@
               pointHoverRadius: 5
             },
             {
-              label: '환율 할인율 (%p)',
+              label: '환율 할인·할증 (%p)',
               data: fxs,
               borderColor: '#60a5fa',
               borderWidth: 1.5,
@@ -1256,6 +1316,7 @@
           scales: {
             y: {
               beginAtZero: true,
+              suggestedMin: Math.min(0, ...totals, ...fxs) - 2,
               max: Math.max(state.cap_total + 5, 40),
               ticks: { callback: v => v + '%p' }
             },
@@ -1289,11 +1350,13 @@
       charts.timeline.data.datasets[3].data = Array(dates.length).fill(state.cap_total);
       charts.timeline.data.datasets[3].label = `${state.cap_total}% 하드캡 상한`;
       charts.timeline.options.scales.y.max = Math.max(state.cap_total + 5, 40);
+      charts.timeline.options.scales.y.suggestedMin = Math.min(0, ...totals, ...fxs) - 2;
       charts.timeline.update();
     }
 
     // --- CHART 2: DISTRIBUTION HISTOGRAM ---
     const bins = [
+      { label: '할증 (0%p 미만)', min: -Infinity, max: 0 },
       { label: '0%', min: 0, max: 0.01 },
       { label: '0~5%p', min: 0.01, max: 5 },
       { label: '5~10%p', min: 5, max: 10 },
@@ -1301,14 +1364,14 @@
       { label: '15~20%p', min: 15, max: 20 },
       { label: '20~25%p', min: 20, max: 25 },
       { label: '25~30%p', min: 25, max: 30 },
-      { label: '30~38%p', min: 30, max: state.cap_total },
+      { label: '30%p 이상 (상한 미만)', min: 30, max: state.cap_total },
       { label: `${state.cap_total}% 캡도달`, min: state.cap_total, max: 999 }
     ];
 
     const binCounts = bins.map(b => {
-      if (b.min === b.max) return totals.filter(v => v === 0).length;
+      if (b.min === 0 && b.max === 0.01) return totals.filter(v => v === 0).length;
       if (b.max === 999) return totals.filter(v => v >= state.cap_total - 1e-6).length;
-      return totals.filter(v => v >= b.min && v < b.max).length;
+      return totals.filter(v => v >= b.min && v < b.max && v < state.cap_total - 1e-6).length;
     });
 
     if (!charts.hist) {
@@ -1367,7 +1430,7 @@
           labels: weekdays,
           datasets: [
             {
-              label: '평균 환율할인 (%p)',
+              label: '평균 환율 할인·할증 (%p)',
               data: wdFx,
               backgroundColor: '#60a5fa',
               borderRadius: 4
@@ -1403,7 +1466,7 @@
 
     scaleSteps.forEach(sc => {
       const scTotals = RAW_DATA.map(d => {
-        const fx = Math.min(state.cap_fx, Math.max(0, d.drop * state.w_fx * sc));
+        const fx = calculateFx(d.drop, sc);
         const cp = d.idx * state.w_s;
         return Math.min(state.cap_total, fx + cp);
       });
@@ -1457,7 +1520,8 @@
               type: 'linear',
               position: 'left',
               beginAtZero: true,
-              max: 40,
+              suggestedMin: Math.min(0, ...curveMeans, ...curveMedians) - 2,
+              suggestedMax: state.cap_total + 2,
               ticks: { callback: v => v + '%p' }
             },
             y1: {
@@ -1475,6 +1539,9 @@
       charts.scaleCurve.data.datasets[0].data = curveMeans;
       charts.scaleCurve.data.datasets[1].data = curveMedians;
       charts.scaleCurve.data.datasets[2].data = curveHits;
+      charts.scaleCurve.data.datasets[2].label = `${state.cap_total}% 캡 도달 일수 (회)`;
+      charts.scaleCurve.options.scales.y.suggestedMin = Math.min(0, ...curveMeans, ...curveMedians) - 2;
+      charts.scaleCurve.options.scales.y.suggestedMax = state.cap_total + 2;
       charts.scaleCurve.update();
     }
   }
@@ -1490,6 +1557,7 @@
     if (state.filter === 'weekday') filtered = filtered.filter(r => !r.isWeekend);
     else if (state.filter === 'weekend') filtered = filtered.filter(r => r.isWeekend);
     else if (state.filter === 'zero-fx') filtered = filtered.filter(r => r.isZeroFx);
+    else if (state.filter === 'surcharge') filtered = filtered.filter(r => r.price > state.base_price);
     else if (state.filter === 'high-disc') filtered = filtered.filter(r => r.total >= 20.0);
     else if (state.filter === 'cap-hit') filtered = filtered.filter(r => r.isCapTotal);
 
@@ -1515,7 +1583,7 @@
         <td style="color:var(--ink-muted);font-size:12px;">${r.src}</td>
         <td>${r.fx ? r.fx.toLocaleString() : '<span style="color:#94a3b8;">이월</span>'}</td>
         <td style="font-weight:700;color:${dropColor};">${dropSign}${r.drop}%</td>
-        <td style="font-weight:750;color:#0284c7;">${r.fx_disc.toFixed(2)}%p</td>
+        <td style="font-weight:750;color:${r.fx_disc < 0 ? '#e11d48' : '#0284c7'};">${r.fx_disc.toFixed(2)}%p${r.fx_disc < 0 ? ' (할증)' : ''}</td>
         <td style="color:#475569;">${r.idx.toFixed(1)}</td>
         <td style="font-weight:750;color:#d97706;">${r.coupon.toFixed(2)}%p</td>
         <td style="font-weight:900;font-size:14px;color:${r.isCapTotal ? '#e11d48' : '#0f172a'};">${r.total.toFixed(2)}%p</td>
@@ -1529,6 +1597,11 @@
   // 7. CONTROLS EVENT HANDLERS
   function onWfxChange(val) {
     state.w_fx = Number(val) / 100;
+    document.getElementById('sliderWfx').value = val;
+    if (Number(val) > 38 && state.lock_sum) {
+      state.lock_sum = false;
+      document.getElementById('lockSumToggle').checked = false;
+    }
     document.getElementById('valWfx').textContent = `${val}.0% (${state.w_fx.toFixed(2)})`;
 
     if (state.lock_sum) {
@@ -1586,6 +1659,10 @@
   function toggleLockSum(checked) {
     state.lock_sum = checked;
     if (checked) {
+      if (state.w_fx > 0.38) {
+        onWfxChange(38);
+        return;
+      }
       // Re-align to 38%
       const curWfx = Math.round(state.w_fx * 100);
       const newWs = Math.max(0, 38 - curWfx);
@@ -1642,7 +1719,7 @@
     state.w_s = ws / 100;
     state.scale = scale;
     state.cap_total = capTotal;
-    state.cap_fx = wfx;
+    if (state.auto_cap_fx) state.cap_fx = wfx;
     state.base_price = price;
 
     document.getElementById('sliderWfx').value = wfx;
@@ -1666,6 +1743,13 @@
   }
 
   function resetDefaults() {
+    state.cap_fx_lower = 28;
+    state.cap_fx_enabled = true;
+    state.cap_fx_lower_enabled = true;
+    state.auto_cap_fx = true;
+    state.lock_sum = true;
+    document.getElementById('autoCapFxToggle').checked = true;
+    document.getElementById('lockSumToggle').checked = true;
     applyPreset('original');
   }
 
@@ -1684,7 +1768,7 @@
 
   // 10. CSV EXPORT
   function exportCsv() {
-    const headers = ['No', '날짜', '요일', '기준일(D-1)', '환율', '하락율(%)', '환율할인(%p)', '검색지수', '검색쿠폰(%p)', '총할인(%p)', '판매가(원)', '구분'];
+    const headers = ['No', '날짜', '요일', '기준일(D-1)', '환율', '하락률(%)', '환율할인_음수는할증(%p)', '검색지수', '검색쿠폰(%p)', '순할인_음수는할증(%p)', '판매가(원)', '구분'];
     const rows = computedRows.map(r => [
       r.idxNo, r.date, r.wd, r.src, r.fx || '', r.drop, r.fx_disc, r.idx, r.coupon, r.total, r.price, r.fresh ? '신규' : '이월'
     ]);
@@ -1697,7 +1781,7 @@
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.setAttribute('download', `makji_stock_simulation_Wfx${state.w_fx}_Ws${state.w_s}_Scale${state.scale}.csv`);
+    link.setAttribute('download', `makji_stock_simulation_Wfx${state.w_fx}_Ws${state.w_s}_Scale${state.scale}_FXupper${state.cap_fx_enabled ? state.cap_fx : 'none'}_FXlower${state.cap_fx_lower_enabled ? state.cap_fx_lower : 'none'}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
