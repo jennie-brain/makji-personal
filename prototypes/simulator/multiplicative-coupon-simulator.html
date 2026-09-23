@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MAKJI STOCK - 38% Hard Cap Simulator</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v3.2.1/dist/web/static/pretendard.css" />
+  <style>
+    :root {
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #212529;
+      --text-muted: #868e96;
+      --primary: #20c997; /* Wellness Green */
+      --secondary: #339af0; /* Blue for Search */
+      --accent: #ff922b; /* Orange for Coupon */
+      --danger: #fa5252;
+      --border: #e9ecef;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      min-height: 100vh;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .header p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .content {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* Price Card */
+    .price-card {
+      background: linear-gradient(135deg, #212529, #343a40);
+      border-radius: var(--radius);
+      padding: 24px;
+      color: white;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(33, 37, 41, 0.2);
+    }
+
+    .price-card .label { font-size: 13px; opacity: 0.8; margin-bottom: 8px; }
+    
+    .price-card .final-price {
+      font-size: 36px;
+      font-weight: 800;
+      margin: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    
+    .price-card .base-price {
+      font-size: 16px;
+      text-decoration: line-through;
+      opacity: 0.6;
+      font-weight: 400;
+    }
+
+    .total-discount-badge {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 12px;
+      box-shadow: 0 4px 12px rgba(32, 201, 151, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    /* Controllers */
+    .control-group {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .control-group:last-child { border-bottom: none; }
+
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .control-title {
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .control-title .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .control-value {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    /* Custom Range Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+      margin: 10px 0;
+    }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      background: #e9ecef;
+      border-radius: 3px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 24px;
+      width: 24px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      -webkit-appearance: none;
+      margin-top: -9px;
+      cursor: pointer;
+      border: 2px solid #dee2e6;
+      transition: border-color 0.2s;
+    }
+    
+    #fxSlider::-webkit-slider-thumb { border-color: var(--primary); }
+    #searchSlider::-webkit-slider-thumb { border-color: var(--secondary); }
+
+    /* Toggle Button for Coupon */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff4e6;
+      border: 1px solid #ffd8a8;
+      padding: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .toggle-container:active { transform: scale(0.98); }
+    
+    .toggle-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .toggle-title { font-weight: 700; color: #d9480f; font-size: 15px; }
+    .toggle-desc { font-size: 12px; color: #f76707; }
+
+    /* Toggle Switch UI */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ffd8a8;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* Calculation Breakdown */
+    .breakdown {
+      background: #f1f3f5;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      color: #495057;
+    }
+    .breakdown-row.result {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #ced4da;
+      font-weight: 700;
+      color: var(--text-main);
+      font-size: 14px;
+    }
+    
+    .hard-cap-bar {
+      margin-top: 32px;
+    }
+    
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .bar-bg {
+      height: 10px;
+      background: var(--border);
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+      position: relative;
+    }
+    
+    .bar-fill { height: 100%; transition: width 0.3s ease; }
+    .bar-fx { background: var(--primary); }
+    .bar-search { background: var(--secondary); }
+    .bar-coupon { background: var(--accent); }
+    
+    .limit-marker {
+      position: absolute;
+      left: 38%;
+      top: -4px;
+      bottom: -4px;
+      width: 2px;
+      background: var(--danger);
+      z-index: 10;
+    }
+    .limit-text {
+      position: absolute;
+      left: 38%;
+      top: -22px;
+      font-size: 11px;
+      color: var(--danger);
+      font-weight: bold;
+      transform: translateX(-50%);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>MAKJI 가격 잠금 시뮬레이터</h1>
+    <p>곱셈 쿠폰(10%) 적용 시 38% 하드캡 완벽 방어 시연</p>
+  </div>
+
+  <div class="content">
+    
+    <!-- Price Display -->
+    <div class="price-card">
+      <div class="label">막지 제로 모닝롤 (정가 10,000원)</div>
+      <div class="final-price">
+        <span id="displayPrice">10,000</span><span style="font-size:24px">원</span>
+        <span class="base-price">10,000원</span>
+      </div>
+      <div class="total-discount-badge" id="displayDiscount">총 0.0% 할인 적용</div>
+    </div>
+
+    <!-- Hard Cap Progress Bar -->
+    <div class="hard-cap-bar">
+      <div class="bar-label">
+        <span>누적 할인율</span>
+        <span>최대 38% Limit</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill bar-fx" id="barFx" style="width: 0%"></div>
+        <div class="bar-fill bar-search" id="barSearch" style="width: 0%"></div>
+        <div class="bar-fill bar-coupon" id="barCoupon" style="width: 0%"></div>
+        <div class="limit-marker"></div>
+        <div class="limit-text">38% Limit</div>
+      </div>
+    </div>
+
+    <div style="height: 32px"></div>
+
+    <!-- Controllers -->
+    <div class="control-group">
+      <div class="control-header">
+        <div class="control-title">
+          <div class="dot" style="background: var(--primary)"></div>
+          환율 시세 할인 (최대 20%)
+        </div>
+        <div class="control-value" id="valFx" style="color: var(--primary)">0%</div>
+      </div>
+      <input type="range" id="fxSlider" min="0" max="20" value="0" step="1">
+    </div>
+
+    <div class="control-group">
+      <div class="control-header">
+        <div class="control-title">
+          <div class="dot" style="background: var(--secondary)"></div>
+          검색량 상승 할인 (최대 11%)
+        </div>
+        <div class="control-value" id="valSearch" style="color: var(--secondary)">0%</div>
+      </div>
+      <input type="range" id="searchSlider" min="0" max="11" value="0" step="1">
+    </div>
+
+    <div class="control-group" style="border: none;">
+      <label class="toggle-container" for="couponToggle">
+        <div class="toggle-label">
+          <div class="toggle-title">🎫 예측 성공 추가 쿠폰 (10%)</div>
+          <div class="toggle-desc">시세 할인가에서 한 번 더 10% 곱셈 할인</div>
+        </div>
+        <div class="switch">
+          <input type="checkbox" id="couponToggle">
+          <span class="slider"></span>
+        </div>
+      </label>
+    </div>
+
+    <!-- Breakdown -->
+    <div class="breakdown">
+      <div class="breakdown-row">
+        <span>정가</span>
+        <span>10,000원</span>
+      </div>
+      <div class="breakdown-row">
+        <span>➖ 시세 할인 (환율+검색) <span id="txtMarketRate">0%</span></span>
+        <span id="txtMarketDiscount">-0원</span>
+      </div>
+      <div class="breakdown-row" id="rowCoupon" style="display: none; color: #d9480f;">
+        <span>➖ 쿠폰 추가 할인 (시세할인가의 10%)</span>
+        <span id="txtCouponDiscount">-0원</span>
+      </div>
+      <div class="breakdown-row result">
+        <span>최종 결제 금액</span>
+        <span id="txtFinalPrice">10,000원</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const BASE_PRICE = 10000;
+  
+  const fxSlider = document.getElementById('fxSlider');
+  const searchSlider = document.getElementById('searchSlider');
+  const couponToggle = document.getElementById('couponToggle');
+  
+  const valFx = document.getElementById('valFx');
+  const valSearch = document.getElementById('valSearch');
+  
+  const displayPrice = document.getElementById('displayPrice');
+  const displayDiscount = document.getElementById('displayDiscount');
+  
+  const txtMarketRate = document.getElementById('txtMarketRate');
+  const txtMarketDiscount = document.getElementById('txtMarketDiscount');
+  const txtCouponDiscount = document.getElementById('txtCouponDiscount');
+  const txtFinalPrice = document.getElementById('txtFinalPrice');
+  const rowCoupon = document.getElementById('rowCoupon');
+
+  const barFx = document.getElementById('barFx');
+  const barSearch = document.getElementById('barSearch');
+  const barCoupon = document.getElementById('barCoupon');
+
+  function calculate() {
+    const fxPct = parseInt(fxSlider.value);
+    const searchPct = parseInt(searchSlider.value);
+    const useCoupon = couponToggle.checked;
+    
+    valFx.textContent = fxPct + '%';
+    valSearch.textContent = searchPct + '%';
+    
+    // 1. 시세 할인 적용
+    const marketPct = fxPct + searchPct;
+    const marketDiscountWon = Math.floor(BASE_PRICE * (marketPct / 100));
+    const priceAfterMarket = BASE_PRICE - marketDiscountWon;
+    
+    // 2. 쿠폰 할인 적용 (곱셈 할인)
+    let couponDiscountWon = 0;
+    let actualCouponPctContribution = 0;
+    
+    if (useCoupon) {
+      couponDiscountWon = Math.floor(priceAfterMarket * 0.10); // 10%
+      rowCoupon.style.display = 'flex';
+      // 전체 기준 쿠폰이 기여한 실제 % 
+      actualCouponPctContribution = (couponDiscountWon / BASE_PRICE) * 100;
+    } else {
+      rowCoupon.style.display = 'none';
+    }
+    
+    // 3. 최종 금액 및 총 할인율 산출
+    const finalPriceWon = priceAfterMarket - couponDiscountWon;
+    const totalDiscountWon = BASE_PRICE - finalPriceWon;
+    const totalDiscountPct = (totalDiscountWon / BASE_PRICE) * 100;
+    
+    // UI 업데이트
+    displayPrice.textContent = finalPriceWon.toLocaleString();
+    displayDiscount.textContent = `총 ${totalDiscountPct.toFixed(1)}% 할인 적용`;
+    
+    // Breakdown 업데이트
+    txtMarketRate.textContent = `${marketPct}%`;
+    txtMarketDiscount.textContent = `-${marketDiscountWon.toLocaleString()}원`;
+    txtCouponDiscount.textContent = `-${couponDiscountWon.toLocaleString()}원`;
+    txtFinalPrice.textContent = `${finalPriceWon.toLocaleString()}원`;
+    
+    // Bar Chart 업데이트
+    barFx.style.width = fxPct + '%';
+    barSearch.style.width = searchPct + '%';
+    barCoupon.style.width = actualCouponPctContribution + '%';
+    
+    // 시각적 피드백 (38%에 가까워질수록 색상 변경 등 가능)
+    if(totalDiscountPct > 37) {
+      displayDiscount.style.background = '#fa5252';
+      displayDiscount.style.boxShadow = '0 4px 12px rgba(250, 82, 82, 0.3)';
+    } else {
+      displayDiscount.style.background = 'var(--primary)';
+      displayDiscount.style.boxShadow = '0 4px 12px rgba(32, 201, 151, 0.3)';
+    }
+  }
+
+  // Event Listeners
+  fxSlider.addEventListener('input', calculate);
+  searchSlider.addEventListener('input', calculate);
+  couponToggle.addEventListener('change', calculate);
+  
+  // Init
+  calculate();
+</script>
+</body>
+</html>
