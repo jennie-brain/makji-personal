@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAKJI STOCK · 기업 대표 보고 v1.0</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+:root{--sky:#42a5f5;--sky2:#0b79d0;--sky3:#dff2ff;--sky4:#f4fbff;--ink:#10233b;--muted:#5f7186;--line:#d8e7f3;--white:#fff;--navy:#17395f;--gold:#f0a93a;--danger:#d95d68;--ok:#1e9a74;--shadow:0 22px 70px rgba(31,92,135,.14)}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#dcecf7;color:var(--ink);font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",Arial,sans-serif}
+button{font:inherit}.stage{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 20% 10%,#fff 0,#e9f6ff 35%,#d7e8f5 100%)}
+.deck{position:relative;width:1280px;height:720px;background:var(--white);overflow:hidden;box-shadow:var(--shadow);transform-origin:center center}
+.slide{position:absolute;inset:0;display:none;padding:46px 68px 66px;background:linear-gradient(135deg,#fff 0%,#fbfdff 72%,#edf8ff 100%)}
+.slide.active{display:block;animation:enter .34s ease both}@keyframes enter{from{opacity:.25;transform:translateX(16px)}to{opacity:1;transform:none}}
+.slide::before{content:"";position:absolute;left:0;top:0;width:10px;height:100%;background:linear-gradient(var(--sky),var(--sky2))}.slide.cover::before{width:100%;height:8px}.slide.cover{background:linear-gradient(145deg,#fff 0%,#eef9ff 60%,#d8efff 100%)}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.brand{font-weight:900;letter-spacing:.12em;color:var(--sky2);font-size:13px}.section{font-size:12px;color:var(--muted);letter-spacing:.06em}.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--sky2);text-transform:uppercase}.eyebrow::before{content:"";width:22px;height:3px;background:var(--sky);border-radius:3px}
+h1,h2,h3,p{margin:0}h1{font-size:64px;line-height:1.04;letter-spacing:-.055em}h2{font-size:32px;line-height:1.2;letter-spacing:-.03em;margin-top:8px}h3{font-size:16px;line-height:1.3;letter-spacing:-.02em}.lead{font-size:19px;line-height:1.5;color:#344d67;letter-spacing:-.02em;margin-top:12px}.key{font-size:23px;font-weight:850;line-height:1.4;letter-spacing:-.03em;color:var(--navy)}.small{font-size:12px;line-height:1.5;color:var(--muted)}.source{position:absolute;left:68px;bottom:48px;right:68px;font-size:10.5px;color:#7c8fa3;line-height:1.5}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.c45{grid-template-columns:4fr 5fr}.c54{grid-template-columns:5fr 4fr}.c37{grid-template-columns:3fr 7fr}.stack{display:grid;gap:12px}
+.card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:16px;padding:18px}.card.blue{background:var(--sky4);border-color:#bfe3fb}.card.strong{background:linear-gradient(145deg,#0d7fd4,#45b7ff);color:white;border:0}.card.warn{background:#fff8ee;border-color:#f3dcae}.card.risk-card{background:#fff5f5;border-color:#f6cdd1}.card h3{margin-bottom:6px}.card p,.card li{font-size:13.5px;line-height:1.5;color:#52677c}.card.strong p,.card.strong li{color:#eaf7ff}
+.num{font-size:34px;font-weight:900;letter-spacing:-.05em;color:var(--sky2)}.mini .num{font-size:24px}.mini h3{font-size:11.5px;color:var(--muted);font-weight:700;margin-top:4px;letter-spacing:-.01em}.mini{padding:13px}.unit{font-size:14px;font-weight:800;margin-left:2px}
+.tag{display:inline-block;padding:5px 10px;border-radius:999px;background:var(--sky3);color:var(--sky2);font-size:11px;font-weight:800}.tag.warn{background:#fff0d6;color:#9a6200}.tag.red{background:#ffe8eb;color:#ad3442}.tag.gray{background:#eef2f5;color:#5f7186}
+.rule{height:1px;background:var(--line);margin:14px 0}.bullets{padding:0;margin:10px 0 0;list-style:none;display:grid;gap:8px}.bullets li{position:relative;padding-left:18px;font-size:13.5px;line-height:1.48;color:#40566e}.bullets li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--sky)}
+.cover-logo{position:absolute;right:68px;top:65px;width:340px;height:340px;object-fit:contain;border-radius:26px;background:#000;box-shadow:0 18px 46px rgba(16,35,59,.16)}.cover-copy{position:relative;z-index:1;width:700px;margin-top:88px}.cover .lead{width:640px}.cover-meta{display:flex;gap:18px;margin-top:44px;color:#557088;font-size:13px}.cover-meta span{padding-right:18px;border-right:1px solid #b9d5e7}.cover-meta span:last-child{border:0}
+.agenda{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin-top:22px}.agenda button{display:flex;align-items:center;gap:15px;text-align:left;padding:15px 18px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);cursor:pointer;transition:.2s}.agenda button:hover,.agenda button:focus{transform:translateY(-2px);border-color:var(--sky);box-shadow:0 8px 24px rgba(66,165,245,.16);outline:none}.agenda b{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:var(--sky3);color:var(--sky2);flex:none}.agenda span{font-size:15px;font-weight:750}
+.flow{display:flex;align-items:stretch;gap:9px;margin-top:20px}.flow .node{flex:1;min-width:0;padding:15px 12px;border-radius:14px;border:1px solid var(--line);background:#fff}.flow .node b{display:block;font-size:13.5px;color:var(--sky2);margin-bottom:6px}.flow .node span{font-size:11.5px;line-height:1.4;color:var(--muted)}.flow .arrow{display:grid;place-items:center;color:var(--sky2);font-size:22px;font-weight:900}
+.pipeline{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}.pipeline.p4{grid-template-columns:repeat(4,1fr)}.pipe{position:relative;padding:15px;border-radius:14px;background:#fff;border:1px solid var(--line)}.pipe:not(:last-child)::after{content:"→";position:absolute;right:-16px;top:50%;transform:translateY(-50%);z-index:2;color:var(--sky2);font-size:18px;font-weight:900}.pipe b{display:block;color:var(--sky2);font-size:13px;margin-bottom:5px}.pipe span{font-size:11.5px;line-height:1.4;color:var(--muted)}
+.matchrow{display:grid;grid-template-columns:1fr 44px 1fr;gap:10px;align-items:stretch;margin-top:12px}.matchrow .card{display:flex;flex-direction:column;justify-content:center;padding:14px 16px}.matchrow .arrow2{display:grid;place-items:center;color:var(--sky2);font-size:20px;font-weight:900}.matchrow p{font-size:12.5px}
+.stepcol h3{font-size:13px;color:var(--sky2);margin-bottom:7px;text-align:center;font-weight:850}.stepflow{display:grid;gap:5px}.step{background:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:11px;line-height:1.35;color:#40566e}.step b{color:var(--navy);display:block;font-size:11.5px;margin-bottom:1px}.step.branch{background:var(--sky4);border-color:#bfe3fb}.step.exit{background:#fff7ed;border-color:#fbd9a6;color:#8a5a12}.stepdown{text-align:center;color:var(--sky2);font-weight:900;font-size:12px;margin:0}.branchwrap{display:grid;grid-template-columns:1fr 1fr;gap:7px}.branchwrap .stepflow{gap:5px}.branchhead{font-size:10.5px;font-weight:850;text-align:center;padding:4px;border-radius:7px 7px 0 0}.branchhead.calm{background:#dff2ff;color:var(--sky2)}.branchhead.risky{background:#ffe9d6;color:#a35c12}
+.scenario-row{display:grid;grid-template-columns:78px 1fr 34px 1fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}.scenario-row:last-child{border:0}.scenario-row .slabel{font-weight:900;font-size:12.5px;color:var(--navy)}.scenario-row .sbox{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px}.scenario-row .sval{font-size:18px;font-weight:900;color:var(--sky2)}.scenario-row .syear{font-size:10.5px;color:var(--muted)}.scenario-row .sarrow{text-align:center;color:var(--sky2);font-weight:900;font-size:16px}
+.risk{display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:start;padding:9px 0;border-bottom:1px solid var(--line)}.risk:last-child{border:0}.risk .rnum{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:var(--sky3);color:var(--sky2);font-weight:900;font-size:13px}.risk h3{font-size:13.5px}.risk p{font-size:11.5px;color:var(--muted);line-height:1.4;margin-top:2px}.risk .level{font-size:10px;font-weight:900;padding:4px 8px;border-radius:999px;background:#fff0d8;color:#9b6200;align-self:center}
+.decision{border-left:4px solid var(--sky);padding:12px 15px;background:var(--sky4);border-radius:0 12px 12px 0}.decision b{display:block;font-size:14.5px;margin-bottom:4px}.decision p{font-size:12.5px;line-height:1.42;color:var(--muted)}
+.match{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--sky2);font-weight:800;margin-top:6px}
+.toc-pill{position:absolute;right:68px;bottom:44px;border:1px solid var(--line);background:#fff;color:var(--sky2);font-size:11px;font-weight:800;border-radius:999px;padding:7px 11px;cursor:pointer}.toc-pill:hover{border-color:var(--sky)}
+.footer{position:absolute;left:0;right:0;bottom:0;height:40px;background:rgba(255,255,255,.94);border-top:1px solid var(--line);display:grid;grid-template-columns:92px 1fr 92px;align-items:center;padding:0 22px;z-index:20}.nav{display:flex;gap:7px}.nav button{width:27px;height:27px;border:1px solid var(--line);background:#fff;border-radius:8px;color:var(--sky2);font-weight:900;cursor:pointer}.nav button:hover{border-color:var(--sky)}.progress{height:6px;background:#e3edf4;border-radius:999px;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--sky),var(--sky2));width:0;transition:width .3s ease}.counter{text-align:right;font-size:11.5px;color:var(--muted)}.counter b{font-size:15px;color:var(--navy)}
+.quote{border-left:4px solid var(--sky2);padding:10px 16px;background:#fff;border-radius:0 10px 10px 0;font-size:13.5px;line-height:1.5;color:#33475e}
+table.pt{width:100%;border-collapse:collapse;font-size:12px}table.pt th,table.pt td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}table.pt th{color:var(--sky2);font-weight:800;font-size:11px}
+@media print{html,body{overflow:visible;background:#fff}.stage{position:static;display:block}.deck{width:1280px;height:auto;box-shadow:none;transform:none!important}.slide{position:relative;display:block!important;width:1280px;height:720px;page-break-after:always}.footer{display:none}}
+</style>
+</head>
+<body>
+<main class="stage"><div class="deck" id="deck" aria-label="MAKJI STOCK 기업 대표 보고 슬라이드 v1.0">
+
+<section class="slide cover active" data-title="표지">
+  <img class="cover-logo" src="file:///C:/Users/Administrator/Downloads/Makji_logo_img.png" alt="막지 Wellness Bakery &amp; Dessert 로고">
+  <div class="cover-copy"><div class="eyebrow">MAKJI · BUSINESS PROPOSAL · v1.0</div><h1>MAKJI<br>STOCK</h1><p class="lead">검색수요와 환율로 매일 달라지는 빵값,<br>가격 확인을 재방문과 자사몰 구매로 연결합니다.</p><div class="cover-meta"><span>기업 대표 보고</span><span>빵값연구소</span><span>2026.09</span></div></div>
+</section>
+
+<section class="slide" data-title="Executive Summary"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">01 · EXECUTIVE SUMMARY</div></div>
+  <div class="eyebrow">한 장 요약</div><h2>가격이 움직인다는 사실 자체가,<br>콘텐츠이자 재방문 이유입니다.</h2>
+  <div class="grid c54" style="margin-top:22px"><div class="stack"><div class="card blue"><span class="tag">고객 가치</span><h3 style="margin-top:9px">"오늘은 잠글까, 예측할까, 그냥 살까?"</h3><p>오전장·오후장으로 매일 두 번 바뀌는 가격을 확인하고, 가격 잠금 또는 안정형·공격형 보상 중 원하는 방식으로 혜택을 직접 고릅니다.</p></div><div class="card"><span class="tag">기업 가치</span><h3 style="margin-top:9px">가격 확인을 반복 방문과 자사몰 전환으로</h3><p>경쟁사 6곳 중 누구도 가격 변동을 콘텐츠로 쓰지 않는 시장에서, 매일의 가격 확인이 자사몰 구매로 이어지는 구조를 만듭니다.</p></div></div><div class="card strong" style="display:grid;align-content:center;gap:10px"><div class="eyebrow" style="color:#fff">Key Metric</div><div class="num" style="color:#fff;font-size:40px">73.5<span class="unit">%</span></div><p style="font-size:13px">5월 단일상품 파일럿 결제 완결률 — 관심은 증명됐고, 반복 방문 구조가 다음 과제입니다.</p></div></div>
+</section>
+
+<section class="slide" data-title="목차" id="agenda"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">02 · AGENDA</div></div><div class="eyebrow">목차</div><h2>왜 필요한지부터 리스크·실행까지,<br>여섯 단계로 설명합니다.</h2>
+  <div class="agenda"><button data-go="3"><b>01</b><span>기획 배경 — 왜 필요한가</span></button><button data-go="4"><b>02</b><span>시장 현황과 문제</span></button><button data-go="6"><b>03</b><span>성공 조건과 차별화 전략</span></button><button data-go="8"><b>04</b><span>고객과 경험(타깃·화면흐름·가격)</span></button><button data-go="11"><b>05</b><span>시장 규모와 매출 시나리오</span></button><button data-go="12"><b>06</b><span>리스크·로드맵·측정 계획</span></button></div>
+  <p class="small" style="margin-top:16px">목차의 항목을 클릭하면 해당 슬라이드로 이동합니다.</p>
+</section>
+
+<section class="slide" data-title="기획 배경(WHY)"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">03 · WHY</div></div><div class="eyebrow">기획 배경</div><h2>B2B에서 검증한 제품력을,<br>B2C 자사몰의 반복 방문으로 확장합니다.</h2>
+  <p class="quote" style="margin-top:14px">5월 초기 자사몰 운영에서 확인된 과제는 "제품을 파는 것"보다 "방문을 다시 오게 하고, 구매까지 이어지게 하는 것"이었습니다.</p>
+  <div class="grid c54" style="margin-top:16px">
+    <div><div class="small" style="margin-bottom:6px;font-weight:800;color:var(--sky2)">5월 단일상품 파일럿 실적(검증완료)</div>
+    <div class="grid g4"><div class="card mini"><div class="num">147</div><h3>생성 주문(건)</h3></div><div class="card mini"><div class="num">108</div><h3>결제 주문(건)</h3></div><div class="card mini blue"><div class="num">73.5<span class="unit">%</span></div><h3>결제 완결률</h3></div><div class="card mini"><div class="num">271.8</div><h3>결제금액(만원)</h3></div><div class="card mini"><div class="num">250.4</div><h3>상품매출 추정(만원)</h3></div><div class="card mini"><div class="num">2.32</div><h3>객단가(만원)</h3></div><div class="card mini strong"><div class="num" style="color:#fff">0.30</div><h3 style="color:#eaf7ff">연환산 상품매출(억원)</h3></div><div class="card mini"><div class="num">40</div><h3>5월 신규가입(건)</h3></div></div>
+    </div>
+    <div class="card"><h3>관찰 — 시간대·측정의 빈칸</h3><ul class="bullets"><li>오전 8~10시 로그인 25.6% · 결제금액 8.0% / 저녁 20~24시 로그인 20.0% · 결제금액 28.4% — 관심과 구매 시간대가 어긋남</li><li>미결제 39건 중 37건은 결제수단 '선불금' — 진짜 이탈인지 단정 금지</li><li>방문자·세션·유입경로 데이터 미확보 — D2C 퍼널 측정 구조 부재</li></ul></div>
+  </div>
+  <p class="quote" style="margin-top:14px">필요한 것은 한 번의 할인 행사가 아니라, 고객이 매일 가격을 확인할 이유를 갖고 자사몰 구매로 자연스럽게 이어지는 반복 방문 구조입니다.</p>
+  <div class="source">단일상품(막지 ZERO 카스테라) 기준, 연환산 0.30억은 자사몰 단독 확장의 성장판이 얕음을 보여줌 · 참고(각주) Wu et al.(2020) n=182, 온라인 프로모션 효과 조사(2023) n=501 · 출처: 0909_막지 자사몰 5월 주문내역/시간별분석.csv(저장소 미포함)</div>
+</section>
+
+<section class="slide" data-title="시장 현황과 문제"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">04 · MARKET &amp; PROBLEM</div></div><div class="eyebrow">시장 현황과 문제</div><h2>시장도 어렵고, 경쟁도 있고,<br>고객도 아직 낯설어합니다.</h2>
+  <div class="grid g3" style="margin-top:20px">
+    <div class="card"><span class="tag red">① 시장 문제</span><ul class="bullets" style="margin-top:10px"><li>화제성 의존형 성장의 한계(런던베이글·노티드 매출 부침)</li><li>헬시플레저 대체재 이탈 — 20대 45.5%·30대 51.1% 단백질 제품 선택</li><li>원부자재·환율 원가압박 — 삼립 등 평균 9% 인상</li></ul></div>
+    <div class="card blue"><span class="tag">② 경쟁 구도</span><p style="margin-top:10px"><b style="color:var(--navy)">직접 경쟁자 널담</b>(2018창업) — 2019년 약 10억 → 2025년 328억 원(전년비 104%↑)</p><p style="margin-top:8px"><b style="color:var(--navy)">맥락 경쟁자</b> — 런던베이글뮤지엄·노티드·성심당·SPC·CJ더마켓</p><div class="rule"></div><p style="font-weight:800;color:var(--sky2)">경쟁사 0/6 — 가격 변동을 콘텐츠로 쓰는 곳 없음</p></div>
+    <div class="card warn"><span class="tag warn">③ 고객 이탈 지점</span><ul class="bullets" style="margin-top:10px"><li>"가격이 오르내인다"는 컨셉 자체가 사행성처럼 느껴져 진입 거부(정은숙·N1)</li><li>처음 보는 개념이라 신뢰가 안 감(김소민·C2)</li></ul></div>
+  </div>
+  <p class="small" style="margin-top:14px">STOCK↔자사몰 전환마찰(C3)은 여기서 다루지 않습니다 — 실행 리스크이므로 12번 슬라이드(핵심 리스크)에서 별도로 다룹니다.</p>
+</section>
+
+<section class="slide" data-title="문제정의와 솔루션"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">05 · PROBLEM → SOLUTION</div></div><div class="eyebrow">문제정의와 솔루션</div><h2>결국 문제는 하나,<br>MAKJI STOCK의 답도 하나입니다.</h2>
+  <div class="grid g2" style="margin-top:26px">
+    <div class="card risk-card"><span class="tag red">문제</span><p class="key" style="font-size:19px;margin-top:12px">정적인 가격과 검증되지 않은 개념으로는, 이미 화제성에 의존해 부침을 겪는 이 시장에서 반복 방문을 만들 수 없습니다.</p></div>
+    <div class="card strong"><span class="tag" style="background:#fff;color:var(--sky2)">솔루션</span><p class="key" style="font-size:19px;margin-top:12px;color:#fff">실제 환율·검색량 데이터로 가격을 매일 움직여 콘텐츠로 만들고, 그 근거를 투명하게 보여주며, 고객이 원하는 방식(잠금 또는 예측)으로 혜택을 직접 고르게 합니다.</p></div>
+  </div>
+  <p class="small" style="margin-top:18px;text-align:center">이 솔루션은 다음 두 슬라이드 — 성공 조건(06)과 차별화 전략(07) — 에서 구체화됩니다.</p>
+</section>
+
+<section class="slide" data-title="성공 조건"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">06 · SUCCESS CONDITIONS</div></div><div class="eyebrow">우리가 반드시 갖춰야 할 성공 조건</div><h2>세 조건은 다음 슬라이드의 차별화 전략과<br>정확히 하나씩 대응합니다.</h2>
+  <div class="matchrow"><div class="card blue"><b style="color:var(--sky2);font-size:13px">① 체감</b><p>진짜 외부데이터(환율·검색량)로 평소엔 안 보이던 경제 흐름을 느끼게 함</p></div><div class="arrow2">↔</div><div class="card"><b style="color:var(--navy);font-size:13px">전략② 투명한 체감</b><p>실제 데이터로 "왜 이 가격인지" 설명(사행성 아님)</p></div></div>
+  <div class="matchrow"><div class="card blue"><b style="color:var(--sky2);font-size:13px">② 주도적으로 고르는 혜택</b><p>잠금 또는 예측(안정형/공격형) 중 원하는 방식으로 혜택을 직접 가져감</p></div><div class="arrow2">↔</div><div class="card"><b style="color:var(--navy);font-size:13px">전략③ 위험성향별 선택 리워드</b><p>안정형 즉시확정 · 공격형 익일판정 중 매일 선택</p></div></div>
+  <div class="matchrow"><div class="card blue"><b style="color:var(--sky2);font-size:13px">③ 가격이 살아있다는 감각</b><p>주식시장처럼 오전장·오후장으로 매일 움직이는 가격 자체가 콘텐츠</p></div><div class="arrow2">↔</div><div class="card"><b style="color:var(--navy);font-size:13px">전략① 가격의 콘텐츠화</b><p>화제성 없이도 지속되는 재방문 엔진</p></div></div>
+  <p class="small" style="margin-top:12px">※ STOCK↔자사몰 전환 마찰은 이 목록에 없습니다 — RFP가 못박은 구조적 제약이라 실행으로 완전히 없앨 수 없어(원클릭·자동인식으로 최소화만 가능), 조건이 아닌 리스크로 12번 슬라이드에서 다룹니다.</p>
+</section>
+
+<section class="slide" data-title="차별화 전략"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">07 · DIFFERENTIATION</div></div><div class="eyebrow">우리는 무엇을 다르게 팔 것인가</div><h2>경쟁사 6곳 중 누구도 하지 않는<br>세 방향으로 차별화합니다.</h2>
+  <div class="grid g3" style="margin-top:22px">
+    <div class="card strong"><span class="tag" style="background:#fff;color:var(--sky2)">① 가격의 콘텐츠화</span><p style="color:#eaf7ff;margin-top:10px">"오늘 얼마인지 궁금해서 다시 오는" 재방문 엔진 — 화제성 의존 없이도 지속되는 구조</p></div>
+    <div class="card blue"><span class="tag">② 투명한 체감</span><p style="margin-top:10px">실제 환율·검색량 데이터로 "왜 이 가격인지"를 설명 — 사행성처럼 보이지 않는 가격 신뢰</p></div>
+    <div class="card"><span class="tag">③ 위험성향별 선택 리워드</span><p style="margin-top:10px">안정형(즉시 확정) · 공격형(내일 적중 시 더 큰 혜택) 중 매일 선택하는 리워드</p></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>기존 6곳의 가치 선언과 비교</h3><table class="pt" style="margin-top:8px"><tr><th>기업</th><th>가치 선언</th></tr><tr><td><b>널담(직접 경쟁자)</b></td><td>영양과학과 지속가능성으로 식탁 위 더 나은 선택지 제안</td></tr><tr><td>런던베이글뮤지엄·노티드·성심당</td><td>공간·캐릭터·나눔 등 오프라인 경험</td></tr><tr><td>SPC·CJ더마켓</td><td>성분·유통 규모, 개인화된 구매 편의</td></tr></table></div>
+</section>
+
+<section class="slide" data-title="타깃 고객"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">08 · TARGET</div></div><div class="eyebrow">타깃 고객</div><h2>"주식은유"는 유입 후킹용,<br>실사용 화면은 비금융권도 쉽게 설계합니다.</h2>
+  <div class="grid g3" style="margin-top:18px"><div class="card blue"><span class="tag">1순위 · 핵심 타깃</span><h3 style="margin-top:8px">2030 직장인(2535세대)</h3><p>온라인 구매·헬시플레저 관심 모두 높음 — MVP 최우선 타깃</p></div><div class="card"><span class="tag gray">2순위 · 확장 타깃</span><h3 style="margin-top:8px">3040 육아·자기관리층</h3><p>헬시플레저 관심 높으나 게이미피케이션 UX엔 상대적으로 덜 친화적</p></div><div class="card"><span class="tag gray">니치 · 확산 통로</span><h3 style="margin-top:8px">1020 트렌드 얼리어답터</h3><p>직접 타깃은 아니나 SNS 바이럴 확산의 핵심 통로</p></div></div>
+  <div class="flow"><div class="node"><b>광고·SNS 유입</b><span>"주식시장처럼 설계된 빵마켓" — 금융지식·재테크 관심층 호기심 후킹</span></div><div class="arrow">→</div><div class="node"><b>클릭·유입</b><span>낯설고 신기한 컨셉이 클릭을 유도</span></div><div class="arrow">→</div><div class="node"><b>실사용 화면</b><span>시세 확인·잠금·보상 선택 — 비금융권도 바로 이해</span></div><div class="arrow">→</div><div class="node"><b>구매 전환</b><span>자사몰 이동·구매 완료</span></div></div>
+  <p class="small" style="margin-top:12px">두 층위를 섞지 않습니다 — 화면까지 어려운 용어로 채우면 일반 소비자가 이탈하고, 화면을 지나치게 단순화하면 광고가 약속한 신기함이 사라져 재방문으로 이어지지 않습니다.</p>
+</section>
+
+<section class="slide" data-title="소비자 화면 흐름"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">09 · CONSUMER FLOW</div></div><div class="eyebrow">소비자 화면 흐름</div><h2>기능별 3개 흐름 — 모두 자사몰 구매로 수렴하되,<br>겨냥하는 심리와 관문이 다릅니다.</h2>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="stepcol"><h3>① 기본 구매 전환</h3><div class="stepflow"><div class="step"><b>SNS·광고 유입</b></div><div class="stepdown">↓</div><div class="step"><b>온보딩 5장</b>빵값이 왜 움직이는지</div><div class="stepdown">↓</div><div class="step"><b>Bread Market</b>오늘 가격 확인</div><div class="stepdown">↓</div><div class="step"><b>상품 선택</b></div><div class="stepdown">↓</div><div class="step branch"><b>"막지에서 구매하기"</b>자사몰 이동</div><div class="stepdown">↓</div><div class="step"><b>가입·로그인 → 구매 완료</b></div></div></div>
+    <div class="stepcol"><h3>② 가격 잠금(아침→오후 재방문)</h3><div class="stepflow"><div class="step"><b>오전장(06~15:59) 방문</b>오전가 확인, 오후 변동 걱정</div><div class="stepdown">↓</div><div class="step branch"><b>가격 잠금(하루 1회)</b>오전가 = 보장가 고정</div><div class="stepdown">↓</div><div class="step exit"><b>이탈</b>오늘은 결제 안 함</div><div class="stepdown">↓</div><div class="step"><b>16:00 오후장 재방문</b></div><div class="stepdown">↓</div><div class="step"><b>오후가 확인</b>올랐으면 차액쿠폰, 내렸으면 오후가</div><div class="stepdown">↓</div><div class="step"><b>자사몰 이동 → 구매 완료</b></div></div></div>
+    <div class="stepcol"><h3>③ 오늘의 보상 고르기</h3><div class="step" style="margin-bottom:5px"><b>"오늘의 보상 고르기" 진입</b></div><div class="branchwrap"><div><div class="branchhead calm">안정형·즉시구매</div><div class="stepflow"><div class="step branch">즉시 확정 쿠폰</div><div class="step">자사몰 이동</div><div class="step">바로 구매 완료</div></div></div><div><div class="branchhead risky">공격형·예측</div><div class="stepflow"><div class="step exit">내일 등락 예측 참여</div><div class="step exit">이탈(익일 재방문)</div><div class="step">익일 06:00 결과 확인</div><div class="step">적중 시 쿠폰→구매</div></div></div></div></div>
+  </div>
+</section>
+
+<section class="slide" data-title="가격 결정 방식"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">10 · PRICING ENGINE</div></div><div class="eyebrow">가격 결정 방식</div><h2>하루 3구간 — 오전장·오후장·정가로<br>가격이 살아 움직입니다.</h2>
+  <div class="grid g3" style="margin-top:22px"><div class="card blue"><span class="tag">06:00~15:59</span><h3 style="margin-top:8px">오전장</h3><p>전일 종가 기준 · 가격 잠금 가능(하루 1회, 상품 1개) · 예측 참여 가능</p></div><div class="card"><span class="tag">16:00~익일 01:59</span><h3 style="margin-top:8px">오후장</h3><p>당일 시가 기준 · 잠금 정산(오르면 차액쿠폰, 내리면 오후가로 구매) · 예측 판정</p></div><div class="card"><span class="tag gray">02:00~05:59</span><h3 style="margin-top:8px">정가</h3><p>정가 판매만 — 할증 없음, 정가를 넘지 않음</p></div></div>
+  <div class="decision" style="margin-top:18px"><b>왜 잠금은 하루 1개만?</b><p>여러 개를 동시에 잠글 수 있게 하면 "어떤 걸 잠글지" 고민이 늘어 신규 방문자가 이해 부담에 이탈합니다. 1개 제한이면 할 일이 "원래 사려던 빵의 오전가를 잠근다" 하나로 단순해집니다 — 기술적 제약이 아니라 의도적 설계입니다.</p></div>
+</section>
+
+<section class="slide" data-title="시장 규모와 매출 시나리오"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">11 · MARKET SIZE</div></div><div class="eyebrow">시장 규모와 5개년 매출 시나리오</div><h2>좁게 정의한 시장에서,<br>점유율 확대만으로 그리는 성장 곡선입니다.</h2>
+  <div class="grid g3" style="margin-top:14px"><div class="card mini"><div class="num" style="font-size:20px">13.6조</div><h3>TAM · 국내 베이커리 시장(2025)</h3></div><div class="card mini blue"><div class="num" style="font-size:20px">2,100~2,650억</div><h3>SAM · 전문점급×온라인D2C×2030세대</h3></div><div class="card mini strong"><div class="num" style="font-size:20px;color:#fff">0.5~3%</div><h3 style="color:#eaf7ff">SAM 대비 목표 점유율(1→3년차)</h3></div></div>
+  <div class="card" style="margin-top:14px"><div class="scenario-row"><span class="slabel">Worst</span><div class="sbox"><span class="syear">1년차</span><div class="sval">1.2억</div></div><span class="sarrow">→</span><div class="sbox"><span class="syear">5년차</span><div class="sval">2.8억</div></div></div><div class="scenario-row"><span class="slabel">Base</span><div class="sbox"><span class="syear">1년차</span><div class="sval">5.7억</div></div><span class="sarrow">→</span><div class="sbox"><span class="syear">5년차</span><div class="sval">18.8억</div></div></div><div class="scenario-row"><span class="slabel">Best</span><div class="sbox"><span class="syear">1년차</span><div class="sval">9.9억</div></div><span class="sarrow">→</span><div class="sbox"><span class="syear">5년차</span><div class="sval">35.3억</div></div></div></div>
+  <div class="source">시장 성장률을 얹지 않고 점유율 확대만 반영 · 망넛이네(2018년 약 5.7억)·널담(2019년 약 9.9억) 초기 실적은 '성공 벤치마크'로만 참고, 확정 전망 아님 · 5월 파일럿 기반 상세 바텀업 모델은 시장분석09·10 별도 참고</div>
+</section>
+
+<section class="slide" data-title="핵심 리스크"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">12 · RISKS</div></div><div class="eyebrow">핵심 리스크</div><h2>구조적 제약 하나와,<br>실행으로 관리 가능한 다섯 가지입니다.</h2>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><div class="risk"><div class="rnum">01</div><div><h3>STOCK↔자사몰 구조적 분리</h3><p>RFP 요구사항 — 완전 해소 불가, 원클릭·자동인식으로 최소화만 가능</p></div><span class="level">구조적</span></div>
+    <div class="risk"><div class="rnum">02</div><div><h3>검색키워드 적합성</h3><p>백테스트는 모닝빵 1종 기준 — 나머지 상품 키워드 검증 필요</p></div><span class="level">HIGH</span></div>
+    <div class="risk"><div class="rnum">03</div><div><h3>표시·결제가 불일치</h3><p>STOCK 표시가격과 자사몰 결제가격이 다르면 신뢰·전환 훼손</p></div><span class="level">HIGH</span></div></div>
+    <div class="card"><div class="risk"><div class="rnum">04</div><div><h3>법적 위험</h3><p>기준가격·할인율·적용기간 표시가 실제와 다르면 표시광고법 저촉 소지</p></div><span class="level">HIGH</span></div>
+    <div class="risk"><div class="rnum">05</div><div><h3>가격모델 전환 재검증</h3><p>3구간 모델로 바뀌어 91일 백테스트 재실행 필요</p></div><span class="level">관리중</span></div>
+    <div class="risk"><div class="rnum">06</div><div><h3>쿠폰 중복 적용</h3><p>잠금·보상 쿠폰을 한 주문에 동시 적용 시 총혜택 상한 초과 가능</p></div><span class="level">관리중</span></div></div>
+  </div>
+</section>
+
+<section class="slide" data-title="로드맵"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">13 · ROADMAP</div></div><div class="eyebrow">로드맵</div><h2>Bread Market MVP부터<br>자사몰 실연동까지 3단계로 구현합니다.</h2>
+  <div class="pipeline" style="margin-top:22px"><div class="pipe"><b>Phase 1 · MVP</b><span>Bread Market — 시세·비교·구매 이동</span></div><div class="pipe"><b>Phase 2 · 참여</b><span>가격 잠금·오늘의 보상 고르기·가격 알림</span></div><div class="pipe"><b>Phase 3 · 연동</b><span>자사몰 실연동 — 판매가·쿠폰·구매 데이터 연결</span></div></div>
+  <div class="grid g3" style="margin-top:20px"><div class="card blue"><span class="tag">9/14</span><h3 style="margin-top:8px">기획안 발표</h3><p>서비스 방향·핵심 가설·MVP 범위 공유</p></div><div class="card"><span class="tag">2~3주차</span><h3 style="margin-top:8px">구현</h3><p>API·가격·참여·구매이동·알림 구현, 확장 설계 초안</p></div><div class="card"><span class="tag">9/28~9/30</span><h3 style="margin-top:8px">검증·발표 준비</h3><p>오류·사용성 검증, 인수인계·최종 발표 자료</p></div></div>
+</section>
+
+<section class="slide" data-title="향후 확장 계획"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">14 · FUTURE</div></div><div class="eyebrow">향후 확장 계획</div><h2>지금 구현하는 것과는 분명히 구분되는,<br>다음 단계 설계입니다.</h2>
+  <div class="grid g3" style="margin-top:20px"><div class="card"><span class="tag gray">설계만 · 구현 아님</span><h3 style="margin-top:8px">Bakery ETF · FX Bakery · Bread Index</h3><p>여러 상품을 묶은 지수형 콘텐츠 — 기능·화면·정책·운영 설계 문서까지만 이번 범위</p></div><div class="card"><span class="tag gray">2차 후보</span><h3 style="margin-top:8px">연속 방문·연속 잠금 스트릭 보상</h3><p>재방문 습관화 대응 — 구체 설계 전, 1스프린트 내 확장 가능한 표시 로직</p></div><div class="card"><span class="tag gray">운영 아이디어</span><h3 style="margin-top:8px">화제성 콘텐츠 캘린더</h3><p>시즌·이슈에 맞춘 콘텐츠 운영 — 별도 운영 계획으로 관리</p></div></div>
+</section>
+
+<section class="slide" data-title="측정 계획"><div class="top"><div class="brand">MAKJI STOCK</div><div class="section">15 · MEASUREMENT</div></div><div class="eyebrow">측정 계획</div><h2>북극성 지표 하나에,<br>보조지표와 가드레일을 더해 관리합니다.</h2>
+  <div class="grid c45" style="margin-top:16px">
+    <div class="card strong"><span class="tag" style="background:#fff;color:var(--sky2)">북극성 KPI</span><h3 style="margin-top:10px;color:#fff">STOCK→자사몰 전환율</h3><p style="color:#eaf7ff">가격 잠금·보상 선택 완료 세션 대비 자사몰 구매 완료 세션 — 서비스 미출시로 현재 미측정, 베타 1주차 베이스라인에서 최초 확보</p></div>
+    <div class="card"><h3>보조 지표</h3><ul class="bullets"><li>자사몰 구매 이동률 · 익일 재방문율</li><li>가격 잠금 사용률 · 안정형/공격형 선택 비율</li><li>쿠폰 사용률 · 알림 신청·클릭률</li><li>안심 고지(신뢰 배지) 열람률</li></ul></div>
+  </div>
+  <div class="card" style="margin-top:14px"><h3>Guardrail — 하나라도 초과 시 롤아웃 즉시 중단</h3><p style="margin-top:8px">총혜택 상한 위반 0건 · 사행성 문구 노출 0건 · 표시·결제가 불일치 0건 · 가격 계산 오류율 ≤0.1% · 데이터 최신성 경고 미표시 0% · 쿠폰 중복 적용 0건</p></div>
+</section>
+
+<section class="slide cover" data-title="Q&amp;A">
+  <img class="cover-logo" style="width:260px;height:260px;top:85px" src="file:///C:/Users/Administrator/Downloads/Makji_logo_img.png" alt="막지 로고">
+  <div class="cover-copy" style="margin-top:108px"><div class="eyebrow">Q&amp;A</div><h2 style="font-size:44px;margin-top:20px">가격이 움직인다는 사실 자체가,<br>매일 다시 찾는 이유가 됩니다.</h2><p class="lead" style="margin-top:20px">질문과 의견을 듣겠습니다.</p><p class="small" style="margin-top:46px">감사합니다 · 빵값연구소</p></div>
+</section>
+
+<div class="footer"><div class="nav"><button id="prev" aria-label="이전 슬라이드">←</button><button id="next" aria-label="다음 슬라이드">→</button></div><div class="progress" aria-label="발표 진행률"><i id="progress"></i></div><div class="counter"><b id="current">01</b> / <span id="total">17</span></div></div>
+</div></main>
+<script>
+(()=>{const deck=document.getElementById('deck'),slides=[...document.querySelectorAll('.slide')],progress=document.getElementById('progress'),current=document.getElementById('current'),total=document.getElementById('total');let index=0;total.textContent=String(slides.length).padStart(2,'0');
+function fit(){const scale=Math.min(innerWidth/1280,innerHeight/720);deck.style.transform=`scale(${scale})`}function show(next){index=Math.max(0,Math.min(slides.length-1,next));slides.forEach((s,i)=>{s.classList.toggle('active',i===index);s.setAttribute('aria-hidden',i===index?'false':'true')});current.textContent=String(index+1).padStart(2,'0');progress.style.width=`${((index+1)/slides.length)*100}%`;history.replaceState(null,'',`#slide-${index+1}`)}
+document.getElementById('prev').onclick=()=>show(index-1);document.getElementById('next').onclick=()=>show(index+1);document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(Number(b.dataset.go)));slides.forEach((s,i)=>{if(i>1){const b=document.createElement('button');b.className='toc-pill';b.textContent='목차';b.onclick=()=>show(2);s.appendChild(b)}});addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(index+1)}else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(index-1)}else if(e.key==='Home'){show(0)}else if(e.key==='End'){show(slides.length-1)}});addEventListener('resize',fit);const m=location.hash.match(/slide-(\d+)/);if(m)index=Math.max(0,Math.min(slides.length-1,Number(m[1])-1));fit();show(index)})();
+</script>
+</body>
+</html>
