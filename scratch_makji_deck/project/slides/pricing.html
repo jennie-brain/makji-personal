@@ -1,0 +1,32 @@
+<section id="pricing" data-transition="fade" style="background:#FAF9F6; color:#4A5568; font-family:'IBM Plex Sans KR', sans-serif; padding:128px 128px 160px; display:flex; flex-direction:column; gap:28px">
+<p style="font-size:24px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#B35F1F">MVP1 · 오늘의 시세</p>
+<h2 style="font-family:'Noto Serif KR', serif; font-size:48px; font-weight:700; line-height:1.3; color:#151F30">빵값은 정가에서, 찾는 사람 수와 환율만큼만 움직이고<br>정해진 선을 넘지 않습니다</h2>
+<p style="font-size:26px; color:#4A5568">임의 세일이 아니라 공개된 규칙 — 매일 정가에서 새로 계산합니다</p>
+<div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:20px">
+<div style="background:#FFFFFF; border:1px solid #E3E6E4; border-radius:16px; padding:24px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:22px; font-weight:700; color:#B35F1F">1 · 출발</p>
+<p style="font-size:22px; font-weight:600; color:#151F30">모든 빵은 정가에서 시작</p>
+</div>
+<div style="background:#FFFFFF; border:1px solid #E3E6E4; border-radius:16px; padding:24px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:22px; font-weight:700; color:#B35F1F">2 · 검색 할인</p>
+<p style="font-size:22px; font-weight:600; color:#151F30">검색지수 × 0.15, 최대 15%p</p>
+</div>
+<div style="background:#FFFFFF; border:1px solid #E3E6E4; border-radius:16px; padding:24px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:22px; font-weight:700; color:#B35F1F">3 · 환율 조정</p>
+<p style="font-size:22px; font-weight:600; color:#151F30">하락×14(최대+28%p) · 상승×7(최대−14%p)</p>
+</div>
+<div style="background:#FFFFFF; border:1px solid #E3E6E4; border-radius:16px; padding:24px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:22px; font-weight:700; color:#B35F1F">4 · 안전선</p>
+<p style="font-size:22px; font-weight:600; color:#151F30">총할인 clamp(0, 38%), 정가 초과 없음</p>
+</div>
+</div>
+<div style="background:#F2ECE3; border-radius:16px; padding:24px 32px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:26px; font-weight:700; color:#151F30">판매가 = 정가 × (1 − 총할인율/100), 총할인율 = clamp(검색지수×0.15 + 환율조정, 0, 38)</p>
+<p style="font-size:22px; color:#4A5568">예시(가상) · 검색관심도 80→12%p + 환율 1.0% 하락→14%p = 총 26%p 할인 · 정가 4,500원 → 판매가 3,330원</p>
+</div>
+<table style="font-family:'IBM Plex Sans KR', sans-serif; font-size:24px; color:#4A5568">
+<tr><th style="width:34%; text-align:left; color:#151F30">오전장</th><th style="width:33%; text-align:left; color:#151F30">오후장</th><th style="width:33%; text-align:left; color:#151F30">정가 시간</th></tr>
+<tr><td>06:00~15:59 · 전일 종가 비교</td><td>16:00~01:59 · 당일 시가 비교</td><td>02:00~05:59 · 할인 없음</td></tr>
+</table>
+<p style="position:absolute; left:128px; bottom:64px; font-size:24px; color:#8792A0">출처 · 한국은행 ECOS 731Y003(원/달러) · 네이버 검색트렌드 API</p>
+</section>

@@ -1,0 +1,45 @@
+{
+  "v": 4,
+  "createdOnFiles": { "v": 1, "at": "2026-09-28T09:00:00Z" },
+  "title": "MAKJI STOCK — RFP 서비스 제안",
+  "order": [
+    "cover",
+    "hook",
+    "market-opportunity",
+    "tam-sam-som",
+    "revenue-scenario",
+    "problem-reframe",
+    "evidence",
+    "two-engines",
+    "daily-rhythm",
+    "target",
+    "target-flow",
+    "pricing",
+    "mechanism-lock",
+    "mechanism-predict",
+    "expected-effect",
+    "kpi-guardrail",
+    "risk-qa",
+    "scalability",
+    "closing",
+    "qa"
+  ],
+  "sections": {
+    "s1": { "description": "오프닝과 시장 기회(TAM·SAM·SOM)", "start": "cover" },
+    "s2": { "description": "문제와 목표", "start": "problem-reframe" },
+    "s3": { "description": "솔루션과 타깃·여정", "start": "two-engines" },
+    "s4": { "description": "MVP1·2·3", "start": "pricing" },
+    "s5": { "description": "기대효과·KPI·리스크", "start": "expected-effect" },
+    "s6": { "description": "확장성과 클로징", "start": "scalability" }
+  },
+  "faces": {
+    "noto-serif-kr": {
+      "family": "Noto Serif KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;800&display=swap"
+    },
+    "ibm-plex-sans-kr": {
+      "family": "IBM Plex Sans KR",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap"
+    }
+  }
+}

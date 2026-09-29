@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">포화된 오프라인에서 성장 중인 온라인으로</title>
+  <desc id="desc">정체된 국내 베이커리 시장에서 온라인 식품거래, 냉동생지, 온라인 출발 건강 베이커리 브랜드가 각각 성장한다는 시장 기회 구조도</desc>
+  <rect width="1600" height="900" fill="#FAF9F6"/>
+  <rect x="88" y="70" width="8" height="52" rx="4" fill="#B35F1F"/>
+  <text x="120" y="94" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="3" fill="#B35F1F">MARKET OPPORTUNITY</text>
+  <text x="88" y="170" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="50" font-weight="800" fill="#151F30">포화된 오프라인에서, 성장 중인 온라인으로</text>
+  <text x="88" y="214" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="24" fill="#647184">막지가 진입하는 곳은 정체된 ‘베이커리 점포’가 아니라, 빠르게 커지는 ‘온라인 냉동 베이커리 수요’입니다.</text>
+
+  <rect x="88" y="284" width="382" height="404" rx="18" fill="#F0F1EF" stroke="#D9DED9" stroke-width="2"/>
+  <text x="124" y="338" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="2" fill="#7C8790">OFFLINE · MATURE</text>
+  <text x="124" y="410" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="48" font-weight="800" fill="#66717C">13.6조 원</text>
+  <text x="124" y="448" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="23" font-weight="700" fill="#3F4A54">국내 베이커리 시장</text>
+  <line x1="124" y1="502" x2="430" y2="502" stroke="#A9B1B7" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="172" cy="502" r="9" fill="#A9B1B7"/><circle cx="258" cy="502" r="9" fill="#A9B1B7"/><circle cx="344" cy="502" r="9" fill="#A9B1B7"/>
+  <text x="124" y="562" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="22" fill="#647184">점포 수는 2022년 정점 이후 정체</text>
+  <text x="124" y="602" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="19" fill="#8792A0">시장 규모는 크지만,</text>
+  <text x="124" y="632" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="19" fill="#8792A0">오프라인 확장은 둔화된 구간</text>
+
+  <path d="M 500 484 C 580 484, 574 484, 642 484" fill="none" stroke="#B35F1F" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 630 467 L 660 484 L 630 501" fill="none" stroke="#B35F1F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="580" y="450" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="18" font-weight="700" fill="#B35F1F">기회 이동</text>
+
+  <rect x="694" y="284" width="818" height="404" rx="18" fill="#FFFFFF" stroke="#CFE0D5" stroke-width="2"/>
+  <text x="734" y="338" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="2" fill="#1F6B4D">ONLINE · GROWTH ENGINE</text>
+  <text x="734" y="381" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="27" font-weight="800" fill="#151F30">온라인 수요가 커지고, 막지의 제품군은 1조 원대로 확장됩니다</text>
+  <line x1="755" y1="430" x2="1452" y2="430" stroke="#E3EAE5" stroke-width="2"/>
+
+  <circle cx="785" cy="489" r="16" fill="#DFEFE6"/><text x="785" y="496" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1F6B4D">1</text>
+  <text x="822" y="482" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="21" font-weight="700" fill="#151F30">온라인 식품거래 기반 확대</text>
+  <text x="822" y="519" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="20" fill="#647184">음·식료품 온라인 거래액</text>
+  <text x="1408" y="504" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="38" font-weight="800" fill="#1F6B4D">+7.7%</text>
+  <text x="1408" y="534" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="17" fill="#8792A0">전년 동월 대비 · 2025</text>
+
+  <line x1="755" y1="564" x2="1452" y2="564" stroke="#E3EAE5" stroke-width="2"/>
+  <circle cx="785" cy="623" r="16" fill="#D4E9DD"/><text x="785" y="630" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1F6B4D">2</text>
+  <text x="822" y="616" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="21" font-weight="700" fill="#151F30">막지와 맞닿은 냉동생지 시장의 확장</text>
+  <text x="822" y="653" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="20" fill="#647184">2020년 시장 규모 → 2030년 전망</text>
+  <text x="1408" y="638" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="34" font-weight="800" fill="#1F6B4D">413억 → 1.3조 원</text>
+  <text x="1408" y="668" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="17" fill="#8792A0">업계 추정 · 전망치</text>
+
+  <path d="M 825 749 C 972 688, 1112 733, 1392 710" fill="none" stroke="#1F6B4D" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 1374 690 L 1414 705 L 1382 734" fill="none" stroke="#1F6B4D" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="950" y="720" width="466" height="78" rx="39" fill="#1F5B45"/>
+  <text x="1183" y="752" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">온라인 출발 브랜드의 성장 선례 · 널담 법인 매출</text>
+  <text x="1183" y="780" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="27" font-weight="800" fill="#FFFFFF">145.6억 원(2023) → 330억 원(2025)</text>
+
+  <line x1="88" y1="830" x2="1512" y2="830" stroke="#E3E6E4" stroke-width="1"/>
+  <text x="88" y="862" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="17" fill="#7B8794">출처: 삼일PwC 경영연구원 · 통계청 온라인쇼핑동향 · 닐슨코리아 인용 냉동생지 시장 전망 · 조인앤조인(널담) 법인 매출</text>
+  <text x="1512" y="862" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="17" fill="#7B8794">각 지표는 시장 성장의 근거이며, 동일 모집단의 수치 비교가 아님</text>
+</svg>

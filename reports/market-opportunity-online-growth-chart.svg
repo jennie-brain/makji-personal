@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">온라인 베이커리 수요 성장 지표</title>
+  <desc id="desc">널담 매출, 마켓컬리 냉동생지 매출, 음식료품 온라인 거래액의 성장률을 비교한 막대 차트</desc>
+  <rect width="1600" height="900" fill="#FAF9F6"/>
+  <rect x="88" y="74" width="8" height="54" rx="4" fill="#B35F1F"/>
+  <text x="120" y="98" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="3" fill="#B35F1F">MARKET OPPORTUNITY</text>
+  <text x="88" y="176" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="48" font-weight="800" fill="#151F30">성장하는 온라인 채널에서 확인되는 수요</text>
+  <text x="88" y="218" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="22" font-weight="400" fill="#647184">서로 다른 공개 지표의 전년 대비 성장률 · 단위: %</text>
+
+  <line x1="184" y1="678" x2="1490" y2="678" stroke="#AEB8C1" stroke-width="2"/>
+  <line x1="184" y1="538" x2="1490" y2="538" stroke="#DFE4E2" stroke-width="1" stroke-dasharray="5 10"/>
+  <line x1="184" y1="398" x2="1490" y2="398" stroke="#DFE4E2" stroke-width="1" stroke-dasharray="5 10"/>
+  <line x1="184" y1="258" x2="1490" y2="258" stroke="#DFE4E2" stroke-width="1" stroke-dasharray="5 10"/>
+  <text x="150" y="684" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="18" fill="#8792A0">0</text>
+  <text x="150" y="544" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="18" fill="#8792A0">40</text>
+  <text x="150" y="404" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="18" fill="#8792A0">80</text>
+  <text x="150" y="264" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="18" fill="#8792A0">120</text>
+
+  <rect x="325" y="314" width="240" height="364" rx="12" fill="#1F5B45"/>
+  <rect x="325" y="314" width="240" height="13" rx="6" fill="#2E805F"/>
+  <text x="445" y="288" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="44" font-weight="800" fill="#151F30">+104.0%</text>
+  <text x="445" y="738" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="24" font-weight="700" fill="#151F30">널담 법인 매출</text>
+  <text x="445" y="774" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="19" fill="#647184">전년 대비 · 2025</text>
+
+  <rect x="760" y="445" width="240" height="233" rx="12" fill="#579473"/>
+  <rect x="760" y="445" width="240" height="13" rx="6" fill="#76AD8B"/>
+  <text x="880" y="419" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="44" font-weight="800" fill="#151F30">+66.6%</text>
+  <text x="880" y="738" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="24" font-weight="700" fill="#151F30">마켓컬리 냉동생지 매출</text>
+  <text x="880" y="774" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="19" fill="#647184">전년 동기 대비 · 2025년 1분기</text>
+
+  <rect x="1195" y="651" width="240" height="27" rx="12" fill="#B35F1F"/>
+  <rect x="1195" y="651" width="240" height="10" rx="5" fill="#D6813E"/>
+  <text x="1315" y="625" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="44" font-weight="800" fill="#151F30">+7.7%</text>
+  <text x="1315" y="738" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="24" font-weight="700" fill="#151F30">음·식료품 온라인 거래액</text>
+  <text x="1315" y="774" text-anchor="middle" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="19" fill="#647184">전년 동월 대비 · 2025</text>
+
+  <line x1="88" y1="828" x2="1512" y2="828" stroke="#E3E6E4" stroke-width="1"/>
+  <text x="88" y="862" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="17" fill="#7B8794">출처: 조인앤조인(널담) 법인 매출 · 마켓컬리 냉동생지 매출 · 통계청 온라인쇼핑동향</text>
+  <text x="1512" y="862" text-anchor="end" font-family="Pretendard, 'Noto Sans KR', Arial, sans-serif" font-size="17" fill="#7B8794">각 지표의 대상·기간이 다르므로 성장률의 절대 규모를 직접 비교하지 않음</text>
+</svg>

@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAKJI STOCK · Business Proposal v4.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111827;--ink2:#4B5563;--mute:#9CA3AF;--line:#E5E7EB;--soft:#F5F7FA;--blue:#4087C7;--blue2:#2F6FAD;--tint:#EAF2FA;--orange:#FF7A45;--orange2:#FFEEE6;--green:#10A37F;--green2:#E3F6F0;--amber:#F5B301;--amber2:#FFF6DB}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#F1F3F6;color:var(--ink);font-family:"Noto Sans KR",sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,ul{margin:0}
+.stage{position:fixed;inset:0;display:grid;place-items:center}
+.deck{position:relative;width:1280px;height:720px;flex:none;transform-origin:center center;background:#fff;overflow:hidden;box-shadow:0 20px 60px rgba(17,24,39,.18)}
+.slide{position:absolute;inset:0;display:none;background:#fff}
+.slide.active{display:block;animation:in .35s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.chrome{position:absolute;left:64px;right:64px;top:28px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:500;color:var(--mute);letter-spacing:.04em}
+.chrome .wm{font-weight:900;color:var(--ink);letter-spacing:.14em;font-size:12px}
+.chrome .wm i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blue);margin-right:8px}
+.pageno{position:absolute;right:64px;bottom:22px;font-size:12px;color:var(--mute);font-weight:500}
+.pageno b{color:var(--ink);font-weight:700}
+.body{position:absolute;left:64px;right:64px;top:64px;bottom:52px}
+.kicker{font-size:13px;font-weight:700;color:var(--blue2);letter-spacing:.02em}
+h2{font-size:33px;line-height:1.28;letter-spacing:-.04em;font-weight:900;margin-top:8px}
+h2 em{font-style:normal;color:var(--blue)}
+.sub{font-size:15px;line-height:1.6;color:var(--ink2);margin-top:10px;letter-spacing:-.02em}
+.foot{position:absolute;left:64px;right:180px;bottom:20px;font-size:11px;line-height:1.5;color:var(--mute)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;transition:box-shadow .2s,transform .2s}
+.card:hover{box-shadow:0 8px 24px rgba(17,24,39,.08);transform:translateY(-2px)}
+.card.soft{background:var(--soft);border-color:var(--soft)}
+.card.tint{background:var(--tint);border-color:var(--tint)}
+.card.ink{background:var(--ink);border-color:var(--ink);color:#fff}
+.card.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.card.org{background:var(--orange2);border-color:var(--orange2)}
+.card.grn{background:var(--green2);border-color:var(--green2)}
+.card.amb{background:var(--amber2);border-color:var(--amber2)}
+.card h3{font-size:17px;font-weight:700;letter-spacing:-.03em;margin-bottom:6px}
+.card p,.card li{font-size:13.5px;line-height:1.6;color:var(--ink2);letter-spacing:-.02em}
+.card.ink p,.card.ink li{color:#D5DBE8}.card.blue p,.card.blue li{color:#fff}
+.card.ink h3,.card.blue h3{color:#fff}
+.tag{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:700;background:var(--tint);color:var(--blue2)}
+.tag.o{background:var(--orange);color:#fff}.tag.g{background:var(--green);color:#fff}.tag.k{background:var(--ink);color:#fff}.tag.w{background:#fff;color:var(--blue2)}.tag.a{background:var(--amber);color:#4a3600}.card.tint .tag:not(.a):not(.o):not(.g):not(.k):not(.w),.card.amb .tag:not(.a):not(.o):not(.g):not(.k):not(.w){background:#fff}
+.tag.l{background:var(--soft);color:var(--ink2)}
+.big{font-size:40px;font-weight:900;letter-spacing:-.05em;line-height:1.05;color:var(--ink)}
+.big small{font-size:.42em;font-weight:700;margin-left:2px;letter-spacing:-.02em}
+.card.ink .big,.card.blue .big{color:#fff}
+.lab{font-size:12.5px;font-weight:500;color:var(--ink2);margin-top:6px;letter-spacing:-.02em;line-height:1.45}
+.card.ink .lab{color:#C4CCDC}.card.blue .lab{color:#fff}
+ul.dots{list-style:none;padding:0;display:grid;gap:8px}
+ul.dots li{position:relative;padding-left:16px}
+ul.dots li::before{content:"";position:absolute;left:0;top:.66em;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.sep{height:1px;background:var(--line);margin:12px 0}
+.quote{border-left:4px solid var(--blue);padding:10px 16px;background:var(--soft);border-radius:0 10px 10px 0;font-size:14.5px;line-height:1.6;color:var(--ink2)}
+.legend{display:flex;gap:14px;font-size:12px;font-weight:500;color:var(--ink2);align-items:center}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.arrowx{display:grid;place-items:center;color:var(--blue);font-size:20px;font-weight:700}
+svg text{font-family:"Noto Sans KR",sans-serif}
+/* cover */
+.cover .rail{position:absolute;left:0;top:0;bottom:0;width:14px;background:var(--blue)}
+.cover h1{font-size:96px;line-height:1;letter-spacing:-.06em;font-weight:900;margin-top:22px}
+.cover h1 em{font-style:normal;color:var(--blue)}
+.cover .lead{font-size:20px;line-height:1.6;color:var(--ink2);margin-top:24px;letter-spacing:-.02em}
+.cover .meta{position:absolute;left:64px;bottom:52px;display:flex;gap:22px;font-size:13px;font-weight:500;color:var(--ink2)}
+.cover .meta span+span{padding-left:22px;border-left:1px solid var(--line)}
+.tick{position:absolute;right:64px;top:150px;width:400px;display:grid;gap:10px}
+.tick div{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-weight:700;font-size:15px}
+.tick div span:last-child{color:var(--green)}
+/* flow nodes */
+.fnode{border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.45;font-weight:500;border:1.5px solid;letter-spacing:-.02em}
+.fnode b{display:block;font-size:14px;margin-bottom:2px;font-weight:700}
+.fnode small{font-size:11.5px;opacity:.85}
+.fnode.n{background:#fff;border-color:var(--line);color:var(--ink2)}
+.fnode.g{background:#E6FAF3;border-color:#20C997;color:#087F5B}
+.fnode.o{background:#FFF1E0;border-color:#FF922B;color:#B8470D}
+.fnode.b{background:#E6F3FF;border-color:#339AF0;color:#1864AB}
+.fnode.r{background:#F1F3F5;border-color:#CED4DA;color:#343A40}
+.fnode.f{background:var(--ink);border-color:var(--ink);color:#fff}
+.step3{display:grid;gap:6px}
+.st{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-size:13px;line-height:1.4;color:var(--ink2)}
+.st b{display:block;color:var(--ink);font-size:13px;font-weight:700}
+.st.hi{background:var(--tint);border-color:#CFE2F4}.st.ex{background:var(--orange2);border-color:#FFD2BF}
+.dn{text-align:center;color:var(--blue);font-weight:700;font-size:12px;line-height:.9}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{font-size:11.5px;color:var(--mute);text-align:right;padding:8px 10px;border-bottom:1.5px solid var(--ink);font-weight:700}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;font-weight:500;font-variant-numeric:tabular-nums}
+table.t tr.hl td{background:var(--tint);font-weight:700}
+table.t.l td,table.t.l th{text-align:left}
+.risk{display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.risk:last-child{border:0}
+.risk .rn{width:36px;height:36px;border-radius:10px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.risk h3{font-size:14.5px;margin:0 0 2px;font-weight:700}.risk p{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.tl{display:grid;grid-template-columns:repeat(3,1fr);position:relative;margin-top:24px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:12px;height:3px;background:var(--line)}
+.tl .p{position:relative;padding-top:38px;padding-right:22px}
+.tl .p::before{content:"";position:absolute;left:0;top:3px;width:20px;height:20px;border-radius:50%;background:var(--blue);border:4px solid #fff;box-shadow:0 0 0 2px var(--blue)}
+.tl .p:nth-child(2)::before{background:var(--amber);box-shadow:0 0 0 2px var(--amber)}
+.tl .p:nth-child(3)::before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+.nav{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(17,24,39,.86);border-radius:99px;padding:6px 10px;z-index:99;opacity:0;transition:opacity .3s}
+.stage:hover .nav{opacity:1}
+.nav button{all:unset;cursor:pointer;color:#fff;width:32px;height:28px;text-align:center;font-weight:700;border-radius:99px}
+.nav button:hover{background:rgba(255,255,255,.2)}
+.nav .bar{width:160px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden}.nav .bar i{display:block;height:100%;background:#fff;width:0;transition:width .3s}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{overflow:visible;background:#fff;width:1280px;height:auto}
+  .stage{position:static;display:block}.deck{transform:none!important;box-shadow:none;height:auto;overflow:visible}
+  .slide{display:block!important;position:relative;width:1280px;height:720px;page-break-after:always;animation:none}
+  .nav{display:none}
+}
+</style>
+</head>
+<body>
+<main class="stage">
+<div class="deck" id="deck">
+
+<section class="slide cover active">
+  <div class="rail"></div>
+  <div class="chrome"><div class="wm"><i></i>MAKJI</div><div>BUSINESS PROPOSAL 2026</div></div>
+  <div style="position:absolute;left:64px;top:150px;width:700px">
+    <div class="kicker">Project Proposal · 기업 대표 보고</div>
+    <h1>MAKJI<br><em>STOCK</em></h1>
+    <p class="lead">웰니스 베이커리 막지의 B2C 확장 —<br>매일 두 번 움직이는 빵값으로 자사몰의 방문과 구매를 만듭니다.</p>
+  </div>
+  <div class="tick"><div><span>FNC 글루텐프리 휘낭시에</span><span>▼ 오전장 06:00</span></div><div><span>MRL 제로 모닝롤</span><span>▼ 오전장 06:00</span></div><div><span>TTR 테트리스 브레드</span><span>▼ 오후장 16:00</span></div></div>
+  <div class="meta"><span>빵값연구소</span><span>기업 대표 보고 v4.0</span><span>2026.09</span></div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>시장 기회</div></div>
+  <div class="body">
+
+    <div class="kicker">시장 기회</div>
+    <h2>온라인 베이커리 시장은 <em>4년 만에 2배</em> 가까이 커졌고,<br>유사 업체도 빠르게 성장하고 있습니다.</h2>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card" style="padding:14px 18px 6px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:15px">국내 온라인 베이커리 시장 (억원)</h3><span class="tag">연평균 +18%</span></div>
+        <div id="ch-mkt"></div></div>
+      <div class="card" style="padding:14px 18px 6px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:15px">널담 연 매출 (억원)</h3><div class="legend"><span><i style="background:var(--blue)"></i>실적</span><span><i style="background:#BFD6EC"></i>역산·목표</span></div></div>
+        <div id="ch-comp"></div></div>
+    </div>
+    <div class="grid g4" style="margin-top:12px;gap:12px">
+      <div class="card blue" style="padding:12px 16px"><div class="big" style="font-size:30px">+95<small>%</small></div><div class="lab">시장 성장 (2021→2025)</div></div>
+      <div class="card soft" style="padding:12px 16px"><div class="big" style="font-size:30px">3.3<small>배</small></div><div class="lab">신세계푸드 온라인 베이커리 (2023→2025)</div></div>
+      <div class="card soft" style="padding:12px 16px"><div class="big" style="font-size:30px">+104<small>%</small></div><div class="lab">널담 2025 매출 성장 (전년 대비)</div></div>
+      <div class="card tint" style="padding:12px 16px"><div class="big" style="font-size:30px;color:var(--blue2)">0<small>/6</small></div><div class="lab">경쟁 6곳 중 가격을 콘텐츠로 쓰는 곳</div></div>
+    </div>
+  </div>
+  <div class="foot">출처: aT 온라인 베이커리 시장 규모(매일경제 2026.03.23 보도) · 널담 2025 매출 약 330억, 2026 목표 800억(플래텀·메트로서울 2026.01). 2024는 역산 추정, 2023은 내부 시장분석. 널담 매출에는 오프라인 유통 포함</div>
+  <div class="pageno"><b>02</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>우리의 방향</div></div>
+  <div class="body">
+
+    <div class="kicker">우리의 방향과 목표</div>
+    <h2>웰니스 베이커리 막지는 B2B에서 <em>B2C 자사몰</em>로 확장합니다.<br>목표는 유입이 먼저, 그다음이 체류와 전환입니다.</h2>
+    <div style="display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;margin-top:16px;align-items:stretch">
+      <div class="card soft" style="padding:14px 18px"><span class="tag l">지금까지</span><h3 style="margin-top:8px;font-size:16px">B2B 제품 공급</h3><p style="font-size:13px">저당·무설탕·글루텐프리 제품력 검증</p></div>
+      <div class="arrowx">→</div>
+      <div class="card tint" style="padding:14px 18px"><span class="tag">지금</span><h3 style="margin-top:8px;font-size:16px">B2C 자사몰 확장</h3><p style="font-size:13px">5월 단일상품 파일럿 운영</p></div>
+      <div class="arrowx">→</div>
+      <div class="card ink" style="padding:14px 18px"><span class="tag w">과제</span><h3 style="margin-top:8px;font-size:16px">다시 오게 하고, 사게 하기</h3><p style="font-size:13px">반복 방문 구조가 필요</p></div>
+    </div>
+    <div class="card" style="margin-top:12px;padding:14px 20px;display:grid;grid-template-columns:repeat(4,auto) 1.6fr;gap:26px;align-items:center">
+      <div><div class="big" style="font-size:28px">147<small>건</small></div><div class="lab" style="margin-top:2px">생성 주문</div></div>
+      <div><div class="big" style="font-size:28px">108<small>건</small></div><div class="lab" style="margin-top:2px">결제 완료</div></div>
+      <div><div class="big" style="font-size:28px;color:var(--blue)">73.5<small>%</small></div><div class="lab" style="margin-top:2px">결제 완결률</div></div>
+      <div><div class="big" style="font-size:28px">0.30<small>억</small></div><div class="lab" style="margin-top:2px">연환산 상품매출</div></div>
+      <p style="font-size:13px;line-height:1.55;border-left:3px solid var(--blue);padding-left:16px;color:var(--ink2)">5월 단일상품 파일럿. 결제 완결률은 준수하지만 연환산 0.30억원이라 <b>반복 방문 구조</b>가 필요합니다.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:14px;margin-top:12px">
+      <div class="card blue" style="padding:18px 22px"><span class="tag w">우선순위 1</span><h3 style="font-size:22px;margin:10px 0 4px;font-weight:900">자사몰 유입 증가</h3><p style="font-size:13.5px">광고를 켠 날에만 팔리는 구조에서 벗어나, 고객이 스스로 찾아오게 합니다.</p></div>
+      <div class="card tint" style="padding:18px 22px"><span class="tag">우선순위 2</span><h3 style="font-size:22px;margin:10px 0 8px;font-weight:900">체류시간 확대 + 전환율 제고</h3>
+        <div class="grid g2" style="gap:10px"><div class="card" style="background:#fff;padding:10px 14px"><p style="font-size:13px;color:var(--ink)"><b>① 체류시간</b> — 가격을 확인·비교하며 머무는 시간</p></div><div class="card" style="background:#fff;padding:10px 14px"><p style="font-size:13px;color:var(--ink)"><b>② 전환율</b> — 가격 탐색 후 자사몰 구매까지</p></div></div></div>
+    </div>
+  </div>
+  <div class="pageno"><b>03</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>전략과 솔루션</div></div>
+  <div class="body">
+
+    <div class="kicker">세부 전략과 솔루션</div>
+    <h2>두 가지 전략을 하나로 묶은 솔루션이 <em>‘막지스톡’</em>입니다.</h2>
+    <div class="grid g2" style="margin-top:18px;gap:16px">
+      <div class="card" style="padding:22px 24px;border-width:2px;border-color:var(--blue)">
+        <div style="display:flex;align-items:center;gap:12px"><div class="big" style="color:var(--blue);font-size:46px">1</div><div><span class="tag">유입 · 체류 ↑</span><h3 style="font-size:21px;margin:5px 0 0;font-weight:900">가격 자체를 콘텐츠로</h3></div></div>
+        <div class="sep"></div>
+        <ul class="dots"><li>빵값이 매일 두 번 바뀌어 <b>“오늘은 얼마일까?”</b>가 방문 이유가 된다</li><li>검색 수요·환율 같은 실제 신호로 움직여 이유가 설명된다</li></ul></div>
+      <div class="card" style="padding:22px 24px;border-width:2px;border-color:var(--orange)">
+        <div style="display:flex;align-items:center;gap:12px"><div class="big" style="color:var(--orange);font-size:46px">2</div><div><span class="tag o">참여 · 전환 ↑</span><h3 style="font-size:21px;margin:5px 0 0;font-weight:900">고객이 직접 고르는 혜택</h3></div></div>
+        <div class="sep"></div>
+        <ul class="dots"><li>가격 잠금 또는 보상 고르기 — <b>내가 원하는 방식</b>으로 혜택을 받는다</li><li>고객이 주도성을 느끼고, 선택한 만큼 구매로 이어진다</li></ul></div>
+    </div>
+    <div class="arrowx" style="font-size:26px;margin:8px 0">↓</div>
+    <div class="card blue" style="padding:22px 30px;display:grid;grid-template-columns:1.1fr 1fr;gap:26px;align-items:center">
+      <div><div style="font-size:12px;font-weight:700;letter-spacing:.16em;color:#EAF2FA">SOLUTION</div><div style="font-size:44px;font-weight:900;letter-spacing:-.05em;margin:4px 0">MAKJI STOCK</div><p>빵값을 주식시장처럼 — 하루 두 번 열리는 시세를 보고, 내 방식대로 혜택을 골라 자사몰에서 삽니다.</p></div>
+      <div class="grid" style="gap:8px"><div class="card" style="padding:9px 16px;background:rgba(255,255,255,.16);border-color:transparent"><p style="color:#fff;font-size:14px"><b>매일 확인하러 옵니다</b> → 유입 ↑</p></div><div class="card" style="padding:9px 16px;background:rgba(255,255,255,.16);border-color:transparent"><p style="color:#fff;font-size:14px"><b>가격을 비교하며 머뭅니다</b> → 체류 ↑</p></div><div class="card" style="padding:9px 16px;background:rgba(255,255,255,.16);border-color:transparent"><p style="color:#fff;font-size:14px"><b>고른 혜택으로 결제합니다</b> → 전환 ↑</p></div></div>
+    </div>
+  </div>
+  <div class="pageno"><b>04</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>서비스 소개</div></div>
+  <div class="body">
+    <div class="kicker">서비스 소개</div>
+    <h2>하루가 이렇게 돌아갑니다 —<br><em>세 가지 기능</em>이 하루를 잇습니다.</h2>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:30px;position:relative">
+      <div style="position:absolute;left:8%;right:8%;top:14px;height:3px;background:var(--line)"></div>
+      <div style="text-align:center;position:relative"><div style="width:30px;height:30px;border-radius:50%;background:var(--blue);margin:0 auto;border:4px solid #fff;box-shadow:0 0 0 2px var(--blue)"></div><div style="font-weight:900;margin-top:10px">06:00</div><p class="small" style="font-size:12.5px;color:var(--ink2)">오전장 개장<br>오늘의 시세 확인</p></div>
+      <div style="text-align:center;position:relative"><div style="width:30px;height:30px;border-radius:50%;background:var(--amber);margin:0 auto;border:4px solid #fff;box-shadow:0 0 0 2px var(--amber)"></div><div style="font-weight:900;margin-top:10px">오전장 중</div><p style="font-size:12.5px;color:var(--ink2)">가격 잠금<br>(하루 1회)</p></div>
+      <div style="text-align:center;position:relative"><div style="width:30px;height:30px;border-radius:50%;background:var(--orange);margin:0 auto;border:4px solid #fff;box-shadow:0 0 0 2px var(--orange)"></div><div style="font-weight:900;margin-top:10px">16:00</div><p style="font-size:12.5px;color:var(--ink2)">오후장 개장<br>잠금 정산</p></div>
+      <div style="text-align:center;position:relative"><div style="width:30px;height:30px;border-radius:50%;background:var(--ink);margin:0 auto;border:4px solid #fff;box-shadow:0 0 0 2px var(--ink)"></div><div style="font-weight:900;margin-top:10px">구매</div><p style="font-size:12.5px;color:var(--ink2)">막지 자사몰에서<br>결제</p></div>
+      <div style="text-align:center;position:relative"><div style="width:30px;height:30px;border-radius:50%;background:var(--green);margin:0 auto;border:4px solid #fff;box-shadow:0 0 0 2px var(--green)"></div><div style="font-weight:900;margin-top:10px">익일 06:00</div><p style="font-size:12.5px;color:var(--ink2)">예측 결과 확인<br>다시 개장</p></div>
+    </div>
+    <div class="grid g3" style="margin-top:22px">
+      <div class="card tint" style="min-height:250px"><span class="tag">기능 1 · 전략 1</span><h3 style="margin-top:12px;font-size:19px">오늘의 시세</h3><p>6종의 가격과 할인율을 하루 두 번 공개. 정가 대비 얼마나 저렴한지 한눈에 비교합니다.</p></div>
+      <div class="card amb" style="min-height:250px"><span class="tag a">기능 2 · 전략 2</span><h3 style="margin-top:12px;font-size:19px">가격 잠금</h3><p>오전장 가격을 하루 1개 잠그면, 오후에 올라도 잠근 가격으로 구매합니다. 내려가면 더 싼 가격이 자동 적용됩니다.</p></div>
+      <div class="card org" style="min-height:250px"><span class="tag o">기능 3 · 전략 2</span><h3 style="margin-top:12px;font-size:19px">오늘의 보상 고르기</h3><p><b>안정형</b> 즉시 확정 쿠폰 / <b>공격형</b> 내일 가격 예측에 걸고 더 큰 쿠폰에 도전. 선택은 언제나 고객 몫입니다.</p></div>
+    </div>
+  </div>
+  
+  <div class="pageno"><b>05</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>사용자 여정</div></div>
+  <div class="body">
+    <div class="kicker">사용자 여정 — 구매 의사별 행동 플로우</div>
+    <h2>잠금과 예측은 구매를 미루는 장치가 아니라,<br>가장 <em>유리한 구매 방식</em>을 보장하는 무기입니다.</h2>
+    <div style="margin-top:16px;display:grid;grid-template-columns:180px 22px 1fr;align-items:stretch">
+      <div class="fnode n" style="display:grid;align-content:center;text-align:center;border-width:2px"><div style="font-size:28px">📱</div><b style="font-size:15px;margin-top:4px">마켓 방문</b>오늘의 가격 확인<br><span style="color:var(--blue2);font-weight:700">4,500원 ➔ 3,200원</span></div>
+      <div class="arrowx" style="font-size:16px">▶</div>
+      <div style="display:grid;gap:9px">
+        <div style="display:grid;grid-template-columns:1fr 18px 1fr 18px 1fr;align-items:stretch">
+          <div class="fnode g"><b>🟢 즉시 구매형</b>이 가격 완벽해!<br><small>가격 만족 ⭕ · 결제 가능 ⭕</small></div><div class="arrowx" style="font-size:12px">▶</div>
+          <div class="fnode r"><b>🛒 오늘 가격으로 즉시 구매</b><small>“고민하는 순간 내일 가격이 오를 수 있어요!”</small></div><div class="arrowx" style="font-size:12px">▶</div>
+          <div class="fnode f"><b>결제</b>오늘가로 즉시 결제</div></div>
+        <div style="display:grid;grid-template-columns:1fr 18px 1fr 18px 1fr;align-items:stretch">
+          <div class="fnode o"><b>🟡 가격 확보형</b>가격은 좋은데 결제는 이따가!<br><small>가격 만족 ⭕ · 결제 보류 ❌</small></div><div class="arrowx" style="font-size:12px">▶</div>
+          <div class="fnode r"><b>🔒 오전가 잠금 후 이따가 구매</b><small>가격 잠그기(하루 1회) — 상승 리스크 헷지</small></div><div class="arrowx" style="font-size:12px">▶</div>
+          <div class="fnode f"><b>결제</b>오후에 올라도 잠가둔 싼 가격으로 안심 결제</div></div>
+        <div style="display:grid;grid-template-columns:1fr 18px 1fr 18px 1fr;align-items:stretch">
+          <div class="fnode b"><b>🔵 관망 및 기대형</b>오후장에 더 싸지면 살래<br><small>가격 관망 ❌ · 결제 보류 ❌</small></div><div class="arrowx" style="font-size:12px">▶</div>
+          <div class="fnode r"><b>🎯 내일 가격 예측 참여</b><small>가격 예측하고 5% 쿠폰 받기</small></div><div class="arrowx" style="font-size:12px">▶</div>
+          <div class="fnode f"><b>결제</b>원하는 가격 도달 시 쿠폰 적용해 최적가 결제</div></div>
+      </div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--mute);margin-top:14px">화면에 적용하는 버튼과 카피</div>
+    <div class="grid g3" style="margin-top:6px;gap:12px">
+      <div class="card grn" style="padding:11px 16px"><span class="tag g">즉시 구매하기</span><p style="margin-top:5px;font-size:12.5px">고민하는 순간 내일 가격이 오를 수 있어요!</p></div>
+      <div class="card amb" style="padding:11px 16px"><span class="tag a">가격 잠그기 (하루 1회)</span><p style="margin-top:5px;font-size:12.5px">바쁘다면 일단 잠그세요. 오후에 올라도 이 가격 그대로 방어해 드려요.</p></div>
+      <div class="card tint" style="padding:11px 16px"><span class="tag">가격 예측하고 5% 쿠폰 받기</span><p style="margin-top:5px;font-size:12.5px">더 싼 가격을 기다리시나요? 예측에 참여하고 최적가에 쿠폰까지 얹어 구매하세요.</p></div>
+    </div>
+  </div>
+  
+  <div class="pageno"><b>06</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>가격과 마진</div></div>
+  <div class="body">
+    <div class="kicker">가격 결정 방식</div>
+    <h2>하루 세 구간, 두 개의 신호.<br>가격은 <em>공개된 산식</em>으로만 움직입니다.</h2>
+    <div class="card" style="margin-top:14px;padding:8px 20px"><div id="ch-day"></div></div>
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1.25fr;margin-top:12px;gap:12px">
+      <div class="card tint" style="padding:14px 16px"><span class="tag">수요 신호</span><h3 style="margin-top:8px;font-size:15.5px">검색지수 × 0.15</h3><p style="font-size:12.5px">0~15% 할인. 많이 찾는 빵에 할인을 더해 첫 구매를 끌어옵니다.</p></div>
+      <div class="card amb" style="padding:14px 16px"><span class="tag a">원가 신호</span><h3 style="margin-top:8px;font-size:15.5px">환율 (원/달러)</h3><p style="font-size:12.5px">내리면 하락률×14 <b>전부</b> 환원(최대 +28%), 오르면 ×7 <b>절반만</b> 반영.</p></div>
+      <div class="card grn" style="padding:14px 16px"><span class="tag g">안전장치</span><h3 style="margin-top:8px;font-size:15.5px">0% ~ 38% 고정</h3><p style="font-size:12.5px">정가를 절대 넘지 않고, 잠금·예측 쿠폰을 합쳐도 38% 이내.</p></div>
+      <div class="card ink" style="padding:14px 16px"><span class="tag w">총 할인율</span><h3 style="margin-top:8px;font-size:14.5px;line-height:1.5">= clamp( 검색 할인 + 환율 조정 , 0 , 38 )</h3><p style="font-size:12px">판매가 = 정가 × (1 − 총 할인율), 10원 단위 반올림</p></div>
+    </div>
+    <div class="card" style="margin-top:10px;padding:6px 18px">
+      <table class="t"><tr><th>상품 (6종, 원)</th><th>MRL 모닝롤</th><th>TTR 테트리스</th><th>MUF 머핀</th><th>SCN 스콘</th><th>FNC 휘낭시에</th><th>GFD 냉동생지</th></tr>
+      <tr><td>정가</td><td>4,500</td><td>11,000</td><td>1,500</td><td>3,800</td><td>3,800</td><td>21,000</td></tr>
+      <tr class="hl"><td>평균 할인(15%) 시</td><td>3,830</td><td>9,350</td><td>1,280</td><td>3,230</td><td>3,230</td><td>17,850</td></tr>
+      <tr><td>최대 할인(38%) 시</td><td>2,790</td><td>6,820</td><td>930</td><td>2,360</td><td>2,360</td><td>13,020</td></tr></table>
+    </div>
+  </div>
+  
+  <div class="pageno"><b>07</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>가격과 마진</div></div>
+  <div class="body">
+
+    <div class="kicker">할인율 분포</div>
+    <h2>평균 할인율은 <em>15.0%</em>, 세션의 <em>84%</em>가 20% 미만이고<br>25% 이상 큰 할인은 3.8%뿐입니다.</h2>
+    <div class="grid g4" style="margin-top:14px;gap:12px">
+      <div class="card ink" style="padding:12px 18px"><div class="lab" style="margin:0 0 2px">전체 평균 (중앙값 13.5%)</div><div class="big" style="font-size:32px">15.0<small>%</small></div></div>
+      <div class="card blue" style="padding:12px 18px"><div class="lab" style="margin:0 0 2px">오전장 평균</div><div class="big" style="font-size:32px">15.8<small>%</small></div></div>
+      <div class="card org" style="padding:12px 18px"><div class="lab" style="margin:0 0 2px;color:#a5461f">오후장 평균</div><div class="big" style="font-size:32px">14.2<small>%</small></div></div>
+      <div class="card soft" style="padding:12px 18px"><div class="lab" style="margin:0 0 2px">최저 · 최고(상한)</div><div class="big" style="font-size:32px">4.6<small>~38%</small></div></div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1.02fr;margin-top:12px;gap:14px">
+      <div class="card" style="padding:12px 14px 4px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:14.5px">구간별 세션 수 (91일 · 182세션)</h3><div class="legend"><span><i style="background:var(--blue)"></i>오전장</span><span><i style="background:var(--orange)"></i>오후장</span></div></div>
+        <div id="ch-hist"></div>
+      </div>
+      <div class="card" style="padding:10px 16px"><table class="t" id="tb-band"></table></div>
+    </div>
+    <div class="foot" style="left:0;right:110px;bottom:-34px">실제 가격 엔진(v1.0)에 한국은행 ECOS 원/달러 시가·종가와 일별 검색지수를 넣은 재현값 (2026.06.12~09.10) · 세션 = 하루 2회(오전장 06:00, 오후장 16:00) · 25% 이상 7세션 중 6세션은 38% 상한 도달 · 검색지수는 6종 합산 단일 시계열</div>
+  </div>
+  <div class="pageno"><b>08</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>가격과 마진</div></div>
+  <div class="body">
+    <div class="kicker">마진율 방어</div>
+    <h2>할인은 대부분 얕은 구간에 몰려 있고,<br>깊은 할인은 <em>상한 38%</em>에서 멈춥니다.</h2>
+    <div class="grid" style="grid-template-columns:1.1fr 1fr;margin-top:12px;gap:14px">
+      <div class="card" style="padding:10px 14px 2px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:14.5px">할인율별 남는 마진율 (정가 마진 가정)</h3><div class="legend"><span><i style="background:var(--green)"></i>60%</span><span><i style="background:var(--blue)"></i>50%</span><span><i style="background:var(--orange)"></i>40%</span></div></div>
+        <div id="ch-margin"></div>
+      </div>
+      <div style="display:grid;gap:10px;align-content:start">
+        <div class="card ink" style="padding:13px 18px"><span class="tag w">방어 ① 분포</span><p style="margin-top:6px;font-size:13.5px">평균 할인 15.0% — 세션의 <b style="color:#fff">84%가 20% 미만</b>, 깊은 할인(25%↑)은 3.8%</p></div>
+        <div class="card tint" style="padding:13px 18px"><span class="tag">방어 ② 상한</span><p style="margin-top:6px;font-size:13.5px">할인 합계 38% 고정, 정가 초과 0. 정가 마진 40%여도 <b>최악 세션 마진 +3.2%</b> — 적자 없음</p></div>
+        <div class="card grn" style="padding:13px 18px"><span class="tag g">방어 ③ 판매량</span><p style="margin-top:6px;font-size:13.5px">평균 할인 기준 손익분기: 마진 50% → 판매량 <b>+43%</b>, 60% → <b>+33%</b></p></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:10px;padding:4px 16px">
+      <table class="t"><tr><th>정가 마진 가정</th><th>평균 할인(15.0%) 시 마진율</th><th>최악 38% 시 마진율</th><th>손익분기 판매량 증가</th></tr>
+      <tr><td>40%</td><td>29.4%</td><td>3.2%</td><td>+60%</td></tr>
+      <tr class="hl"><td>50%</td><td>41.2%</td><td>19.4%</td><td>+43%</td></tr>
+      <tr><td>60%</td><td>52.9%</td><td>35.5%</td><td>+33%</td></tr></table>
+    </div>
+  </div>
+  <div class="foot">※ 실제 원가·마진 자료가 없어 정가 마진율 40/50/60%를 가정한 시나리오입니다 (마진율 = (판매가 − 원가) ÷ 판매가, 원가는 정가 기준 고정)</div>
+  
+  <div class="pageno"><b>09</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>MVP</div></div>
+  <div class="body">
+    <div class="kicker">MVP 범위</div>
+    <h2>첫 버전은 <em>두 전략을 검증하는 기능</em>만 담습니다.</h2>
+    <div class="grid" style="grid-template-columns:1.25fr 1fr 1fr;margin-top:18px;gap:14px;min-height:340px">
+      <div class="card tint" style="padding:20px 22px"><span class="tag">MUST · 반드시 포함</span>
+        <table class="t l" style="margin-top:10px;font-size:13px"><tr><td style="padding:9px 0;width:52px;color:var(--blue2);font-weight:700">전략1</td><td style="padding:9px 0"><b>오전장·오후장 가격 확인</b><br><span style="color:var(--ink2);font-size:12px">세션 상태 표시 · 상품 상세와 할인 구성</span></td></tr>
+        <tr><td style="padding:9px 0;color:#c2410c;font-weight:700">전략2</td><td style="padding:9px 0"><b>가격 잠금</b> (오전장 하루 1회)</td></tr>
+        <tr><td style="padding:9px 0;color:#c2410c;font-weight:700">전략2</td><td style="padding:9px 0"><b>오늘의 보상 고르기</b> (안정형/공격형)</td></tr>
+        <tr><td style="padding:9px 0;color:var(--ink2);font-weight:700">전환</td><td style="padding:9px 0"><b>자사몰 이동·구매</b> (원클릭 지향)</td></tr>
+        <tr><td style="padding:9px 0;color:var(--ink2);font-weight:700">신뢰</td><td style="padding:9px 0"><b>“투자가 아닙니다” 안내</b> · 가격 근거 배지</td></tr>
+        <tr><td style="padding:9px 0;color:var(--ink2);font-weight:700">안전</td><td style="padding:9px 0;border:0"><b>38% 상한 가드레일</b></td></tr></table></div>
+      <div class="card amb" style="padding:20px 22px"><span class="tag a">SHOULD · 여력 시</span>
+        <h3 style="margin-top:14px">가격 하락·지정가 이메일 알림</h3><p>가격이 내려가면 알려 주어 재방문을 돕습니다.</p>
+        <div class="sep"></div><h3>운영 과제</h3><p>화제성 콘텐츠 캘린더는 시스템이 아니라 지속 운영 프로세스로 관리</p></div>
+      <div class="card soft" style="padding:20px 22px"><span class="tag l">이번 범위 제외</span>
+        <ul class="dots" style="margin-top:14px"><li>도감·씰 수집 콘텐츠</li><li>매수가 기준 보상</li><li>막지스톡 안에서의 결제</li><li>막지스톡 자체 로그인·회원가입</li><li>38% 초과 이벤트성 할인</li></ul></div>
+    </div>
+    <div class="grid g3" style="margin-top:14px">
+      <div class="card" style="padding:18px 20px"><span class="tag">2~3주차</span><p style="margin-top:4px;color:var(--ink);font-size:13.5px"><b>구현</b> — API·가격·참여·구매 이동</p></div>
+      <div class="card" style="padding:18px 20px"><span class="tag">9/28 ~ 9/30</span><p style="margin-top:4px;color:var(--ink);font-size:13.5px"><b>검증</b> — 오류·사용성 점검, 발표 준비</p></div>
+      <div class="card" style="padding:18px 20px"><span class="tag">확정 대기</span><p style="margin-top:4px;color:var(--ink);font-size:13.5px"><b>MVP 상품 수</b> — 대표 6종 기준, 최종 승인 필요</p></div>
+    </div>
+  </div>
+  
+  <div class="pageno"><b>10</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>KPI</div></div>
+  <div class="body">
+    <div class="kicker">KPI</div>
+    <h2>서비스 목표와 <em>같은 순서</em>로 측정합니다.</h2>
+    <div class="grid" style="grid-template-columns:1fr 2.3fr;margin-top:18px;gap:14px;min-height:330px">
+      <div class="card blue" style="padding:22px"><span class="tag w">북극성 KPI</span><h3 style="font-size:22px;margin:14px 0 8px;font-weight:900">STOCK → 자사몰<br>전환율</h3><p>가격 잠금·보상 선택을 완료한 세션 중 자사몰 구매까지 도달한 세션의 비율</p><div class="sep" style="background:rgba(255,255,255,.25)"></div><p>서비스 미출시로 현재 <b style="color:#fff">미측정</b> — 베타 1주차에 기준선 확보</p></div>
+      <div class="card" style="padding:6px 18px">
+        <table class="t l" style="font-size:14px"><tr><th style="width:110px">목표</th><th>지표</th><th style="width:150px">현재 기준선</th><th style="width:130px">목표값</th></tr>
+        <tr style="height:66px"><td><span class="tag">1순위 유입</span></td><td>방문자 수 · 신규 가입 · 자사몰 구매 이동률</td><td>신규가입 5월 40건<br><span style="color:var(--mute)">방문자 수 미측정</span></td><td>베타 실측 후 확정</td></tr>
+        <tr style="height:66px"><td><span class="tag a">2순위 체류</span></td><td>익일 재방문율 · 세션 체류시간 · 가격 잠금 사용률</td><td>미측정</td><td>베타 실측 후 확정</td></tr>
+        <tr style="height:66px"><td><span class="tag o">2순위 전환</span></td><td>STOCK→자사몰 전환율 · 쿠폰 사용률 · 결제 완결률</td><td>결제 완결률 73.5%</td><td>전환율: 기준선 확보 후</td></tr>
+        <tr style="height:66px"><td><span class="tag g">신뢰</span></td><td>안심 고지 열람률</td><td>미측정</td><td>≥ 50%</td></tr></table></div>
+    </div>
+    <div class="card ink" style="margin-top:14px;padding:18px 24px"><span class="tag w">GUARDRAIL · 하나라도 초과 시 롤아웃 즉시 중단</span><p style="margin-top:6px;color:#fff;font-size:13.5px">총혜택 상한 위반 0건 · 사행성 문구 0건 · 표시·결제가 불일치 0건 · 가격 계산 오류율 ≤ 0.1% · 쿠폰 중복 적용 0건</p></div>
+  </div>
+  <div class="foot">목표값은 근거 없이 숫자를 만들지 않는 원칙에 따라, 서비스 출시 후 베타 1주차 실측으로 확정합니다</div>
+  
+  <div class="pageno"><b>11</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>매출 시나리오</div></div>
+  <div class="body">
+    <div class="kicker">매출 시나리오</div>
+    <h2>KPI가 달성되면 매출은 이렇게 그려집니다 —<br><em>점유율 확대만</em>으로 잡은 5개년 시나리오.</h2>
+    <div class="card tint" style="margin-top:14px;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:16px;font-size:16px;font-weight:700"><span>매출</span><span style="color:var(--blue)">=</span><span>유입(방문자)</span><span style="color:var(--blue)">×</span><span>구매 전환율</span><span style="color:var(--blue)">×</span><span>객단가 <small style="font-weight:500;color:var(--ink2)">(5월 2.32만원)</small></span></div>
+    <div class="grid" style="grid-template-columns:230px 1fr;margin-top:12px;gap:14px">
+      <div style="display:grid;gap:10px;align-content:stretch;grid-auto-rows:1fr">
+        <div class="card" style="padding:12px 16px"><div class="lab" style="margin:0 0 3px">TAM · 국내 베이커리(2025)</div><div class="big" style="font-size:30px">13.6<small>조원</small></div></div>
+        <div class="card tint" style="padding:12px 16px"><div class="lab" style="margin:0 0 3px">SAM · 전문점×온라인×2030</div><div class="big" style="font-size:24px">2,100~2,650<small>억</small></div></div>
+        <div class="card ink" style="padding:12px 16px"><div class="lab" style="margin:0 0 3px">SAM 대비 목표 점유율</div><div class="big" style="font-size:30px">0.5~3<small>%</small></div></div>
+      </div>
+      <div class="card" style="padding:12px 18px 4px"><div style="display:flex;justify-content:space-between"><h3 style="margin:0;font-size:14.5px">시나리오별 연 매출 (억원)</h3><div class="legend"><span><i style="background:#BFD6EC"></i>1년차</span><span><i style="background:var(--blue)"></i>5년차</span></div></div><div id="ch-rev"></div></div>
+    </div>
+  </div>
+  <div class="foot">시장 성장률을 얹지 않고 점유율 확대만 반영 · 망넛이네(2018년 약 5.7억)·널담(2019년 약 9.9억) 초기 실적은 ‘성공 벤치마크’로만 참고, 확정 전망이 아님</div>
+  
+  <div class="pageno"><b>12</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>리스크</div></div>
+  <div class="body">
+    <div class="kicker">핵심 리스크</div>
+    <h2>구조적 제약 하나와,<br><em>실행으로 관리 가능한</em> 다섯 가지입니다.</h2>
+    <div class="grid g2" style="margin-top:12px;gap:16px">
+      <div class="card" style="padding:4px 20px">
+        <div class="risk"><div class="rn">01</div><div><h3>STOCK ↔ 자사몰 구조적 분리</h3><p>RFP 요구사항 — 완전 해소 불가, 원클릭·자동인식으로 최소화만 가능</p></div><span class="tag k">구조적</span></div>
+        <div class="risk"><div class="rn">02</div><div><h3>검색 키워드 적합성</h3><p>백테스트는 모닝빵 1종 중심 — 나머지 상품 키워드 검증 필요</p></div><span class="tag o">HIGH</span></div>
+        <div class="risk"><div class="rn">03</div><div><h3>표시·결제가 불일치</h3><p>STOCK 표시가와 자사몰 결제가가 다르면 신뢰·전환 훼손</p></div><span class="tag o">HIGH</span></div></div>
+      <div class="card" style="padding:4px 20px">
+        <div class="risk"><div class="rn">04</div><div><h3>법적 위험</h3><p>기준가격·할인율·적용기간 표시가 실제와 다르면 표시광고법 저촉 소지</p></div><span class="tag o">HIGH</span></div>
+        <div class="risk"><div class="rn">05</div><div><h3>가격모델 전환 재검증</h3><p>3구간 모델로 바뀌어 91일 백테스트 재실행 필요</p></div><span class="tag a">관리중</span></div>
+        <div class="risk"><div class="rn">06</div><div><h3>쿠폰 중복 적용</h3><p>잠금·보상 쿠폰 동시 적용 시 총혜택 상한(38%) 초과 가능</p></div><span class="tag a">관리중</span></div></div>
+    </div>
+    <div class="card ink" style="margin-top:14px;padding:12px 20px"><span class="tag w">대응 원칙</span><p style="margin-top:6px;color:#fff;font-size:13.5px">총혜택 상한 38% 고정 · 표시가 = 결제가 일치 검증 · 할인 표시 법무 검토 · 3구간 모델 기준 백테스트 재실행</p></div>
+  </div>
+  
+  <div class="pageno"><b>13</b> / 15</div>
+</section>
+
+<section class="slide">
+  <div class="chrome"><div class="wm"><i></i>MAKJI STOCK</div><div>로드맵과 요청</div></div>
+  <div class="body">
+
+    <div class="kicker">로드맵과 요청 사항</div>
+    <h2>3단계로 구현하고, 대표님께는 <em>세 가지</em>를 요청드립니다.</h2>
+    <div class="tl">
+      <div class="p"><span class="tag">PHASE 1</span><h3 style="margin:10px 0 4px;font-size:19px;font-weight:900">MVP</h3><p style="font-size:13.5px;color:var(--ink2);line-height:1.55">Bread Market — 시세 · 비교 · 구매 이동</p></div>
+      <div class="p"><span class="tag a">PHASE 2</span><h3 style="margin:10px 0 4px;font-size:19px;font-weight:900">참여</h3><p style="font-size:13.5px;color:var(--ink2);line-height:1.55">가격 잠금 · 보상 고르기 · 가격 알림</p></div>
+      <div class="p"><span class="tag o">PHASE 3</span><h3 style="margin:10px 0 4px;font-size:19px;font-weight:900">연동</h3><p style="font-size:13.5px;color:var(--ink2);line-height:1.55">자사몰 실연동 — 판매가 · 쿠폰 · 구매 데이터</p></div>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;color:var(--mute);margin-top:22px">대표님께 요청드리는 것</div>
+    <div class="grid g3" style="margin-top:8px">
+      <div class="card tint" style="min-height:190px"><div class="big" style="font-size:34px;color:var(--blue)">01</div><h3 style="margin-top:8px">MVP 상품 수 확정</h3><p>대표 6종 기준으로 준비 중이며, 최종 승인이 필요합니다.</p></div>
+      <div class="card amb" style="min-height:190px"><div class="big" style="font-size:34px;color:#c98f00">02</div><h3 style="margin-top:8px">실제 원가·마진율 공유</h3><p>지금은 40/50/60% 가정입니다. 실제 수치로 마진 방어를 정밀 검증합니다.</p></div>
+      <div class="card org" style="min-height:190px"><div class="big" style="font-size:34px;color:var(--orange)">03</div><h3 style="margin-top:8px">할인 표시 법무 검토</h3><p>기준가격·할인율·적용기간 표시가 표시광고법에 맞는지 사전 검토가 필요합니다.</p></div>
+    </div>
+    <p class="small" style="margin-top:16px;color:var(--mute);font-size:12.5px">향후 확장(설계 단계, 이번 구현 범위 아님): Bakery ETF · FX Bakery · Bread Index · 연속 방문 스트릭 보상</p>
+  </div>
+  <div class="pageno"><b>14</b> / 15</div>
+</section>
+
+<section class="slide cover">
+  <div class="rail"></div>
+  <div class="chrome"><div class="wm"><i></i>MAKJI</div><div>Q&amp;A</div></div>
+  <div style="position:absolute;left:64px;top:200px;width:900px">
+    <div class="kicker">Thank you</div>
+    <h1 style="font-size:58px;line-height:1.18;margin-top:18px">가격이 움직인다는 사실 자체가,<br><em>다시 찾는 이유</em>가 됩니다.</h1>
+    <p class="lead">질문과 의견을 듣겠습니다.</p>
+  </div>
+  <div class="meta"><span>빵값연구소</span><span>MAKJI STOCK</span></div>
+</section>
+
+</div>
+<div class="nav"><button id="prev">←</button><div class="bar"><i id="prog"></i></div><button id="next">→</button></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const DATA={"series": [["2026-06-12", 10.46, 22.6, 0], ["2026-06-13", 18.45, 18.45, 1], ["2026-06-14", 19.17, 19.17, 1], ["2026-06-15", 19.76, 19.17, 0], ["2026-06-16", 20.57, 11.4, 0], ["2026-06-17", 13.28, 13.14, 0], ["2026-06-18", 11.55, 7.02, 0], ["2026-06-19", 4.97, 6.59, 0], ["2026-06-20", 9.56, 9.56, 1], ["2026-06-21", 10.09, 10.09, 1], ["2026-06-22", 10.81, 8.93, 0], ["2026-06-23", 8.51, 12.0, 0], ["2026-06-24", 12.56, 17.33, 0], ["2026-06-25", 12.46, 13.15, 0], ["2026-06-26", 11.08, 9.4, 0], ["2026-06-27", 21.56, 21.56, 1], ["2026-06-28", 18.88, 18.88, 1], ["2026-06-29", 21.56, 9.79, 0], ["2026-06-30", 6.29, 14.22, 0], ["2026-07-01", 12.09, 13.81, 0], ["2026-07-02", 10.19, 15.02, 0], ["2026-07-03", 11.68, 22.25, 0], ["2026-07-04", 38, 38, 1], ["2026-07-05", 38, 38, 1], ["2026-07-06", 38, 10.63, 0], ["2026-07-07", 10.28, 13.72, 0], ["2026-07-08", 14.96, 23.75, 0], ["2026-07-09", 38, 8.83, 0], ["2026-07-10", 11.45, 14.72, 0], ["2026-07-11", 14.49, 14.49, 1], ["2026-07-12", 14.43, 14.43, 1], ["2026-07-13", 15.62, 13.95, 0], ["2026-07-14", 11.69, 15.79, 0], ["2026-07-15", 20.46, 13.59, 0], ["2026-07-16", 20.52, 11.18, 0], ["2026-07-17", 12.03, 7.69, 0], ["2026-07-18", 13.11, 13.11, 1], ["2026-07-19", 11.26, 11.26, 1], ["2026-07-20", 12.99, 5.75, 0], ["2026-07-21", 12.36, 13.02, 0], ["2026-07-22", 16.58, 8.14, 0], ["2026-07-23", 7.0, 12.16, 0], ["2026-07-24", 24.43, 7.69, 0], ["2026-07-25", 8.52, 8.52, 1], ["2026-07-26", 10.13, 10.13, 1], ["2026-07-27", 12.33, 18.54, 0], ["2026-07-28", 11.0, 15.24, 0], ["2026-07-29", 16.49, 17.95, 0], ["2026-07-30", 24.23, 12.01, 0], ["2026-07-31", 19.3, 23.15, 0], ["2026-08-01", 22.81, 22.81, 1], ["2026-08-02", 22.58, 22.58, 1], ["2026-08-03", 24.3, 4.61, 0], ["2026-08-04", 7.09, 8.96, 0], ["2026-08-05", 10.7, 13.98, 0], ["2026-08-06", 20.02, 13.68, 0], ["2026-08-07", 11.82, 11.03, 0], ["2026-08-08", 17.99, 17.99, 1], ["2026-08-09", 16.86, 16.86, 1], ["2026-08-10", 17.99, 13.48, 0], ["2026-08-11", 10.05, 11.14, 0], ["2026-08-12", 13.38, 14.47, 0], ["2026-08-13", 11.25, 10.06, 0], ["2026-08-14", 8.71, 14.38, 0], ["2026-08-15", 10.31, 10.31, 1], ["2026-08-16", 10.07, 10.07, 1], ["2026-08-17", 10.91, 12.09, 0], ["2026-08-18", 16.24, 9.03, 0], ["2026-08-19", 13.33, 11.4, 0], ["2026-08-20", 25.35, 22.09, 0], ["2026-08-21", 16.83, 10.52, 0], ["2026-08-22", 17.38, 17.38, 1], ["2026-08-23", 16.55, 16.55, 1], ["2026-08-24", 16.19, 9.81, 0], ["2026-08-25", 15.51, 11.88, 0], ["2026-08-26", 10.57, 15.57, 0], ["2026-08-27", 13.4, 11.98, 0], ["2026-08-28", 15.79, 12.25, 0], ["2026-08-29", 17.09, 17.09, 1], ["2026-08-30", 19.35, 19.35, 1], ["2026-08-31", 18.93, 6.59, 0], ["2026-09-01", 17.37, 15.03, 0], ["2026-09-02", 9.5, 8.07, 0], ["2026-09-03", 11.38, 19.56, 0], ["2026-09-04", 20.63, 11.84, 0], ["2026-09-05", 19.46, 19.46, 1], ["2026-09-06", 17.92, 17.92, 1], ["2026-09-07", 18.27, 11.8, 0], ["2026-09-08", 22.47, 10.17, 0], ["2026-09-09", 9.18, 17.15, 0], ["2026-09-10", 20.72, 8.79, 0]], "bands": [{"name": "5% 미만", "am": 1, "pm": 1, "mean": 4.8}, {"name": "5~10%", "am": 9, "pm": 18, "mean": 8.3}, {"name": "10~15%", "am": 37, "pm": 40, "mean": 12.1}, {"name": "15~20%", "am": 25, "pm": 22, "mean": 17.6}, {"name": "20~25%", "am": 14, "pm": 8, "mean": 22.2}, {"name": "25% 이상", "am": 5, "pm": 2, "mean": 36.2}], "stats": {"n": 182, "mean": 15.0, "median": 13.5, "am_mean": 15.8, "pm_mean": 14.2, "am_med": 14.5, "pm_med": 13.2, "min": 4.6, "max": 38, "ge38": 6, "chg_mean": 6.1, "carried": 26, "days": 91}};
+const C={blue:'#4087C7',org:'#FF7A45',grn:'#10A37F',ink:'#111827',line:'#E5E7EB',mute:'#9CA3AF',lb:'#BFD6EC'};
+const svg=(w,h,inner)=>`<svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block">${inner}</svg>`;
+const T=(x,y,s,o={})=>`<text x="${x}" y="${y}" font-size="${o.s||12}" font-weight="${o.w||500}" fill="${o.c||C.mute}" text-anchor="${o.a||'middle'}">${s}</text>`;
+const bars=(id,data,o)=>{const W=o.W,H=o.H,base=H-o.bot,mh=o.mh,mx=o.mx,n=data.length,bw=o.bw,gap=(W-o.l*2-n*bw)/(n-1||1);let s='';
+ data.forEach((d,i)=>{const x=o.l+i*(bw+gap),h=d.v/mx*mh;s+=`<rect x="${x}" y="${base-h}" width="${bw}" height="${h}" rx="8" fill="${d.c}"/>`+T(x+bw/2,base-h-8,d.lab||d.v.toLocaleString(),{s:o.fs||15,w:900,c:C.ink})+T(x+bw/2,base+22,d.n,{s:12.5,c:C.ink,w:700})+(d.n2?T(x+bw/2,base+38,d.n2,{s:11}):'')});
+ s+=`<line x1="${o.l-14}" x2="${W-o.l+14}" y1="${base}" y2="${base}" stroke="${C.line}" stroke-width="2"/>`;document.getElementById(id).innerHTML=svg(W,H,s)};
+
+bars('ch-mkt',[{n:'2021',v:3200,c:C.lb},{n:'2024',v:5400,c:C.lb},{n:'2025',v:6250,c:C.blue}],{W:600,H:280,bot:44,mh:170,mx:6600,bw:110,l:80,fs:16});
+bars('ch-comp',[{n:'2023',v:145.6,c:C.blue,lab:'145.6'},{n:'2024',n2:'역산',v:162,c:C.lb,lab:'≈162'},{n:'2025',v:330,c:C.blue,lab:'≈330'},{n:'2026',n2:'목표',v:800,c:C.lb,lab:'800'}],{W:600,H:280,bot:52,mh:170,mx:830,bw:86,l:60,fs:15});
+
+(()=>{const g=[{n:'오전 8~10시',a:25.6,b:8.0},{n:'저녁 20~24시',a:20.0,b:28.4}];const W=460,H=190,base=150;const mhh=100;let s='';
+ g.forEach((d,i)=>{const x=60+i*200;[[d.a,C.blue,0],[d.b,C.org,60]].forEach(([v,c,o])=>{const h=v/30*mhh;s+=`<rect x="${x+o}" y="${base-h}" width="50" height="${h}" rx="7" fill="${c}"/>`+T(x+o+25,base-h-6,v+'%',{s:13,w:900,c:C.ink})});s+=T(x+55,base+20,d.n,{s:12,c:C.ink,w:700})});
+ s+=`<line x1="30" x2="${W-30}" y1="${base}" y2="${base}" stroke="${C.line}" stroke-width="2"/>`;($('ch-time')||{}).innerHTML=svg(W,H,s)})();
+
+(()=>{const W=1150,H=94;let s='';const x0=10,tw=W-20,uw=tw/24;
+ const parts=[[6,16,'오전장  06:00 ~ 15:59','전일 종가 기준 · 잠금 가능 · 예측 참여',C.blue,'#fff'],[16,26,'오후장  16:00 ~ 익일 01:59','당일 시가 기준 · 잠금 정산 · 예측 판정',C.org,'#fff'],[26,30,'정가  02:00~05:59','할인 없음','#E5E7EB',C.ink]];
+ parts.forEach(p=>{const x=x0+(p[0]-6)*uw,w=(p[1]-p[0])*uw;s+=`<rect x="${x}" y="12" width="${w-4}" height="50" rx="12" fill="${p[4]}"/>`+T(x+16,34,p[2],{a:'start',s:p[0]==26?12:15,w:900,c:p[5]})+(p[0]==26?'':T(x+16,52,p[3],{a:'start',s:12,w:500,c:'rgba(255,255,255,.85)'}))});
+ [6,12,16,20,24,26,30].forEach(h=>{const x=x0+(h-6)*uw;s+=T(Math.min(Math.max(x,20),W-24),84,String(h%24).padStart(2,'0')+':00',{s:11})});
+ ($('ch-day')||{}).innerHTML=svg(W,H,s)})();
+
+(()=>{const S=DATA.series,W=800,H=290,l=44,r=14,t=10,b=32,pw=W-l-r,ph=H-t-b,ymax=40;const py=v=>t+ph-(v/ymax)*ph;let s='';
+ [0,10,20,30,38].forEach(v=>{s+=`<line x1="${l}" x2="${W-r}" y1="${py(v)}" y2="${py(v)}" stroke="${v==38?C.org:C.line}" stroke-width="${v==38?1.5:1}" ${v==38?'stroke-dasharray="5 4"':''}/>`+T(l-8,py(v)+4,v+'%',{a:'end',s:11,c:v==38?C.org:C.mute})});
+ s+=T(W-r-2,py(38)-6,'상한 38%',{a:'end',s:11,c:C.org,w:700});
+ s+=`<line x1="${l}" x2="${W-r}" y1="${py(15)}" y2="${py(15)}" stroke="${C.ink}" stroke-width="1.4" stroke-dasharray="2 4"/>`+T(W-r-2,py(15)-6,'평균 15.0%',{a:'end',s:11,c:C.ink,w:700});
+ const line=(k,c)=>{let d='';S.forEach((row,i)=>{d+=(i?'L':'M')+(l+i/(S.length-1)*pw).toFixed(1)+' '+py(row[k]).toFixed(1)});return `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.1" stroke-linejoin="round" opacity=".92"/>`};
+ s+=line(2,C.org)+line(1,C.blue);
+ [['2026-06-12','6월'],['2026-07-01','7월'],['2026-08-01','8월'],['2026-09-01','9월']].forEach(([d,n])=>{const i=S.findIndex(r=>r[0]>=d);if(i>=0)s+=T(l+i/(S.length-1)*pw,H-8,n,{s:12,c:C.ink,w:700})});
+ ($('ch-line')||{}).innerHTML=svg(W,H,s)})();
+
+(()=>{const B=DATA.bands,N=DATA.stats.n,W=520,H=250,l=34,base=206,mh=150,mx=45;let s='';
+ B.forEach((b,i)=>{const x=l+i*80+8;[[b.am,C.blue,0],[b.pm,C.org,30]].forEach(([v,c,o])=>{const h=v/mx*mh;s+=`<rect x="${x+o}" y="${base-h}" width="28" height="${h}" rx="6" fill="${c}"/>`+T(x+o+14,base-h-6,v,{s:12,w:900,c:C.ink})});s+=T(x+29,base+20,b.name,{s:11.5,c:C.ink,w:700})});
+ s+=`<line x1="${l}" x2="${W-6}" y1="${base}" y2="${base}" stroke="${C.line}" stroke-width="2"/>`;
+ document.getElementById('ch-hist').innerHTML=svg(W,H,s);
+ let cum=0,h='<tr><th>할인율 구간</th><th>오전장</th><th>오후장</th><th>합계</th><th>비율</th><th>누적</th></tr>';
+ B.forEach((b,i)=>{const t=b.am+b.pm;cum+=t;h+=`<tr${i==2?' class="hl"':''}><td>${b.name}</td><td>${b.am}</td><td>${b.pm}</td><td>${t}</td><td>${(t/N*100).toFixed(1)}%</td><td style="color:${C.mute}">${(cum/N*100).toFixed(1)}%</td></tr>`});
+ const am=B.reduce((a,b)=>a+b.am,0),pm=B.reduce((a,b)=>a+b.pm,0);
+ h+=`<tr style="border-top:2px solid ${C.ink}"><td><b>합계</b></td><td>${am}</td><td>${pm}</td><td>${N}</td><td>100%</td><td></td></tr>`;
+ document.getElementById('tb-band').innerHTML=h})();
+
+(()=>{const W=640,H=232,l=44,r=16,t=10,b=30,pw=W-l-r,ph=H-t-b,px=d=>l+d/40*pw,py=m=>t+ph-(m/70)*ph;let s='';
+ [0,20,40,60].forEach(v=>{s+=`<line x1="${l}" x2="${W-r}" y1="${py(v)}" y2="${py(v)}" stroke="${C.line}"/>`+T(l-8,py(v)+4,v+'%',{a:'end',s:11})});
+ s+=`<rect x="${px(0)}" y="${t}" width="${px(20)-px(0)}" height="${ph}" fill="${C.blue}" opacity=".07"/>`+T(px(10),t+16,'세션의 84%',{s:12,w:700,c:C.blue});
+ [0,10,20,30].forEach(d=>s+=T(px(d),H-8,d+'%',{s:11}));s+=T(W-r,H-8,'할인율',{a:'end',s:11,c:C.ink,w:700});
+ [[60,C.grn],[50,C.blue],[40,C.org]].forEach(([m,c])=>{let d='';for(let x=0;x<=38;x++){const mg=((1-x/100)-(1-m/100))/(1-x/100)*100;d+=(x?'L':'M')+px(x).toFixed(1)+' '+py(mg).toFixed(1)}
+  s+=`<path d="${d}" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+  const a=((1-.15)-(1-m/100))/(1-.15)*100,z=((1-.38)-(1-m/100))/(1-.38)*100;
+  s+=`<circle cx="${px(15)}" cy="${py(a)}" r="5.5" fill="#fff" stroke="${c}" stroke-width="3"/>`+T(px(15)+8,py(a)-8,a.toFixed(1)+'%',{a:'start',s:11.5,w:900,c:C.ink})+`<circle cx="${px(38)}" cy="${py(z)}" r="5.5" fill="${c}"/>`+T(px(38)-7,py(z)-9,z.toFixed(1)+'%',{a:'end',s:11.5,w:900,c:C.ink})});
+ s+=`<line x1="${px(38)}" x2="${px(38)}" y1="${t}" y2="${t+ph}" stroke="${C.org}" stroke-dasharray="5 4"/>`+T(px(38)-4,t+12,'상한 38%',{a:'end',s:11,w:700,c:C.org});
+ document.getElementById('ch-margin').innerHTML=svg(W,H,s)})();
+
+(()=>{const D=[['Worst',1.2,2.8],['Base',5.7,18.8],['Best',9.9,35.3]],W=760,H=300,base=250,mh=210,mx=36;let s='';
+ D.forEach((d,i)=>{const x=80+i*230;[[d[1],C.lb,0],[d[2],C.blue,74]].forEach(([v,c,o])=>{const h=v/mx*mh;s+=`<rect x="${x+o}" y="${base-h}" width="64" height="${h}" rx="8" fill="${c}"/>`+T(x+o+32,base-h-8,v,{s:16,w:900,c:C.ink})});s+=T(x+70,base+22,d[0],{s:14,c:C.ink,w:700});s+=T(x+70,base+38,'1년차 → 5년차',{s:11})});
+ s+=`<line x1="40" x2="${W-20}" y1="${base}" y2="${base}" stroke="${C.line}" stroke-width="2"/>`;document.getElementById('ch-rev').innerHTML=svg(W,H,s)})();
+
+(()=>{const deck=document.getElementById('deck'),sl=[...document.querySelectorAll('.slide')],prog=document.getElementById('prog');let i=0;
+ const fit=()=>{deck.style.transform=`scale(${Math.min(innerWidth/1280,innerHeight/720)})`};
+ const show=n=>{i=Math.max(0,Math.min(sl.length-1,n));sl.forEach((s,k)=>s.classList.toggle('active',k===i));prog.style.width=((i+1)/sl.length*100)+'%';try{history.replaceState(null,'','#'+(i+1))}catch(e){}};
+ document.getElementById('prev').onclick=()=>show(i-1);document.getElementById('next').onclick=()=>show(i+1);
+ addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(i+1)}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(i-1)}else if(e.key==='Home')show(0);else if(e.key==='End')show(sl.length-1)});
+ deck.addEventListener('click',e=>{if(e.target.closest('button,a'))return;if(e.clientX>innerWidth*.5)show(i+1);else show(i-1)});
+ addEventListener('resize',fit);fit();const h=parseInt(location.hash.slice(1));show(h>0?h-1:0)})();
+</script>
+</body>
+</html>

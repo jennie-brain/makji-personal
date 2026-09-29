@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKJI STOCK : REBOOT</title>
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/simple.min.css">
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background-color: #f9f9f9; }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5 {
+            font-family: 'Pretendard', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: #2c3e50;
+        }
+        .reveal h1 { font-size: 2.5em; margin-bottom: 20px; }
+        .reveal h2 { font-size: 1.8em; color: #ff5a5f; margin-bottom: 30px; }
+        .reveal p { font-size: 0.9em; line-height: 1.6; color: #555; }
+        .reveal .slide-number { font-size: 16px; font-weight: 600; color: #ff5a5f; }
+        .highlight { color: #ff5a5f; font-weight: 800; }
+        .bg-dark { background-color: #2c3e50; color: white !important; }
+        .bg-dark h1, .bg-dark h2, .bg-dark p { color: white !important; }
+        
+        .box {
+            border: 1px solid #eaeaea;
+            padding: 30px;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin: 20px 0;
+            font-size: 0.8em;
+        }
+        .flex-container { display: flex; justify-content: center; gap: 30px; width: 100%; }
+        .flex-item { flex: 1; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .flex-item h3 { font-size: 1.2em; border-bottom: 2px solid #ff5a5f; padding-bottom: 10px; }
+        
+        .device-mockup {
+            width: 375px;
+            height: 667px;
+            border: 12px solid #333;
+            border-radius: 36px;
+            overflow: hidden;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            background: #fff;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        .strike { text-decoration: line-through; color: #999; }
+        ul { font-size: 0.85em; color: #444; }
+        li { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Title -->
+            <section class="bg-dark">
+                <h2>MAKJI STOCK : REBOOT</h2>
+                <h1>시스템을 가볍게, 타격감은 확실하게.</h1>
+                <p>오버엔지니어링을 걷어낸 '단기 트래픽 부스팅 캠페인' 기획안</p>
+                <p style="margin-top: 50px; font-size: 0.6em; opacity: 0.7;">SeSAC AI 핀테크 PM · 기획 수정안</p>
+            </section>
+
+            <!-- Slide 2: Feedback Review -->
+            <section>
+                <h2>1. 뼈아픈 피드백 수용</h2>
+                <div class="box">
+                    <p><strong>"이 기획안은 전면 보류해야 합니다."</strong></p>
+                    <ul>
+                        <li><span class="highlight">문제 진단 오류:</span> 일 6건 주문은 리텐션이 아닌 <strong>트래픽(Acquisition)</strong> 부족의 문제.</li>
+                        <li><span class="highlight">마진 붕괴:</span> 평균 24.9% 상시 할인은 저당 베이커리의 수익 구조를 파괴함.</li>
+                        <li><span class="highlight">개발 공수 과다:</span> 일 6건을 위해 복잡한 가격 엔진을 구축하는 것은 심각한 오버엔지니어링.</li>
+                        <li><span class="highlight">고객 인지 부하:</span> 빵을 사기 위해 매일 시세를 예측하게 하는 것은 불필요한 피로감 유발.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 3: Pivot Strategy -->
+            <section>
+                <h2>2. 기획의 전면 수정 (PIVOT)</h2>
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <h3>AS-IS (기존안)</h3>
+                        <p class="strike">상시 운영되는 다이내믹 프라이싱</p>
+                        <p class="strike">전 품목 대상 20% 이상 변동 할인</p>
+                        <p class="strike">복잡한 자체 가격 산출 엔진 개발</p>
+                        <p class="strike">주식 차트형 UX로 인한 인지 부하</p>
+                    </div>
+                    <div class="flex-item">
+                        <h3>TO-BE (수정안)</h3>
+                        <p class="highlight">2주 한정 게릴라 마케팅 캠페인</p>
+                        <p class="highlight">미끼 상품 1종에 한해, 선착순 할인</p>
+                        <p class="highlight">기존 자사몰 쿠폰 API와 가볍게 연동</p>
+                        <p class="highlight">'갓 구운 빵의 타임세일'로 브랜딩 변경</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Data Insight -->
+            <section>
+                <h2>3. 버릴 수 없는 단 하나의 통찰</h2>
+                <div class="box">
+                    <p>5월 데이터에서 발견한 <strong>'출근길 탐색 → 퇴근길 결제'</strong> 패턴은 여전히 유효합니다.</p>
+                </div>
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Data" style="border-radius: 12px; max-height: 300px;">
+                <p>아침 8시의 트래픽을 저녁 8시의 결제로 잇는 <strong>'가벼운 넛지(Nudge)'</strong>가 필요합니다.</p>
+            </section>
+
+            <!-- Slide 5: Concept -->
+            <section>
+                <h2>4. 새로운 MAKJI STOCK</h2>
+                <h1>"출근길에 발견한 럭키 혜택"</h1>
+                <p>주식 시장의 복잡함은 빼고,<br><strong>'시간 한정(Time-bound)'</strong>이 주는 짜릿함만 남겼습니다.</p>
+                <ul style="margin-top: 30px;">
+                    <li>아침 08:00 ~ 09:00, 단 1시간만 열리는 게릴라 이벤트 페이지</li>
+                    <li>복잡한 계산 없이 직관적인 타임 혜택 제공</li>
+                </ul>
+            </section>
+
+            <!-- Slide 6: Prototype Demo -->
+            <section>
+                <h2>5. Prototype (Interactive)</h2>
+                <p>무거운 백엔드 없이, 프론트엔드(Vercel)로 가볍게 구현된 캠페인 페이지입니다.</p>
+                <div class="device-mockup">
+                    <iframe src="https://makji-stock.vercel.app/market" title="Makji Stock Prototype"></iframe>
+                </div>
+            </section>
+
+            <!-- Slide 7: Feature 1 -->
+            <section>
+                <h2>6. 핵심 기능 ① : 게릴라 미끼 상품</h2>
+                <div class="box">
+                    <p>전 품목 할인이 아닌, <strong>매일 1개의 타겟 상품(Hero Item)</strong>만 파격 할인합니다.</p>
+                </div>
+                <ul>
+                    <li><strong>선착순 통제:</strong> 매일 선착순 100명 한정 (비용 상한선 캡핑)</li>
+                    <li><strong>목적:</strong> 무분별한 이익률 훼손 방지 및 희소성을 통한 오픈런 유도</li>
+                    <li><strong>CAC(고객획득비용) 방어:</strong> SNS 광고 클릭당 3천원을 쓸 바에, 빵 하나를 3천원 할인하여 '결제 경험'을 선사합니다.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 8: Feature 2 -->
+            <section>
+                <h2>7. 핵심 기능 ② : 카카오톡 혜택 킵(Keep)</h2>
+                <div class="box">
+                    <p>개발 공수가 큰 '자사몰 시스템 내 가격 잠금' 대신,<br><strong>카카오톡 알림톡/플친 푸시</strong>를 활용합니다.</p>
+                </div>
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <h3>아침 (08:00)</h3>
+                        <p>이벤트 페이지에서 혜택가 확인 후 <strong>'내 카톡으로 혜택 보내놓기'</strong> 버튼 클릭</p>
+                    </div>
+                    <div class="flex-item">
+                        <h3>저녁 (19:00)</h3>
+                        <p>퇴근 시간에 맞춰 <strong>장바구니 리마인드 카톡</strong> 발송 (시크릿 쿠폰 코드 포함)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 9: Feature 3 -->
+            <section>
+                <h2>8. 핵심 기능 ③ : 내일의 빵 투표</h2>
+                <p>사행성 논란과 인지 부하를 없앤 가벼운 참여형 이벤트</p>
+                <div class="box">
+                    <p class="strike">복잡한 예측 (수익률 5~20% 변동 보상)</p>
+                    <p class="highlight">단순 투표 "내일 아침, 어떤 빵이 할인됐으면 좋겠나요?"</p>
+                </div>
+                <ul>
+                    <li>A/B 두 가지 빵 중 하나에 투표.</li>
+                    <li>다음 날 아침, 승리한 빵이 그날의 할인 라인업에 오름.</li>
+                    <li>참여자 전원에게는 5% 소액 쿠폰 지급으로 내일의 재방문(Retention) 유도.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 10: Risk Management 1 -->
+            <section>
+                <h2>9. 리스크 검증 : 마진(Margin) 방어</h2>
+                <h3>"적자 보는 장사는 하지 않습니다."</h3>
+                <p>수정안은 철저한 예산 기반의 캠페인입니다.</p>
+                <ul>
+                    <li>1일 미끼상품 한도 : 100개</li>
+                    <li>개당 할인 부담금 : 2,500원</li>
+                    <li><strong>1일 마케팅 예산 : 250,000원</strong></li>
+                </ul>
+                <p class="highlight" style="margin-top:20px;">월 300~500만 원의 퍼포먼스 마케팅 예산을 <strong>'직접 혜택'</strong>으로 치환한 개념으로, 통제 불가능한 마진 붕괴 리스크가 없습니다.</p>
+            </section>
+
+            <!-- Slide 11: Risk Management 2 -->
+            <section>
+                <h2>10. 리스크 검증 : 개발 공수(Dev Cost) 최소화</h2>
+                <h3>"본진(자사몰)을 뜯어고치지 않습니다."</h3>
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <h3>이벤트 페이지</h3>
+                        <p>현재 배포된 <strong>Vercel (React/Next.js)</strong> 웹앱을 독립된 캠페인 랜딩 페이지로 활용.</p>
+                    </div>
+                    <div class="flex-item">
+                        <h3>결제 및 적용</h3>
+                        <p>기존 쇼핑몰(카페24 등)의 <strong>'특정 상품 대상 시크릿 쿠폰 API'</strong>만 연동. 시스템 부하 및 SI 개발 제로.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 12: Risk Management 3 -->
+            <section>
+                <h2>11. 리스크 검증 : 브랜드 경험 (Brand UX)</h2>
+                <p>'저당 베이커리'의 프리미엄을 잃지 않는 카피라이팅</p>
+                <div class="box bg-dark">
+                    <h3 style="color:#ff5a5f; margin-bottom:15px;">AS-IS (주식/투기 프레임)</h3>
+                    <p>"오를까 내릴까? 막지 지수 하락 24%, 빵을 주식처럼!"</p>
+                </div>
+                <div class="box">
+                    <h3 style="color:#2c3e50; margin-bottom:15px;">TO-BE (프레시 타임 프레임)</h3>
+                    <p>"새벽에 갓 구운 빵, 아침 8시 가장 신선한 혜택으로 만나보세요. 퇴근길 당신을 위해 남겨둘게요."</p>
+                </div>
+            </section>
+
+            <!-- Slide 13: KPI & Targets -->
+            <section>
+                <h2>12. 현실적인 KPI (캠페인 목표)</h2>
+                <p>일평균 6건의 현실에서 시작하는 실현 가능한 마일스톤</p>
+                <table style="width:100%; font-size:0.8em; margin-top:30px;">
+                    <tr style="border-bottom: 2px solid #333;">
+                        <th>지표</th>
+                        <th>5월 실측치</th>
+                        <th>캠페인 목표치</th>
+                    </tr>
+                    <tr>
+                        <td>일평균 주문 건수</td>
+                        <td>6.1건</td>
+                        <td class="highlight">30건 (약 5배 상승)</td>
+                    </tr>
+                    <tr>
+                        <td>오전 접속자 구매 전환율</td>
+                        <td>측정 불가</td>
+                        <td class="highlight">5% 이상 (카톡 리마인드 기여)</td>
+                    </tr>
+                    <tr>
+                        <td>객단가 방어 (번들 유도)</td>
+                        <td>25,165원</td>
+                        <td class="highlight">무료배송 컷인 3만원대 진입</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Slide 14: Action Plan -->
+            <section>
+                <h2>13. Action Plan (1개월 단기 실행)</h2>
+                <div style="text-align: left; padding: 0 10%;">
+                    <p><strong>Week 1:</strong> Vercel 프로토타입 고도화 및 자사몰 시크릿 쿠폰 연동 테스트</p>
+                    <p><strong>Week 2:</strong> 카카오 알림톡 API 연동 및 기존 고객 대상 티징(Teasing) 푸시 발송</p>
+                    <p class="highlight"><strong>Week 3:</strong> MAKJI MORNING WEEK 캠페인 오픈 (1주차)</p>
+                    <p class="highlight"><strong>Week 4:</strong> 캠페인 2주차 운영 및 A/B 테스트 (투표 이벤트 활성화)</p>
+                    <p><strong>Week 5:</strong> 리포트 산출 및 상시 도입 여부 판단</p>
+                </div>
+            </section>
+
+            <!-- Slide 15: Closing -->
+            <section class="bg-dark">
+                <h2>CLOSING</h2>
+                <h1>가볍게 테스트하고,<br>데이터로 증명하겠습니다.</h1>
+                <p>무거운 시스템 개편이 아닌, 민첩한(Agile) 마케팅 캠페인으로<br>비즈니스의 막힌 혈을 뚫겠습니다.</p>
+                <p style="margin-top: 40px;"><a href="https://makji-stock.vercel.app/market" target="_blank" style="color: #ff5a5f; text-decoration: underline;">👉 캠페인 프로토타입 앱 다시 보기</a></p>
+            </section>
+
+        </div>
+    </div>
+    
+    <!-- Reveal.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: 'c/t',
+            transition: 'slide',
+            controls: true,
+            progress: true,
+            center: true
+        });
+    </script>
+</body>
+</html>
